@@ -32,9 +32,18 @@ namespace SystemPrzychodznia
 
         }
 
-        private void buttonAddUser_Click(object sender, EventArgs e)
-        {
+        private void buttonAddUser_Click(object sender, EventArgs e) 
+        { 
+            using (Form AddUser = new FormAddUser(_userService))
+            {
 
+                AddUser.ShowDialog();
+            }
+        }
+
+        private void FormAdminView_Activated(object sender, EventArgs e)
+        {
+            LoadUsers();
         }
     }
 }
