@@ -1,3 +1,6 @@
+using SystemPrzychodznia.Data;
+using SystemPrzychodznia.Services;
+
 namespace SystemPrzychodznia
 {
     internal static class Program
@@ -10,9 +13,11 @@ namespace SystemPrzychodznia
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
-            Data.DatabaseInitializer.Initialize();
+
+            DatabaseInitializer.Initialize();
+
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(new FormAdminView());
         }
     }
 }

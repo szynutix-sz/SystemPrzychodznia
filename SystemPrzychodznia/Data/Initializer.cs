@@ -18,11 +18,29 @@ namespace SystemPrzychodznia.Data
                     Login TEXT NOT NULL UNIQUE,
                     FirstName TEXT NOT NULL,
                     LastName TEXT NOT NULL,
+                    Locality TEXT NOT NULL,
+                    PostalCode TEXT NOT NULL,
+                    Street TEXT,
+                    PropertyNumber TEXT NOT NULL,
+                    HouseUnitNumber TEXT,
+                    PESEL TEXT NOT NULL UNIQUE,
+                    BirthDate TEXT NOT NULL,
+                    Gender TEXT NOT NULL,
                     Email TEXT NOT NULL UNIQUE,
-                    Phone TEXT,
-                    Role TEXT NOT NULL
+                    Phone TEXT NOT NULL,
+                    Password TEXT NOT NULL
                 )";
             createTableCmd.ExecuteNonQuery();
+
+            var createAdminCmd = connection.CreateCommand();
+            createAdminCmd.CommandText = @"
+                INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)
+                SELECT          'SuperAdmin','-',     '-',       '-',      '-',       '-',     '-',             '-',           '-',    '-',      '-',     'customer_service@ict_supplier.com', '000000000', 'AdminPass'
+                WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'SuperAdmin');
+";
+            createAdminCmd.ExecuteNonQuery();
+
+
         }
     }
 }
