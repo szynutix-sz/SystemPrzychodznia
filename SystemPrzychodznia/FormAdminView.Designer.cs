@@ -91,6 +91,7 @@
             Load += FormAdminView_Load;
             UserList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvUsers).EndInit();
+            this.Activated += FormAdminView_Activated;
             ResumeLayout(false);
         }
 
