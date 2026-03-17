@@ -102,6 +102,11 @@ namespace SystemPrzychodznia.Services
             if (string.IsNullOrWhiteSpace(user.Password))
                 errors.Add("Hasło jest wymagane");
 
+            // Do zrobienia : walidacje unikalności loginu, email, PESEL 
+            // Do zrobienia : walidacja formatu hasła
+            // Do zrobienia : walidacja długości pól (np. max 255 znaków)
+            // Do zrobienia : walidacja czy data urodzenia i data która wynika z PESEL są zgodne
+
             return new ValidationResult(errors.Count == 0) { Errors = errors };
         }
 
@@ -154,6 +159,22 @@ namespace SystemPrzychodznia.Services
             }
         }
 
-        public List<User> GetListUsers() => _repository.GetList();
+        public List<User> GetListUsers(SearchTerms s) => _repository.GetList(s);
+
+        public UserFull GetUserFull(String s_Login) => _repository.GetUserFull(s_Login);
+
+        public ValidationResult EditUser(UserFull user)
+        {
+            var validation = ValidateUserFull(user);
+
+            if (!validation.IsValid)
+            {
+                return validation;
+            }
+
+            _repository.EditUser(user);
+            return new ValidationResult(true);
+
+        }
     }
 }

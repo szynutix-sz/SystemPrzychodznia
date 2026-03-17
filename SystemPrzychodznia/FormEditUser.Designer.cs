@@ -68,6 +68,7 @@
             buttonEditUser.TabIndex = 1;
             buttonEditUser.Text = "Potwierdz Dane";
             buttonEditUser.UseVisualStyleBackColor = true;
+            buttonEditUser.Click += buttonEditUser_Click;
             // 
             // buttonForgetUser
             // 

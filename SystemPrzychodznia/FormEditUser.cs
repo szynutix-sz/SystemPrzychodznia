@@ -21,13 +21,15 @@ namespace SystemPrzychodznia
             InitializeComponent();
             _userService = service;
             _user = u;
-            
+            uF = _userService.GetUserFull(_user.Login);
+
         }
 
-        private void buttonSendUser_Click(object sender, EventArgs e)
+        private void buttonEditUser_Click(object sender, EventArgs e)
         {
             UserFull userBeforeValid = new UserFull();
 
+            userBeforeValid.Id = uF.Id;
             userBeforeValid.Login = textBoxLogin.Text.Trim();
             userBeforeValid.FirstName = textBoxFirstName.Text.Trim();
             userBeforeValid.LastName = textBoxLastName.Text.Trim();
@@ -37,17 +39,17 @@ namespace SystemPrzychodznia
             userBeforeValid.PropertyNumber = textBoxPropertyNumber.Text.Trim();
             userBeforeValid.HouseUnitNumber = textBoxHouseUnitNumber.Text.Trim();
             userBeforeValid.PESEL = textBoxPESEL.Text.Trim();
-            userBeforeValid.BirthDate = (BirthDateTimePicker.Value.Date).ToString();
+            userBeforeValid.BirthDate = (BirthDateTimePicker.Value).ToString("yyyy-MM-dd");
             userBeforeValid.Gender = comboBoxGender.Text;
             userBeforeValid.Email = textBoxEmail.Text.Trim();
             userBeforeValid.Phone = textBoxPhone.Text.Trim();
+            userBeforeValid.Password = "DummyPassword";
 
-            // trzeba zmienić na edycję użytkownika, a nie dodawanie nowego, ale to już później
-            ValidationResult valRe = _userService.AddUser(userBeforeValid);
+            ValidationResult valRe = _userService.EditUser(userBeforeValid);
 
-            if (valRe.getResult() == true)
+            if (valRe.IsValid == true)
             {
-                MessageBox.Show("Dodano użytkownika", "OK");
+                MessageBox.Show("Zmieniono dane użytkownika", "Informacja");
                 textBoxLogin.Clear();
                 textBoxFirstName.Clear();
                 textBoxLastName.Clear();
@@ -64,7 +66,8 @@ namespace SystemPrzychodznia
             }
             else
             {
-                MessageBox.Show(valRe.getMessage(), "OK");
+                string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                MessageBox.Show(errorMessage, "Błąd walidacji");
             }
 
 
@@ -73,8 +76,6 @@ namespace SystemPrzychodznia
 
         private void FormAddUser_Load(object sender, EventArgs e)
         {
-            uF = _userService.GetUserFull(_user.Login);
-
             textBoxLogin.Text = uF.Login;
             textBoxFirstName.Text = uF.FirstName;
             textBoxLastName.Text = uF.Login;
@@ -88,6 +89,9 @@ namespace SystemPrzychodznia
             comboBoxGender.Text = uF.Gender;
             textBoxEmail.Text = uF.Email;
             textBoxPhone.Text = uF.Phone;
+
+
         }
+
     }
 }

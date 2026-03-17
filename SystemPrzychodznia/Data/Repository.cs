@@ -88,6 +88,58 @@ namespace SystemPrzychodznia.Data
             return users;
         }
 
+        public void  EditUser(UserFull user)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(_connectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                    UPDATE Users
+                    SET Login = $login,
+                        FirstName = $firstName,
+                        LastName = $lastName,
+                        Locality = $locality,
+                        PostalCode = $postalCode,
+                        Street = $street,
+                        PropertyNumber = $propertyNumber,
+                        HouseUnitNumber = $houseUnitNumber,
+                        PESEL = $pesel,
+                        BirthDate = $birthDate,
+                        Gender = $gender,
+                        Email = $email,
+                        Phone = $phone
+                    WHERE Id = $id;";
+
+
+                command.Parameters.AddWithValue("$id", user.Id);
+                command.Parameters.AddWithValue("$login", user.Login);
+                command.Parameters.AddWithValue("$firstName", user.FirstName);
+                command.Parameters.AddWithValue("$lastName", user.LastName);
+                command.Parameters.AddWithValue("$locality", user.Locality);
+                command.Parameters.AddWithValue("$postalCode", user.PostalCode);
+                command.Parameters.AddWithValue("$street", user.Street ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$propertyNumber", user.PropertyNumber);
+                command.Parameters.AddWithValue("$houseUnitNumber", user.HouseUnitNumber ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$pesel", user.PESEL);
+                command.Parameters.AddWithValue("$birthDate", user.BirthDate);
+                command.Parameters.AddWithValue("$gender", user.Gender);
+                command.Parameters.AddWithValue("$email", user.Email);
+                command.Parameters.AddWithValue("$phone", user.Phone);
+
+                command.ExecuteNonQuery();
+
+            }
+            catch (SqliteException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public UserFull GetUserFull(string S_Login)
         {
             var users = new List<UserFull>();

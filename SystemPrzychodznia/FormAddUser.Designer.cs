@@ -257,7 +257,7 @@
             // 
             // BirthDateTimePicker
             // 
-            BirthDateTimePicker.CustomFormat = "YYYY-MM-DD";
+            BirthDateTimePicker.CustomFormat = "yyyy-MM-dd";
             BirthDateTimePicker.ImeMode = ImeMode.Off;
             BirthDateTimePicker.Location = new Point(384, 410);
             BirthDateTimePicker.Name = "BirthDateTimePicker";
@@ -267,7 +267,7 @@
             // comboBoxGender
             // 
             comboBoxGender.FormattingEnabled = true;
-            comboBoxGender.Items.AddRange(new object[] { "Mężczyzna", "Kobieta" });
+            comboBoxGender.Items.AddRange(new object[] { "M", "K" });
             comboBoxGender.Location = new Point(384, 447);
             comboBoxGender.Name = "comboBoxGender";
             comboBoxGender.Size = new Size(375, 33);

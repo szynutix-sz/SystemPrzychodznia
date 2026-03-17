@@ -35,7 +35,7 @@ namespace SystemPrzychodznia
                 userBeforeValid.PropertyNumber = textBoxPropertyNumber.Text.Trim();
                 userBeforeValid.HouseUnitNumber = textBoxHouseUnitNumber.Text.Trim();
                 userBeforeValid.PESEL = textBoxPESEL.Text.Trim();
-                userBeforeValid.BirthDate = (BirthDateTimePicker.Value.Date).ToString();
+                userBeforeValid.BirthDate = (BirthDateTimePicker.Value).ToString("yyyy-MM-dd");
                 userBeforeValid.Gender = comboBoxGender.Text;
                 userBeforeValid.Email = textBoxEmail.Text.Trim();
                 userBeforeValid.Phone = textBoxPhone.Text.Trim();
@@ -43,9 +43,9 @@ namespace SystemPrzychodznia
 
                 ValidationResult valRe = _userService.AddUser(userBeforeValid);
 
-                if (valRe.getResult() == true)
+                if (valRe.IsValid == true)
                 {
-                    MessageBox.Show("Dodano użytkownika", "OK");
+                    MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
                     textBoxLogin.Clear();
                     textBoxFirstName.Clear();
                     textBoxLastName.Clear();
@@ -64,13 +64,14 @@ namespace SystemPrzychodznia
                 }
                 else
                 {
-                    MessageBox.Show(valRe.getMessage(), "OK");
+                    string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                    MessageBox.Show(errorMessage, "Błąd walidacji");
                 }
 
             }
             else
             {
-                MessageBox.Show("Hasło i jego powtórzenie muszą być takie same", "OK");
+                MessageBox.Show("Hasło i jego powtórzenie muszą być takie same", "Błąd walidacji");
                 textBoxPass.Clear();
                 textBoxPassRepeat.Clear();
             }
@@ -80,7 +81,9 @@ namespace SystemPrzychodznia
 
         private void FormAddUser_Load(object sender, EventArgs e)
         {
-
+            BirthDateTimePicker.Format = DateTimePickerFormat.Custom;
+            BirthDateTimePicker.CustomFormat = "yyyy-MM-dd";
+            //MessageBox.Show(BirthDateTimePicker.Value.ToString("yyyy-MM-dd"), "OK");
         }
     }
 }
