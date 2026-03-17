@@ -71,6 +71,7 @@
             dgvUsers.RowHeadersWidth = 62;
             dgvUsers.Size = new Size(1688, 453);
             dgvUsers.TabIndex = 0;
+            dgvUsers.CellDoubleClick += dgvUsers_CellDoubleClick;
             // 
             // buttonAddUser
             // 

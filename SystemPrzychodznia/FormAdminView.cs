@@ -81,5 +81,18 @@ namespace SystemPrzychodznia
             ClearSearchFields();
             
         }
+
+        private void dgvUsers_CellDoubleClick (object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                var selectedUser = (User)_bindingSource[e.RowIndex];
+                using (Form EditUser = new FormEditUser(_userService, selectedUser))
+                {
+                    EditUser.ShowDialog();
+                }
+            }
+        }
+
     }
 }

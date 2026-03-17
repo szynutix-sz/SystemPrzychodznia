@@ -88,6 +88,50 @@ namespace SystemPrzychodznia.Data
             return users;
         }
 
+        public UserFull GetUserFull(string S_Login)
+        {
+            var users = new List<UserFull>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT Id, Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender, Email, Phone
+                FROM Users
+                WHERE Status = 'A'";
+
+            command.CommandText += $"\n AND Login = '{S_Login}'";
+            command.CommandText += ";";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new UserFull
+                {
+                    Id = reader.GetInt32(0),
+
+                    Login = reader.GetString(1),
+                    FirstName = reader.GetString(2),
+                    LastName = reader.GetString(3),
+
+                    Locality = reader.GetString(4),
+                    PostalCode = reader.GetString(5),
+                    Street = reader.IsDBNull(6) ? null : reader.GetString(6),
+                    PropertyNumber = reader.GetString(7),
+                    HouseUnitNumber = reader.IsDBNull(8) ? null : reader.GetString(8),
+
+                    PESEL = reader.GetString(9),
+
+                    BirthDate = reader.GetString(10),
+                    Gender = reader.GetString(11),
+                    Email = reader.GetString(12),
+                    Phone = reader.GetString(13),
+
+                });
+            }
+            return users[0];
+        }
+
 
 
     }

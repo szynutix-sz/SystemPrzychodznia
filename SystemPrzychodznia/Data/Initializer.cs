@@ -36,7 +36,7 @@ namespace SystemPrzychodznia.Data
             var createAdminCmd = connection.CreateCommand();
             createAdminCmd.CommandText = @"
                 INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)
-                SELECT          'SuperAdmin','-',     '-',       '-',      '-',       '-',     '-',             '-',           '-',    '-',      '-',     'customer_service@ict_supplier.com', '000000000', 'AdminPass'
+                SELECT          'SuperAdmin','-',     '-',       '-',      '-',       '-',     '-',             '-',           '-',    '2026/03/17',      '-',     'customer_service@ict_supplier.com', '000000000', 'AdminPass'
                 WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'SuperAdmin');
 ";
             createAdminCmd.ExecuteNonQuery();
