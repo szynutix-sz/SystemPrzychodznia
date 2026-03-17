@@ -1,3 +1,4 @@
+using SystemPrzychodznia.Data;
 using SystemPrzychodznia.Services;
 
 namespace SystemPrzychodznia
@@ -15,7 +16,13 @@ namespace SystemPrzychodznia
 
         private void LoadUsers()
         {
-            var users = _userService.GetListUsers();
+            SearchTerms s = new SearchTerms();
+            s.Login = "";
+            s.FirstName = "";
+            s.LastName = "";
+            s.PESEL = "";
+            s.Email = "";
+            var users = _userService.GetListUsers(s);
             _bindingSource.DataSource = users;
             dgvUsers.DataSource = _bindingSource;
 
@@ -25,6 +32,7 @@ namespace SystemPrzychodznia
             dgvUsers.Columns["LastName"].HeaderText = "Nazwisko";
             dgvUsers.Columns["Email"].HeaderText = "Email";
             dgvUsers.Columns["PESEL"].HeaderText = "PESEL";
+            dgvUsers.AutoResizeColumns();
         }
 
         private void FormAdminView_Load(object sender, EventArgs e)
@@ -32,8 +40,8 @@ namespace SystemPrzychodznia
 
         }
 
-        private void buttonAddUser_Click(object sender, EventArgs e) 
-        { 
+        private void buttonAddUser_Click(object sender, EventArgs e)
+        {
             using (Form AddUser = new FormAddUser(_userService))
             {
 
@@ -44,6 +52,11 @@ namespace SystemPrzychodznia
         private void FormAdminView_Activated(object sender, EventArgs e)
         {
             LoadUsers();
+        }
+
+        private void buttonSearchUser_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -70,7 +70,7 @@ namespace SystemPrzychodznia.Services
 
 
 
-        public List<User> GetListUsers() => _repository.GetList();
+        public List<User> GetListUsers(SearchTerms s) => _repository.GetList(s);
 
 
     }

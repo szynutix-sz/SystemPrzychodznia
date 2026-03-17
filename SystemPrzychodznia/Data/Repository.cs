@@ -1,8 +1,18 @@
 ﻿using Microsoft.Data.Sqlite;
+using Microsoft.VisualBasic.Logging;
 using System.Collections.Generic;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace SystemPrzychodznia.Data
 {
+    public class SearchTerms
+    {
+        public string Login = "";
+        public string FirstName = "";
+        public string LastName = "";
+        public string Email = "";
+        public string PESEL = "";
+    }
     public class UserRepository
     {
         private readonly string _connectionString = "Data Source=przychodnia.db";
@@ -45,14 +55,23 @@ namespace SystemPrzychodznia.Data
             }
         }
 
-        public List<User> GetList()
+        public List<User> GetList(SearchTerms s)
         {
             var users = new List<User>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = "SELECT Login, FirstName, LastName, Email, PESEL FROM Users";
+            command.CommandText = @"
+                SELECT Login, FirstName, LastName, Email, PESEL FROM Users
+                WHERE Status = 'A'";
+
+            command.CommandText += $"\n AND Login LIKE '%{s.Login}%'";
+            command.CommandText += $"\n AND FirstName LIKE '%{s.FirstName}%'";
+            command.CommandText += $"\n AND LastName LIKE '%{s.LastName}%'";
+            command.CommandText += $"\n AND Email LIKE '%{s.Email}%'";
+            command.CommandText += $"\n AND PESEL LIKE '%{s.PESEL}%'";
+            command.CommandText += ";";
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -68,6 +87,8 @@ namespace SystemPrzychodznia.Data
             }
             return users;
         }
+
+
 
     }
 }

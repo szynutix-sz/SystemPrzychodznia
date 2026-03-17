@@ -77,6 +77,7 @@
             buttonSearchUser.TabIndex = 2;
             buttonSearchUser.Text = "Wyszukaj Użytkownika";
             buttonSearchUser.UseVisualStyleBackColor = true;
+            buttonSearchUser.Click += buttonSearchUser_Click;
             // 
             // FormAdminView
             // 
@@ -88,10 +89,10 @@
             Controls.Add(UserList);
             Name = "FormAdminView";
             Text = "System Przychodnia";
+            Activated += FormAdminView_Activated;
             Load += FormAdminView_Load;
             UserList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvUsers).EndInit();
-            this.Activated += FormAdminView_Activated;
             ResumeLayout(false);
         }
 

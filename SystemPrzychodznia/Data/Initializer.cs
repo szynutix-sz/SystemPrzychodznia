@@ -28,7 +28,8 @@ namespace SystemPrzychodznia.Data
                     Gender TEXT NOT NULL,
                     Email TEXT NOT NULL UNIQUE,
                     Phone TEXT NOT NULL,
-                    Password TEXT NOT NULL
+                    Password TEXT NOT NULL,
+                    Status TEXT NOT NULL DEFAULT 'A'
                 )";
             createTableCmd.ExecuteNonQuery();
 
