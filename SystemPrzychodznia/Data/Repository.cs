@@ -149,7 +149,7 @@ namespace SystemPrzychodznia.Data
                 SELECT Id, Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender, Email, Phone
                 FROM Users
                 WHERE Status = 'A' AND
-                Login = '$login';";
+                Login = $login;";
 
 
             command.Parameters.AddWithValue("$login", S_Login);

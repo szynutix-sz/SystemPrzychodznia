@@ -85,17 +85,19 @@ namespace SystemPrzychodznia.Services
                 errors.Add("Hasło jest wymagane");
 
             // Walidacja unikalności loginu, email, PESEL
-            if (!string.IsNullOrWhiteSpace(user.Login) && _repository.CzyIstniejeLogin(user.Login))
-                errors.Add("Login jest już zajęty");
+            // trzeba chyba osobną walidację zrobić, jak przy edycji loginu/email/PESEL
+            // bo przy edycji użytkownik może zostawić te same dane i wtedy nie powinno być błędu o zajętym loginie/emailu/PESELu
+            //if (!string.IsNullOrWhiteSpace(user.Login) && _repository.CzyIstniejeLogin(user.Login))
+            //    errors.Add("Login jest już zajęty");
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && _repository.CzyIstniejeEmail(user.Email))
-                errors.Add("Email jest już zajęty");
+            //if (!string.IsNullOrWhiteSpace(user.Email) && _repository.CzyIstniejeEmail(user.Email))
+            //    errors.Add("Email jest już zajęty");
 
-            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 && _repository.CzyIstnieje_PESEL(user.PESEL))
-                errors.Add("PESEL jest już w systemie");
+            //if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 && _repository.CzyIstnieje_PESEL(user.PESEL))
+            //    errors.Add("PESEL jest już w systemie");
 
-// Walidacja formatu hasła - minimum 6 znaków
-if (!string.IsNullOrWhiteSpace(user.Password) && user.Password.Length < 6)
+            // Walidacja formatu hasła - minimum 6 znaków
+            if (!string.IsNullOrWhiteSpace(user.Password) && user.Password.Length < 6)
     errors.Add("Hasło musi mieć co najmniej 6 znaków");
 
 // Walidacja długości pól - max 255 znaków
