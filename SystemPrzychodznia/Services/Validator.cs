@@ -94,11 +94,11 @@ namespace SystemPrzychodznia.Services
             if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 && _repository.CzyIstnieje_PESEL(user.PESEL))
                 errors.Add("PESEL jest już w systemie");
 
-            // Walidacja formatu hasła - minimum 6 znaków
-            if (!string.IsNullOrWhiteSpace(user.Password) && user.Password.Length < 6)
-                errors.Add("Hasło musi mieć co najmniej 6 znaków");
+// Walidacja formatu hasła - minimum 6 znaków
+if (!string.IsNullOrWhiteSpace(user.Password) && user.Password.Length < 6)
+    errors.Add("Hasło musi mieć co najmniej 6 znaków");
 
-            // Walidacja długości pól - max 255 znaków
+// Walidacja długości pól - max 255 znaków
             if (!string.IsNullOrWhiteSpace(user.Login) && user.Login.Length > 255)
                 errors.Add("Login nie może być dłuższy niż 255 znaków");
 
@@ -134,6 +134,7 @@ namespace SystemPrzychodznia.Services
 
             int rok, miesiac;
 
+            // Kodowanie stulecia w miesiącu PESEL
             if (miesKod >= 81)      { rok = 1800 + rok2; miesiac = miesKod - 80; }
             else if (miesKod >= 61) { rok = 2200 + rok2; miesiac = miesKod - 60; }
             else if (miesKod >= 41) { rok = 2100 + rok2; miesiac = miesKod - 40; }

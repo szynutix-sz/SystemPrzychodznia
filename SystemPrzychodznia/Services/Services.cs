@@ -18,8 +18,8 @@ namespace SystemPrzychodznia.Services
             _validator = new Validator(_repository);
         }
 
-        public ValidationResult ValidateUserFull(UserFull user) => _validator.ValidateUserFull(user);
-        public ValidationResult AddUser(UserFull user)
+public ValidationResult ValidateUserFull(UserFull user) => _validator.ValidateUserFull(user);
+public ValidationResult AddUser(UserFull user)
         {
             var validation = ValidateUserFull(user);
             if (!validation.IsValid)
