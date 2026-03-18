@@ -183,34 +183,68 @@ namespace SystemPrzychodznia.Data
             return users[0];
         }
 
-        public bool CzyIstniejeLogin(string login)
+        public void ForgetUser(int id)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM Users WHERE Login = $login;";
+            command.CommandText = "UPDATE Users SET Status = 'I' WHERE Id = $id;";
+            command.Parameters.AddWithValue("$id", id);
+            command.ExecuteNonQuery();
+        }
+
+        public bool CzyIstniejeLogin(string login, int excludeId = 0)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            if (excludeId > 0)
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Login = $login AND Id != $excludeId;";
+                command.Parameters.AddWithValue("$excludeId", excludeId);
+            }
+            else
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Login = $login;";
+            }
             command.Parameters.AddWithValue("$login", login);
             long count = (long)command.ExecuteScalar();
             return count > 0;
         }
 
-        public bool CzyIstniejeEmail(string email)
+        public bool CzyIstniejeEmail(string email, int excludeId = 0)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM Users WHERE Email = $email;";
+            if (excludeId > 0)
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Email = $email AND Id != $excludeId;";
+                command.Parameters.AddWithValue("$excludeId", excludeId);
+            }
+            else
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Email = $email;";
+            }
             command.Parameters.AddWithValue("$email", email);
             long count = (long)command.ExecuteScalar();
             return count > 0;
         }
 
-        public bool CzyIstnieje_PESEL(string pesel)
+        public bool CzyIstnieje_PESEL(string pesel, int excludeId = 0)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM Users WHERE PESEL = $pesel;";
+            if (excludeId > 0)
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Users WHERE PESEL = $pesel AND Id != $excludeId;";
+                command.Parameters.AddWithValue("$excludeId", excludeId);
+            }
+            else
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Users WHERE PESEL = $pesel;";
+            }
             command.Parameters.AddWithValue("$pesel", pesel);
             long count = (long)command.ExecuteScalar();
             return count > 0;
