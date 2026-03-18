@@ -13,7 +13,7 @@ namespace SystemPrzychodznia
     public partial class FormAddUser : Form
     {
 
-        private UserService _userService;
+        private readonly UserService _userService;
         public FormAddUser(UserService service)
         {
             InitializeComponent();

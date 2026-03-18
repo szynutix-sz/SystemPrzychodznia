@@ -6,7 +6,7 @@ namespace SystemPrzychodznia
 
     public partial class FormAdminView : Form
     {
-        private UserService _userService = new UserService();
+        private readonly UserService _userService = new UserService();
         private BindingSource _bindingSource = new BindingSource();
         public FormAdminView()
         {

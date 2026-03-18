@@ -1,19 +1,13 @@
 ﻿using Microsoft.Data.Sqlite;
+using Microsoft.VisualBasic.ApplicationServices;
 using Microsoft.VisualBasic.Logging;
 using System.Collections.Generic;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace SystemPrzychodznia.Data
 {
-    public class SearchTerms
-    {
-        public string Login = "";
-        public string FirstName = "";
-        public string LastName = "";
-        public string Email = "";
-        public string PESEL = "";
-    }
-    public class UserRepository
+
+    internal class UserRepository
     {
         private readonly string _connectionString = "Data Source=przychodnia.db";
 
@@ -64,14 +58,18 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             command.CommandText = @"
                 SELECT Login, FirstName, LastName, Email, PESEL FROM Users
-                WHERE Status = 'A'";
+                WHERE Status = 'A' AND
+                Login LIKE '%' || $login || '%' AND
+                FirstName LIKE '%' || $firstName || '%' AND
+                LastName LIKE '%' || $lastName || '%' AND
+                Email LIKE '%' || $email || '%' AND
+                PESEL LIKE '%' || $pesel || '%';";
 
-            command.CommandText += $"\n AND Login LIKE '%{s.Login}%'";
-            command.CommandText += $"\n AND FirstName LIKE '%{s.FirstName}%'";
-            command.CommandText += $"\n AND LastName LIKE '%{s.LastName}%'";
-            command.CommandText += $"\n AND Email LIKE '%{s.Email}%'";
-            command.CommandText += $"\n AND PESEL LIKE '%{s.PESEL}%'";
-            command.CommandText += ";";
+            command.Parameters.AddWithValue("$login", s.Login);
+            command.Parameters.AddWithValue("$firstName", s.FirstName);
+            command.Parameters.AddWithValue("$lastName", s.LastName);
+            command.Parameters.AddWithValue("$pesel", s.PESEL);
+            command.Parameters.AddWithValue("$email", s.Email);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -150,10 +148,11 @@ namespace SystemPrzychodznia.Data
             command.CommandText = @"
                 SELECT Id, Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender, Email, Phone
                 FROM Users
-                WHERE Status = 'A'";
+                WHERE Status = 'A' AND
+                Login = '$login';";
 
-            command.CommandText += $"\n AND Login = '{S_Login}'";
-            command.CommandText += ";";
+
+            command.Parameters.AddWithValue("$login", S_Login);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())

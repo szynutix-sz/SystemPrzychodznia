@@ -13,7 +13,7 @@ namespace SystemPrzychodznia
     public partial class FormEditUser : Form
     {
 
-        private UserService _userService;
+        private readonly UserService _userService;
         private User _user;
         private UserFull uF;
         public FormEditUser(UserService service, User u)
@@ -43,26 +43,14 @@ namespace SystemPrzychodznia
             userBeforeValid.Gender = comboBoxGender.Text;
             userBeforeValid.Email = textBoxEmail.Text.Trim();
             userBeforeValid.Phone = textBoxPhone.Text.Trim();
-            userBeforeValid.Password = "DummyPassword";
+            userBeforeValid.Password = "DummyPassword"; // Nie jest edytowane, ale musi być przekazane do walidacji, więc ustawiamy na wartość tymczasową
 
             ValidationResult valRe = _userService.EditUser(userBeforeValid);
 
             if (valRe.IsValid == true)
             {
                 MessageBox.Show("Zmieniono dane użytkownika", "Informacja");
-                textBoxLogin.Clear();
-                textBoxFirstName.Clear();
-                textBoxLastName.Clear();
-                textBoxLocality.Clear();
-                textBoxPostCode.Clear();
-                textBoxStreet.Clear();
-                textBoxPropertyNumber.Clear();
-                textBoxHouseUnitNumber.Clear();
-                textBoxPESEL.Clear();
-                BirthDateTimePicker.Value = DateTime.Today;
-                comboBoxGender.SelectedIndex = -1;
-                textBoxEmail.Clear();
-                textBoxPhone.Clear();
+
             }
             else
             {

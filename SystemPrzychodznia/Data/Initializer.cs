@@ -2,7 +2,7 @@
 
 namespace SystemPrzychodznia.Data
 {
-    public static class DatabaseInitializer
+    internal static class DatabaseInitializer
     {
         private const string ConnectionString = "Data Source=przychodnia.db";
 
