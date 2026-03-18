@@ -78,6 +78,7 @@
             buttonForgetUser.TabIndex = 2;
             buttonForgetUser.Text = "Zapomnij Użytkownika";
             buttonForgetUser.UseVisualStyleBackColor = true;
+            buttonForgetUser.Click += buttonForgetUser_Click;
             // 
             // textBoxPhone
             // 

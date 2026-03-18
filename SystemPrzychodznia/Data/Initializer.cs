@@ -33,6 +33,15 @@ namespace SystemPrzychodznia.Data
                 )";
             createTableCmd.ExecuteNonQuery();
 
+            
+            try
+            {
+                var alterCmd = connection.CreateCommand();
+                alterCmd.CommandText = "ALTER TABLE Users ADD COLUMN Phone TEXT NOT NULL DEFAULT '';";
+                alterCmd.ExecuteNonQuery();
+            }
+            catch { }
+
             var createAdminCmd = connection.CreateCommand();
             createAdminCmd.CommandText = @"
                 INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)

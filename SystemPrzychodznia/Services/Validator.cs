@@ -14,7 +14,7 @@ namespace SystemPrzychodznia.Services
             _repository = repository;
         }
 
-        public ValidationResult ValidateUserFull(UserFull user)
+        public ValidationResult ValidateUserFull(UserFull user, int excludeId = 0)
         {
             var errors = new List<string>();
 
@@ -85,13 +85,13 @@ namespace SystemPrzychodznia.Services
                 errors.Add("Hasło jest wymagane");
 
             // Walidacja unikalności loginu, email, PESEL
-            if (!string.IsNullOrWhiteSpace(user.Login) && _repository.CzyIstniejeLogin(user.Login))
+            if (!string.IsNullOrWhiteSpace(user.Login) && _repository.CzyIstniejeLogin(user.Login, excludeId))
                 errors.Add("Login jest już zajęty");
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && _repository.CzyIstniejeEmail(user.Email))
+            if (!string.IsNullOrWhiteSpace(user.Email) && _repository.CzyIstniejeEmail(user.Email, excludeId))
                 errors.Add("Email jest już zajęty");
 
-            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 && _repository.CzyIstnieje_PESEL(user.PESEL))
+            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 && _repository.CzyIstnieje_PESEL(user.PESEL, excludeId))
                 errors.Add("PESEL jest już w systemie");
 
 // Walidacja formatu hasła - minimum 6 znaków

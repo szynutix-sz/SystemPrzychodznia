@@ -37,9 +37,11 @@ public ValidationResult AddUser(UserFull user)
 
         public UserFull GetUserFull(String s_Login) => _repository.GetUserFull(s_Login);
 
+        public void ForgetUser(int id) => _repository.ForgetUser(id);
+
         public ValidationResult EditUser(UserFull user)
         {
-            var validation = ValidateUserFull(user);
+            var validation = _validator.ValidateUserFull(user, user.Id);
 
             if (!validation.IsValid)
             {

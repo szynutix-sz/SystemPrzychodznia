@@ -66,7 +66,7 @@ namespace SystemPrzychodznia
         {
             textBoxLogin.Text = uF.Login;
             textBoxFirstName.Text = uF.FirstName;
-            textBoxLastName.Text = uF.Login;
+            textBoxLastName.Text = uF.LastName;
             textBoxLocality.Text = uF.Locality;
             textBoxPostCode.Text = uF.PostalCode;
             textBoxStreet.Text = uF.Street;
@@ -81,5 +81,21 @@ namespace SystemPrzychodznia
 
         }
 
+            private void buttonForgetUser_Click(object sender, EventArgs e)
+            {
+                var result = MessageBox.Show(
+                    $"Czy na pewno chcesz zapomnieć użytkownika {uF.Login}?",
+                    "Potwierdzenie",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    _userService.ForgetUser(uF.Id);
+                    MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
+                    this.Close();
+                }
+            }
+
+        }
     }
-}
