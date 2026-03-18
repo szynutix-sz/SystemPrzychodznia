@@ -7,6 +7,12 @@ namespace SystemPrzychodznia.Services
 {
     internal class Validator
     {
+        private readonly UserRepository _repository;
+
+        public Validator(UserRepository repository)
+        {
+            _repository = repository;
+        }
 
         public ValidationResult ValidateUserFull(UserFull user)
         {
@@ -78,12 +84,63 @@ namespace SystemPrzychodznia.Services
             if (string.IsNullOrWhiteSpace(user.Password))
                 errors.Add("Hasło jest wymagane");
 
-            // Do zrobienia : walidacje unikalności loginu, email, PESEL 
-            // Do zrobienia : walidacja formatu hasła
-            // Do zrobienia : walidacja długości pól (np. max 255 znaków)
-            // Do zrobienia : walidacja czy data urodzenia i data która wynika z PESEL są zgodne
+            // Walidacja unikalności loginu, email, PESEL
+            if (!string.IsNullOrWhiteSpace(user.Login) && _repository.CzyIstniejeLogin(user.Login))
+                errors.Add("Login jest już zajęty");
+
+            if (!string.IsNullOrWhiteSpace(user.Email) && _repository.CzyIstniejeEmail(user.Email))
+                errors.Add("Email jest już zajęty");
+
+            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 && _repository.CzyIstnieje_PESEL(user.PESEL))
+                errors.Add("PESEL jest już w systemie");
+
+            // Walidacja formatu hasła - minimum 6 znaków
+            if (!string.IsNullOrWhiteSpace(user.Password) && user.Password.Length < 6)
+                errors.Add("Hasło musi mieć co najmniej 6 znaków");
+
+            // Walidacja długości pól - max 255 znaków
+            if (!string.IsNullOrWhiteSpace(user.Login) && user.Login.Length > 255)
+                errors.Add("Login nie może być dłuższy niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(user.FirstName) && user.FirstName.Length > 255)
+                errors.Add("Imię nie może być dłuższe niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(user.LastName) && user.LastName.Length > 255)
+                errors.Add("Nazwisko nie może być dłuższe niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(user.Email) && user.Email.Length > 255)
+                errors.Add("Email nie może być dłuższy niż 255 znaków");
+
+            // Walidacja czy data urodzenia zgadza się z datą zakodowaną w PESEL
+            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11
+                && CzySameLiczby(user.PESEL)
+                && !string.IsNullOrWhiteSpace(user.BirthDate)
+                && CzyPoprawnaDates(user.BirthDate))
+            {
+                string dataZPesel = WyciagnijDateZPesel(user.PESEL);
+                if (dataZPesel != user.BirthDate)
+                    errors.Add("Data urodzenia nie zgadza się z datą zakodowaną w PESEL");
+            }
 
             return new ValidationResult(errors.Count == 0) { Errors = errors };
+        }
+
+        // Wyciąga datę urodzenia z PESEL i zwraca w formacie YYYY-MM-DD
+        private string WyciagnijDateZPesel(string pesel)
+        {
+            int rok2    = int.Parse(pesel.Substring(0, 2));
+            int miesKod = int.Parse(pesel.Substring(2, 2));
+            int dzien   = int.Parse(pesel.Substring(4, 2));
+
+            int rok, miesiac;
+
+            if (miesKod >= 81)      { rok = 1800 + rok2; miesiac = miesKod - 80; }
+            else if (miesKod >= 61) { rok = 2200 + rok2; miesiac = miesKod - 60; }
+            else if (miesKod >= 41) { rok = 2100 + rok2; miesiac = miesKod - 40; }
+            else if (miesKod >= 21) { rok = 2000 + rok2; miesiac = miesKod - 20; }
+            else                    { rok = 1900 + rok2; miesiac = miesKod; }
+
+            return $"{rok:D4}-{miesiac:D2}-{dzien:D2}";
         }
 
         // Sprawdza czy string zawiera tylko cyfry

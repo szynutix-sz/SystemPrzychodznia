@@ -183,6 +183,38 @@ namespace SystemPrzychodznia.Data
             return users[0];
         }
 
+        public bool CzyIstniejeLogin(string login)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM Users WHERE Login = $login;";
+            command.Parameters.AddWithValue("$login", login);
+            long count = (long)command.ExecuteScalar();
+            return count > 0;
+        }
+
+        public bool CzyIstniejeEmail(string email)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM Users WHERE Email = $email;";
+            command.Parameters.AddWithValue("$email", email);
+            long count = (long)command.ExecuteScalar();
+            return count > 0;
+        }
+
+        public bool CzyIstnieje_PESEL(string pesel)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM Users WHERE PESEL = $pesel;";
+            command.Parameters.AddWithValue("$pesel", pesel);
+            long count = (long)command.ExecuteScalar();
+            return count > 0;
+        }
 
 
     }

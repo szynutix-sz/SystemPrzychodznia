@@ -8,9 +8,15 @@ namespace SystemPrzychodznia.Services
 
     public class UserService
     {
-        private readonly UserRepository _repository = new UserRepository();
-        
-        private readonly Validator _validator = new Validator();
+        private readonly UserRepository _repository;
+
+        private readonly Validator _validator;
+
+        public UserService()
+        {
+            _repository = new UserRepository();
+            _validator = new Validator(_repository);
+        }
 
         public ValidationResult ValidateUserFull(UserFull user) => _validator.ValidateUserFull(user);
         public ValidationResult AddUser(UserFull user)
