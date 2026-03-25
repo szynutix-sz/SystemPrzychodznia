@@ -1,5 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
-
+//test
 namespace SystemPrzychodznia.Data
 {
     internal static class DatabaseInitializer
