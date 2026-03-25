@@ -122,6 +122,7 @@ namespace SystemPrzychodznia.Data
                 INSERT OR IGNORE INTO Roles (Name) VALUES ('Administrator');
                 INSERT OR IGNORE INTO Roles (Name) VALUES ('Recepcjonista');
                 INSERT OR IGNORE INTO Roles (Name) VALUES ('Lekarz');
+                INSERT OR IGNORE INTO Roles (Name) VALUES ('Klient');
 
                 -- Wstawienie konta SuperAdmin, jeśli nie istnieje
                 INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL, BirthDate, Gender, Email, Phone, Password)
