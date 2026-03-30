@@ -117,7 +117,7 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
             tableLayoutPanel1.RowStyles.Add(new RowStyle());
-            tableLayoutPanel1.Size = new Size(533, 425);
+            tableLayoutPanel1.Size = new Size(533, 460);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // labelLogin
@@ -397,7 +397,7 @@
             // 
             // buttonSendUser
             // 
-            buttonSendUser.Location = new Point(276, 436);
+            buttonSendUser.Location = new Point(276, 472);
             buttonSendUser.Margin = new Padding(2, 2, 2, 2);
             buttonSendUser.Name = "buttonSendUser";
             buttonSendUser.Size = new Size(262, 20);
@@ -410,7 +410,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(550, 500);
+            ClientSize = new Size(550, 535);
             Controls.Add(buttonSendUser);
             Controls.Add(tableLayoutPanel1);
             Margin = new Padding(2, 2, 2, 2);
