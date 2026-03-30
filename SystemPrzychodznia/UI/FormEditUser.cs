@@ -45,18 +45,39 @@ namespace SystemPrzychodznia
             userBeforeValid.Phone = textBoxPhone.Text.Trim();
             userBeforeValid.Password = "DummyPassword"; // Nie jest edytowane, ale musi być przekazane do walidacji, więc ustawiamy na wartość tymczasową
 
-            ValidationResult valRe = _userService.EditUser(userBeforeValid);
 
-            if (valRe.IsValid == true)
+            bool somethingChanged = userBeforeValid.Login != uF.Login || userBeforeValid.FirstName != uF.FirstName;
+
+            somethingChanged = somethingChanged || userBeforeValid.LastName != uF.LastName || userBeforeValid.Locality != uF.Locality;
+            somethingChanged = somethingChanged || userBeforeValid.PostalCode != uF.PostalCode || userBeforeValid.Street != uF.Street;
+            somethingChanged = somethingChanged || userBeforeValid.PropertyNumber != uF.PropertyNumber || userBeforeValid.HouseUnitNumber != uF.HouseUnitNumber;
+            somethingChanged = somethingChanged || userBeforeValid.PESEL != uF.PESEL || userBeforeValid.BirthDate != uF.BirthDate;
+            somethingChanged = somethingChanged || userBeforeValid.Gender != uF.Gender;
+            somethingChanged = somethingChanged || userBeforeValid.Email != uF.Email || userBeforeValid.Phone != uF.Phone;
+
+
+            if (somethingChanged == true)
             {
-                MessageBox.Show("Zmieniono dane użytkownika", "Informacja");
+                ValidationResult valRe = _userService.EditUser(userBeforeValid);
 
+                if (valRe.IsValid == true)
+                {
+                    MessageBox.Show("Zmieniono dane użytkownika", "Informacja");
+
+                }
+                else
+                {
+                    string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                    MessageBox.Show(errorMessage, "Błąd walidacji");
+                }
+                
             }
             else
             {
-                string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
-                MessageBox.Show(errorMessage, "Błąd walidacji");
+                MessageBox.Show("Nie wprowadzono żadnych zmian", "Informacja");
             }
+
+
 
 
 
