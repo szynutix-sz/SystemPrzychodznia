@@ -18,18 +18,18 @@ namespace SystemPrzychodznia.Services
             _validator = new Validator(_repository);
         }
 
-public ValidationResult ValidateUserFull(UserFull user) => _validator.ValidateUserFull(user);
-public ValidationResult AddUser(UserFull user)
-        {
-            var validation = ValidateUserFull(user);
-            if (!validation.IsValid)
-            {
-                return validation;
-            }
+        public ValidationResult ValidateUserFull(UserFull user) => _validator.ValidateUserFull(user);
+        public ValidationResult AddUser(UserFull user)
+                {
+                    var validation = ValidateUserFull(user);
+                    if (!validation.IsValid)
+                    {
+                        return validation;
+                    }
 
-            _repository.Add(user);
-            return new ValidationResult(true);
-        }
+                    _repository.Add(user);
+                    return new ValidationResult(true);
+                }
 
         
 
@@ -51,6 +51,29 @@ public ValidationResult AddUser(UserFull user)
             _repository.EditUser(user);
             return new ValidationResult(true);
 
+        }
+
+        public UserFull PrepareRawStrings(UserFull user)
+        /// Metoda przygotowująca surowe dane do walidacji, np. usuwająca zbędne spacje
+        /// Nie obowiązuje w przypadku daty urodzenia, która jest pobierana z DateTimePicker, więc nie jest surowym stringiem, a już sformatowaną datą
+        /// Nie obowiązuje również w przypadku płci, która jest pobierana z ComboBoxa, więc nie jest surowym stringiem, a już sformatowaną płcią
+        {
+
+            UserFull userBeforeValid = new UserFull();
+
+            userBeforeValid.Login = user.Login.Trim();
+            userBeforeValid.FirstName = user.FirstName.Trim();
+            userBeforeValid.LastName = user.LastName.Trim();
+            userBeforeValid.Locality = user.Locality.Trim();
+            userBeforeValid.PostalCode = user.PostalCode.Trim();
+            userBeforeValid.Street = user.Street.Trim();
+            userBeforeValid.PropertyNumber = user.PropertyNumber.Trim();
+            userBeforeValid.HouseUnitNumber = user.HouseUnitNumber.Trim();
+            userBeforeValid.PESEL = user.PESEL.Trim();
+            userBeforeValid.Email = user.Email.Trim();
+            userBeforeValid.Phone = user.Phone.Trim();
+
+            return userBeforeValid;
         }
     }
 }

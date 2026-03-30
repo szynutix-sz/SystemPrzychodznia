@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Text;
 using System.Windows.Forms;
 using SystemPrzychodznia.Data;
@@ -46,6 +47,8 @@ namespace SystemPrzychodznia
             userBeforeValid.Password = "DummyPassword"; // Nie jest edytowane, ale musi być przekazane do walidacji, więc ustawiamy na wartość tymczasową
 
 
+
+            // trzeba by tą cześć przenieść do serwisu, by logike oddzielić od UI
             bool somethingChanged = userBeforeValid.Login != uF.Login || userBeforeValid.FirstName != uF.FirstName;
 
             somethingChanged = somethingChanged || userBeforeValid.LastName != uF.LastName || userBeforeValid.Locality != uF.Locality;
@@ -63,14 +66,15 @@ namespace SystemPrzychodznia
                 if (valRe.IsValid == true)
                 {
                     MessageBox.Show("Zmieniono dane użytkownika", "Informacja");
-
+                    _user.Login = userBeforeValid.Login; // aktualizujemy login w obiekcie User, by przy kolejnych edycjach porównywać do aktualnego loginu, a nie tego z bazy
+                    LockEditing();
                 }
                 else
                 {
                     string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
                     MessageBox.Show(errorMessage, "Błąd walidacji");
                 }
-                
+
             }
             else
             {
@@ -78,13 +82,12 @@ namespace SystemPrzychodznia
             }
 
 
-
-
-
         }
 
-        private void FormAddUser_Load(object sender, EventArgs e)
+        private void FormEditUser_Load(object sender, EventArgs e)
         {
+
+
             textBoxLogin.Text = uF.Login;
             textBoxFirstName.Text = uF.FirstName;
             textBoxLastName.Text = uF.LastName;
@@ -98,25 +101,84 @@ namespace SystemPrzychodznia
             comboBoxGender.Text = uF.Gender;
             textBoxEmail.Text = uF.Email;
             textBoxPhone.Text = uF.Phone;
+            this.Text = $"Podgląd użytkownika: {uF.Login}";
+            LockEditing();
 
+        }
+        private void LockEditing() { 
+
+           textBoxLogin.Enabled = false;
+            textBoxFirstName.Enabled = false;
+            textBoxLastName.Enabled = false;
+            textBoxLocality.Enabled = false;
+            textBoxPostCode.Enabled = false;
+            textBoxStreet.Enabled = false;
+            textBoxPropertyNumber.Enabled = false;
+            textBoxHouseUnitNumber.Enabled = false;
+            textBoxPESEL.Enabled = false;
+            BirthDateTimePicker.Enabled = false;
+            comboBoxGender.Enabled = false;
+            textBoxEmail.Enabled = false;
+            textBoxPhone.Enabled = false;
+
+            buttonEditUser.Enabled = false;
+            buttonForgetUser.Enabled = false;
+
+            buttonUnlockEditing.Text = "Odblokuj edycję";
+        }
+
+        private void buttonForgetUser_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                $"Czy na pewno chcesz zapomnieć użytkownika {uF.Login}?",
+                "Potwierdzenie",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                _userService.ForgetUser(uF.Id);
+                MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
+                this.Close();
+            }
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
 
         }
 
-            private void buttonForgetUser_Click(object sender, EventArgs e)
+        private void buttonUnlockEditing_Click(object sender, EventArgs e)
+        {
+            if ( buttonEditUser.Enabled == true )
             {
-                var result = MessageBox.Show(
-                    $"Czy na pewno chcesz zapomnieć użytkownika {uF.Login}?",
-                    "Potwierdzenie",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
+                uF = _userService.GetUserFull(_user.Login);
+                FormEditUser_Load(null, null); // przywracamy dane z bazy, by anulować wprowadzone zmiany
+                LockEditing();
+                
+            } else
+            {
+                textBoxLogin.Enabled = true;
+                textBoxFirstName.Enabled = true;
+                textBoxLastName.Enabled = true;
+                textBoxLocality.Enabled = true;
+                textBoxPostCode.Enabled = true;
+                textBoxStreet.Enabled = true;
+                textBoxPropertyNumber.Enabled = true;
+                textBoxHouseUnitNumber.Enabled = true;
+                textBoxPESEL.Enabled = true;
+                BirthDateTimePicker.Enabled = true;
+                comboBoxGender.Enabled = true;
+                textBoxEmail.Enabled = true;
+                textBoxPhone.Enabled = true;
 
-                if (result == DialogResult.Yes)
-                {
-                    _userService.ForgetUser(uF.Id);
-                    MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
-                    this.Close();
-                }
+                buttonEditUser.Enabled = true;
+                buttonForgetUser.Enabled = true;
+
+                buttonUnlockEditing.Text = "Zrezygnuj z edycji";
+                this.Text = $"Edytujesz użytkownika: {uF.Login}";
             }
 
         }
     }
+}
