@@ -31,6 +31,7 @@
             UserList = new GroupBox();
             dgvUsers = new DataGridView();
             buttonAddUser = new Button();
+            buttonRoles = new Button();
             buttonSearchUser = new Button();
             tableLayoutPanel1 = new TableLayoutPanel();
             labelLogin = new Label();
@@ -77,11 +78,21 @@
             // 
             buttonAddUser.Location = new Point(18, 15);
             buttonAddUser.Name = "buttonAddUser";
-            buttonAddUser.Size = new Size(149, 91);
+            buttonAddUser.Size = new Size(149, 44);
             buttonAddUser.TabIndex = 1;
             buttonAddUser.Text = "Dodaj Użytkownika";
             buttonAddUser.UseVisualStyleBackColor = true;
             buttonAddUser.Click += buttonAddUser_Click;
+            // 
+            // buttonRoles
+            // 
+            buttonRoles.Location = new Point(18, 59);
+            buttonRoles.Name = "buttonRoles";
+            buttonRoles.Size = new Size(149, 44);
+            buttonRoles.TabIndex = 5;
+            buttonRoles.Text = "Uprawnienia ról";
+            buttonRoles.UseVisualStyleBackColor = true;
+            buttonRoles.Click += buttonRoles_Click;
             // 
             // buttonSearchUser
             // 
@@ -217,6 +228,7 @@
             Controls.Add(buttonClearSearch);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(buttonSearchUser);
+            Controls.Add(buttonRoles);
             Controls.Add(buttonAddUser);
             Controls.Add(UserList);
             Name = "FormAdminView";
@@ -235,6 +247,7 @@
         private GroupBox UserList;
         private DataGridView dgvUsers;
         private Button buttonAddUser;
+        private Button buttonRoles;
         private Button buttonSearchUser;
         private TableLayoutPanel tableLayoutPanel1;
         private Label labelLogin;

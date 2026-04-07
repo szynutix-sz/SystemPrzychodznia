@@ -41,31 +41,38 @@ namespace SystemPrzychodznia
                 userBeforeValid.Phone = textBoxPhone.Text.Trim();
                 userBeforeValid.Password = textBoxPass.Text;
 
-                ValidationResult valRe = _userService.AddUser(userBeforeValid);
+                try
+                {
+                    ValidationResult valRe = _userService.AddUser(userBeforeValid);
 
-                if (valRe.IsValid == true)
-                {
-                    MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
-                    textBoxLogin.Clear();
-                    textBoxFirstName.Clear();
-                    textBoxLastName.Clear();
-                    textBoxLocality.Clear();
-                    textBoxPostCode.Clear();
-                    textBoxStreet.Clear();
-                    textBoxPropertyNumber.Clear();
-                    textBoxHouseUnitNumber.Clear();
-                    textBoxPESEL.Clear();
-                    BirthDateTimePicker.Value = DateTime.Today;
-                    comboBoxGender.SelectedIndex = -1;
-                    textBoxEmail.Clear();
-                    textBoxPhone.Clear();
-                    textBoxPass.Clear();
-                    textBoxPassRepeat.Clear();
+                    if (valRe.IsValid == true)
+                    {
+                        MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
+                        textBoxLogin.Clear();
+                        textBoxFirstName.Clear();
+                        textBoxLastName.Clear();
+                        textBoxLocality.Clear();
+                        textBoxPostCode.Clear();
+                        textBoxStreet.Clear();
+                        textBoxPropertyNumber.Clear();
+                        textBoxHouseUnitNumber.Clear();
+                        textBoxPESEL.Clear();
+                        BirthDateTimePicker.Value = DateTime.Today;
+                        comboBoxGender.SelectedIndex = -1;
+                        textBoxEmail.Clear();
+                        textBoxPhone.Clear();
+                        textBoxPass.Clear();
+                        textBoxPassRepeat.Clear();
+                    }
+                    else
+                    {
+                        string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                        MessageBox.Show(errorMessage, "Błąd walidacji");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
-                    MessageBox.Show(errorMessage, "Błąd walidacji");
+                    MessageBox.Show("Wystąpił błąd: " + ex.Message, "Błąd");
                 }
 
             }

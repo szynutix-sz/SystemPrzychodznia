@@ -60,6 +60,14 @@ namespace SystemPrzychodznia
             }
         }
 
+        private void buttonRoles_Click(object sender, EventArgs e)
+        {
+            using (Form rolesForm = new FormRoles())
+            {
+                rolesForm.ShowDialog();
+            }
+        }
+
         private void FormAdminView_Activated(object sender, EventArgs e)
         {
             ClearSearchFields();

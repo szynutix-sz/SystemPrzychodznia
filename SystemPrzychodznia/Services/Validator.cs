@@ -43,6 +43,8 @@ namespace SystemPrzychodznia.Services
                 errors.Add("PESEL musi mieć 11 cyfr");
             else if (!CzySameLiczby(user.PESEL))
                 errors.Add("PESEL musi zawierać tylko cyfry");
+            else if (!SprawdzCyfreKontrolnaPESEL(user.PESEL))
+                errors.Add("Niepoprawny PESEL");
 
             // Walidacja Miejscowości
             if (string.IsNullOrWhiteSpace(user.Locality))
@@ -72,7 +74,20 @@ namespace SystemPrzychodznia.Services
             else if (user.Gender != "M" && user.Gender != "K")
                 errors.Add("Płeć musi być 'M' lub 'K'");
 
-            // Walidacja Numeru Telefonu - musi mieć 9 znaków i być liczbą
+            // Walidacja PESEL vs płeć - 10. cyfra PESEL: nieparzysta = M, parzysta = K
+            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11
+                && CzySameLiczby(user.PESEL)
+                && !string.IsNullOrWhiteSpace(user.Gender)
+                && (user.Gender == "M" || user.Gender == "K"))
+            {
+                int cyfraPici = user.PESEL[9] - '0';
+                if (user.Gender == "M" && cyfraPici % 2 == 0)
+                    errors.Add("PESEL nie pasuje względem ustawionej płci");
+                else if (user.Gender == "K" && cyfraPici % 2 == 1)
+                    errors.Add("PESEL nie pasuje względem ustawionej płci");
+            }
+
+            // Walidacja Numeru Telefonu
             if (string.IsNullOrWhiteSpace(user.Phone))
                 errors.Add("Numer telefonu jest wymagany");
             else if (user.Phone.Length != 9)
@@ -86,7 +101,7 @@ namespace SystemPrzychodznia.Services
 
             // Walidacja unikalności loginu, email, PESEL
             if (!string.IsNullOrWhiteSpace(user.Login) && _repository.CzyIstniejeLogin(user.Login))
-                errors.Add("Login jest już zajęty");
+                errors.Add("Użytkownik o takim loginie już istnieje");
 
             if (!string.IsNullOrWhiteSpace(user.Email) && _repository.CzyIstniejeEmail(user.Email))
                 errors.Add("Email jest już zajęty");
@@ -123,6 +138,16 @@ namespace SystemPrzychodznia.Services
             }
 
             return new ValidationResult(errors.Count == 0) { Errors = errors };
+        }
+
+        // Sprawdza poprawność cyfry kontrolnej PESEL
+        private bool SprawdzCyfreKontrolnaPESEL(string pesel)
+        {
+            int[] wagi = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
+            int suma = 0;
+            for (int i = 0; i < 10; i++)
+                suma += (pesel[i] - '0') * wagi[i];
+            return (10 - (suma % 10)) % 10 == (pesel[10] - '0');
         }
 
         // Wyciąga datę urodzenia z PESEL i zwraca w formacie YYYY-MM-DD
