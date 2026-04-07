@@ -58,14 +58,21 @@
             labelLogin = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
             buttonUnlockEditing = new Button();
+            tabControlEditUser = new TabControl();
+            tabPageUserData = new TabPage();
+            tabPageUserUpra = new TabPage();
+            checkedListBoxUprawnienia = new CheckedListBox();
             tableLayoutPanel1.SuspendLayout();
+            tabControlEditUser.SuspendLayout();
+            tabPageUserData.SuspendLayout();
+            tabPageUserUpra.SuspendLayout();
             SuspendLayout();
             // 
             // buttonEditUser
             // 
-            buttonEditUser.Location = new Point(397, 472);
+            buttonEditUser.Location = new Point(397, 514);
             buttonEditUser.Name = "buttonEditUser";
-            buttonEditUser.Size = new Size(374, 44);
+            buttonEditUser.Size = new Size(381, 44);
             buttonEditUser.TabIndex = 1;
             buttonEditUser.Text = "Potwierdz Dane";
             buttonEditUser.UseVisualStyleBackColor = true;
@@ -325,7 +332,7 @@
             tableLayoutPanel1.Controls.Add(textBoxPESEL, 1, 8);
             tableLayoutPanel1.Controls.Add(textBoxEmail, 1, 11);
             tableLayoutPanel1.Controls.Add(textBoxPhone, 1, 12);
-            tableLayoutPanel1.Location = new Point(12, 12);
+            tableLayoutPanel1.Location = new Point(3, 3);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 13;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 7.69230843F));
@@ -347,21 +354,61 @@
             // 
             // buttonUnlockEditing
             // 
-            buttonUnlockEditing.Location = new Point(396, 522);
+            buttonUnlockEditing.Location = new Point(396, 563);
             buttonUnlockEditing.Name = "buttonUnlockEditing";
-            buttonUnlockEditing.Size = new Size(375, 41);
+            buttonUnlockEditing.Size = new Size(382, 41);
             buttonUnlockEditing.TabIndex = 3;
             buttonUnlockEditing.Text = "Edytuj Użytkownika";
             buttonUnlockEditing.UseVisualStyleBackColor = true;
             buttonUnlockEditing.Click += buttonUnlockEditing_Click;
             // 
+            // tabControlEditUser
+            // 
+            tabControlEditUser.Controls.Add(tabPageUserData);
+            tabControlEditUser.Controls.Add(tabPageUserUpra);
+            tabControlEditUser.Location = new Point(12, 12);
+            tabControlEditUser.Name = "tabControlEditUser";
+            tabControlEditUser.SelectedIndex = 0;
+            tabControlEditUser.Size = new Size(786, 507);
+            tabControlEditUser.TabIndex = 4;
+            // 
+            // tabPageUserData
+            // 
+            tabPageUserData.Controls.Add(tableLayoutPanel1);
+            tabPageUserData.Location = new Point(4, 34);
+            tabPageUserData.Name = "tabPageUserData";
+            tabPageUserData.Padding = new Padding(3);
+            tabPageUserData.Size = new Size(778, 469);
+            tabPageUserData.TabIndex = 0;
+            tabPageUserData.Text = "Dane";
+            tabPageUserData.UseVisualStyleBackColor = true;
+            // 
+            // tabPageUserUpra
+            // 
+            tabPageUserUpra.Controls.Add(checkedListBoxUprawnienia);
+            tabPageUserUpra.Location = new Point(4, 34);
+            tabPageUserUpra.Name = "tabPageUserUpra";
+            tabPageUserUpra.Padding = new Padding(3);
+            tabPageUserUpra.Size = new Size(778, 469);
+            tabPageUserUpra.TabIndex = 1;
+            tabPageUserUpra.Text = "Uprawnienia";
+            tabPageUserUpra.UseVisualStyleBackColor = true;
+            // 
+            // checkedListBoxUprawnienia
+            // 
+            checkedListBoxUprawnienia.FormattingEnabled = true;
+            checkedListBoxUprawnienia.Location = new Point(3, 0);
+            checkedListBoxUprawnienia.Name = "checkedListBoxUprawnienia";
+            checkedListBoxUprawnienia.Size = new Size(769, 452);
+            checkedListBoxUprawnienia.TabIndex = 0;
+            // 
             // FormEditUser
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(786, 700);
+            ClientSize = new Size(796, 700);
+            Controls.Add(tabControlEditUser);
             Controls.Add(buttonUnlockEditing);
-            Controls.Add(tableLayoutPanel1);
             Controls.Add(buttonForgetUser);
             Controls.Add(buttonEditUser);
             Name = "FormEditUser";
@@ -369,6 +416,9 @@
             Load += FormEditUser_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            tabControlEditUser.ResumeLayout(false);
+            tabPageUserData.ResumeLayout(false);
+            tabPageUserUpra.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -403,5 +453,9 @@
         private Label labelLogin;
         private TableLayoutPanel tableLayoutPanel1;
         private Button buttonUnlockEditing;
+        private TabControl tabControlEditUser;
+        private TabPage tabPageUserData;
+        private TabPage tabPageUserUpra;
+        private CheckedListBox checkedListBoxUprawnienia;
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.VisualBasic.ApplicationServices;
 using Microsoft.VisualBasic.Logging;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace SystemPrzychodznia.Data
@@ -100,6 +101,11 @@ COMMIT;
                 command.Parameters.AddWithValue("$password", user.Password);
             
                 command.ExecuteNonQuery();
+
+                user.Id = GetUserID(user.Login);
+
+                ZmieńUprawnienia(user.Id, user.Uprawnienia);
+
             }
             catch (SqliteException ex)
             {
@@ -111,6 +117,43 @@ COMMIT;
             }
         }
 
+        public int GetUserID(string login)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+SELECT ID_Uzytkownika FROM Uzytkownik WHERE Login = $login;
+";
+            command.Parameters.AddWithValue("$login", login);
+            using var reader_id = command.ExecuteReader();
+
+            reader_id.Read();
+            return reader_id.GetInt32(0);
+
+        }
+
+        public List<string> GetUserUprawnienia(int user_id)
+        {
+            List<string> uprawnienia = new List<string>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+SELECT Uprawnienie.Nazwa
+FROM Uzytkownik_Uprawnienie
+JOIN Uprawnienie ON Uzytkownik_Uprawnienie.ID_Uprawnienia = Uprawnienie.ID_Uprawnienia
+WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;'";
+
+            command.Parameters.AddWithValue("$id", user_id);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                uprawnienia.Add(reader.GetString(0));
+            }
+            return uprawnienia;
+        }
         public List<string> GetUprawnienia()
         {
             List<string> uprawnienia = new List<string>();
@@ -234,6 +277,8 @@ COMMIT;";
 
                 command.ExecuteNonQuery();
 
+                ZmieńUprawnienia(user.Id, user.Uprawnienia);
+
             }
             catch (SqliteException ex)
             {
@@ -306,6 +351,8 @@ WHERE
 
                 });
             }
+
+            users[0].Uprawnienia = GetUserUprawnienia(users[0].Id);
             return users[0];
         }
 
@@ -318,6 +365,41 @@ WHERE
             command.Parameters.AddWithValue("$id", id);
             command.ExecuteNonQuery();
         }
+
+        public void ZmieńUprawnienia(int userId, List<string> noweUprawnienia)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+
+            // Najpierw usuwamy wszystkie obecne uprawnienia użytkownika
+            var deleteCommand = connection.CreateCommand();
+            deleteCommand.CommandText = @"
+DELETE FROM Uzytkownik_Uprawnienie 
+WHERE ID_Uzytkownika = $userId
+    AND ID_Uprawnienia != 
+        (SELECT ID_Uprawnienia FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');";
+            deleteCommand.Parameters.AddWithValue("$userId", userId);
+            deleteCommand.ExecuteNonQuery();
+            // Następnie dodajemy nowe uprawnienia
+            foreach (var uprawnienie in noweUprawnienia)
+            {
+                var insertCommand = connection.CreateCommand();
+                insertCommand.CommandText = @"
+INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+SELECT u.ID_Uzytkownika, p.ID_Uprawnienia
+FROM Uzytkownik u, Uprawnienie p
+WHERE u.ID_Uzytkownika = $userId
+  AND p.Nazwa = $uprawnienie
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up
+                  WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
+                    AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+";
+                insertCommand.Parameters.AddWithValue("$userId", userId);
+                insertCommand.Parameters.AddWithValue("$uprawnienie", uprawnienie);
+                insertCommand.ExecuteNonQuery();
+            }
+}
 
         public bool CzyIstniejeLogin(string login, int excludeId = 0)
         {

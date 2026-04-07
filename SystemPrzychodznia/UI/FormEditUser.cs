@@ -58,6 +58,19 @@ namespace SystemPrzychodznia
             somethingChanged = somethingChanged || userBeforeValid.Gender != uF.Gender;
             somethingChanged = somethingChanged || userBeforeValid.Email != uF.Email || userBeforeValid.Phone != uF.Phone;
 
+            foreach (string item in checkedListBoxUprawnienia.Items)
+            {
+                if (checkedListBoxUprawnienia.CheckedItems.Contains(item) && !uF.Uprawnienia.Contains(item))
+                {
+                    somethingChanged = somethingChanged || true;
+                    userBeforeValid.Uprawnienia.Add(item);
+                }
+                else if (!checkedListBoxUprawnienia.CheckedItems.Contains(item) && uF.Uprawnienia.Contains(item))
+                {
+                    somethingChanged = somethingChanged || true;
+                    userBeforeValid.Uprawnienia.Remove(item);
+                }
+            }
 
             if (somethingChanged == true)
             {
@@ -102,6 +115,13 @@ namespace SystemPrzychodznia
             textBoxEmail.Text = uF.Email;
             textBoxPhone.Text = uF.Phone;
             this.Text = $"Podgląd użytkownika: {uF.Login}";
+            
+            foreach (string uprawnienie in _userService.GetUprawnienia())
+            {
+                checkedListBoxUprawnienia.Items.Add(uprawnienie, uF.Uprawnienia.Contains(uprawnienie));
+            }
+
+
             LockEditing();
 
         }
@@ -123,6 +143,8 @@ namespace SystemPrzychodznia
 
             buttonEditUser.Enabled = false;
             buttonForgetUser.Enabled = false;
+
+            checkedListBoxUprawnienia.Enabled = false;
 
             buttonUnlockEditing.Text = "Odblokuj edycję";
         }
@@ -174,6 +196,8 @@ namespace SystemPrzychodznia
 
                 buttonEditUser.Enabled = true;
                 buttonForgetUser.Enabled = true;
+
+                checkedListBoxUprawnienia.Enabled = true;
 
                 buttonUnlockEditing.Text = "Zrezygnuj z edycji";
                 this.Text = $"Edytujesz użytkownika: {uF.Login}";

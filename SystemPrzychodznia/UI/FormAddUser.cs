@@ -30,7 +30,7 @@ namespace SystemPrzychodznia
                 userBeforeValid.FirstName = textBoxFirstName.Text.Trim();
                 userBeforeValid.LastName = textBoxLastName.Text.Trim();
                 userBeforeValid.Locality = textBoxLocality.Text.Trim();
-                userBeforeValid.PostalCode = textBoxPostCode.Text.Trim();
+                userBeforeValid.PostalCode = textBoxPostCode.Text.Trim().Replace("-","");
                 userBeforeValid.Street = textBoxStreet.Text.Trim();
                 userBeforeValid.PropertyNumber = textBoxPropertyNumber.Text.Trim();
                 userBeforeValid.HouseUnitNumber = textBoxHouseUnitNumber.Text.Trim();
@@ -40,6 +40,12 @@ namespace SystemPrzychodznia
                 userBeforeValid.Email = textBoxEmail.Text.Trim();
                 userBeforeValid.Phone = textBoxPhone.Text.Trim();
                 userBeforeValid.Password = textBoxPass.Text;
+
+
+                foreach (var item in checkedListBoxUprawnienia.CheckedItems)
+                {
+                    userBeforeValid.Uprawnienia.Add(item.ToString());
+                }
 
                 ValidationResult valRe = _userService.AddUser(userBeforeValid);
 

@@ -55,6 +55,8 @@ namespace SystemPrzychodznia.Services
 
         }
 
+        public List<string> GetUserUprawnienia() => _repository.GetUprawnienia();
+
         public UserFull PrepareRawStrings(UserFull user)
         /// Metoda przygotowująca surowe dane do walidacji, np. usuwająca zbędne spacje
         /// Nie obowiązuje w przypadku daty urodzenia, która jest pobierana z DateTimePicker, więc nie jest surowym stringiem, a już sformatowaną datą
