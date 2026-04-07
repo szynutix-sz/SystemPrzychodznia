@@ -20,8 +20,70 @@ namespace SystemPrzychodznia.Data
 
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO Uzytkownicy (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)
-                    VALUES ($login ,$firstName, $lastName, $locality, $postalCode, $street, $propertyNumber, $houseUnitNumber, $pesel, $birthDate, $gender , $email, $phone, $password);";
+BEGIN TRANSACTION;
+
+-- 1. Wstawienie adresu
+INSERT INTO Adres (
+    Miejscowosc,
+    Kod_pocztowy,
+    Ulica,
+    Numer_posesji_domu,
+    Numer_lokalu_mieszkania
+)
+VALUES (
+    $locality,
+    $postalCode,
+    $street,
+    $propertyNumber,
+    $houseUnitNumber
+);
+
+-- 2. Wstawienie użytkownika (ID_Adresu pobierane automatycznie)
+INSERT INTO Uzytkownik (
+    ID_Adresu,
+    Login,
+    Imie,
+    Nazwisko,
+    PESEL,
+    Data_urodzenia,
+    Plec,
+    Adres_email,
+    Numer_telefonu,
+    Blokada_konta_do,
+    Czy_zapomniany,
+    Data_zapomnienia,
+    ID_Kto_Zapomnial
+)
+VALUES (
+    last_insert_rowid(),   -- ID właśnie dodanego adresu
+    $login,
+    $firstName,
+    $lastName,
+    $pesel,
+    $birthDate,
+    $gender,
+    $email,
+    $phone,
+    NULL,                  -- domyślnie brak blokady
+    0,                     -- konto nieoznaczone jako zapomniane
+    NULL,
+    NULL
+);
+
+-- 3. Wstawienie hasła do historii haseł
+INSERT INTO Historia_Hasel (
+    ID_Uzytkownika,
+    Haslo_Hash,
+    Data_ustawienia
+)
+VALUES (
+    last_insert_rowid(),   -- ID właśnie dodanego użytkownika
+    $password,
+    CURRENT_TIMESTAMP      -- data ustawienia hasła
+);
+
+COMMIT;
+";
                 command.Parameters.AddWithValue("$login", user.Login);
                 command.Parameters.AddWithValue("$firstName", user.FirstName);
                 command.Parameters.AddWithValue("$lastName", user.LastName);
@@ -57,13 +119,20 @@ namespace SystemPrzychodznia.Data
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT Login, FirstName, LastName, Email, PESEL FROM Uzytkownicy
-                WHERE Status = 'A' AND
-                Login LIKE '%' || $login || '%' AND
-                FirstName LIKE '%' || $firstName || '%' AND
-                LastName LIKE '%' || $lastName || '%' AND
-                Email LIKE '%' || $email || '%' AND
-                PESEL LIKE '%' || $pesel || '%';";
+SELECT 
+    Login, 
+    Imie AS FirstName, 
+    Nazwisko AS LastName, 
+    Adres_email AS Email, 
+    PESEL 
+FROM Uzytkownik
+WHERE 
+    Czy_zapomniany = 0
+    AND Login LIKE '%' || $login || '%'
+    AND Imie LIKE '%' || $firstName || '%'
+    AND Nazwisko LIKE '%' || $lastName || '%'
+    AND Adres_email LIKE '%' || $email || '%'
+    AND PESEL LIKE '%' || $pesel || '%';";
 
             command.Parameters.AddWithValue("$login", s.Login);
             command.Parameters.AddWithValue("$firstName", s.FirstName);
@@ -94,21 +163,36 @@ namespace SystemPrzychodznia.Data
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    UPDATE Uzytkownicy
-                    SET Login = $login,
-                        FirstName = $firstName,
-                        LastName = $lastName,
-                        Locality = $locality,
-                        PostalCode = $postalCode,
-                        Street = $street,
-                        PropertyNumber = $propertyNumber,
-                        HouseUnitNumber = $houseUnitNumber,
-                        PESEL = $pesel,
-                        BirthDate = $birthDate,
-                        Gender = $gender,
-                        Email = $email,
-                        Phone = $phone
-                    WHERE Id = $id;";
+                   BEGIN TRANSACTION;
+
+-- 1. Aktualizacja danych adresowych powiązanych z użytkownikiem
+UPDATE Adres
+SET 
+    Miejscowosc = $locality,
+    Kod_pocztowy = $postalCode,
+    Ulica = $street,
+    Numer_posesji_domu = $propertyNumber,
+    Numer_lokalu_mieszkania = $houseUnitNumber
+WHERE ID_Adresu = (
+    SELECT ID_Adresu 
+    FROM Uzytkownik 
+    WHERE ID_Uzytkownika = $id
+);
+
+-- 2. Aktualizacja danych użytkownika
+UPDATE Uzytkownik
+SET 
+    Login = $login,
+    Imie = $firstName,
+    Nazwisko = $lastName,
+    PESEL = $pesel,
+    Data_urodzenia = $birthDate,
+    Plec = $gender,
+    Adres_email = $email,
+    Numer_telefonu = $phone
+WHERE ID_Uzytkownika = $id;
+
+COMMIT;";
 
 
                 command.Parameters.AddWithValue("$id", user.Id);
@@ -146,10 +230,30 @@ namespace SystemPrzychodznia.Data
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT Id, Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender, Email, Phone
-                FROM Uzytkownicy
-                WHERE Status = 'A' AND
-                Login = $login;";
+               SELECT 
+    u.ID_Uzytkownika AS Id,
+    u.Login,
+    u.Imie AS FirstName,
+    u.Nazwisko AS LastName,
+    a.Miejscowosc AS Locality,
+    a.Kod_pocztowy AS PostalCode,
+    a.Ulica AS Street,
+    a.Numer_posesji_domu AS PropertyNumber,
+    a.Numer_lokalu_mieszkania AS HouseUnitNumber,
+    u.PESEL,
+    u.Data_urodzenia AS BirthDate,
+    u.Plec AS Gender,
+    u.Adres_email AS Email,
+    u.Numer_telefonu AS Phone
+FROM Uzytkownik u
+JOIN Adres a ON u.ID_Adresu = a.ID_Adresu
+WHERE 
+    u.Login = $login
+    AND (
+        u.Blokada_konta_do IS NULL               -- konto nie jest zablokowane
+        OR u.Blokada_konta_do <= CURRENT_TIMESTAMP  -- blokada już wygasła
+    )
+    AND u.Czy_zapomniany = 0;                    -- konto nie jest oznaczone jako zapomniane";
 
 
             command.Parameters.AddWithValue("$login", S_Login);
@@ -188,7 +292,7 @@ namespace SystemPrzychodznia.Data
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-            command.CommandText = "UPDATE Uzytkownicy SET Status = 'I' WHERE Id = $id;";
+            command.CommandText = "UPDATE Uzytkownik SET Czy_zapomniany = 1 WHERE ID_Uzytkownika = $id;";
             command.Parameters.AddWithValue("$id", id);
             command.ExecuteNonQuery();
         }
@@ -200,12 +304,12 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             if (excludeId > 0)
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Login = $login AND Id != $excludeId;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Login = $login AND ID_Uzytkownika != $excludeId;";
                 command.Parameters.AddWithValue("$excludeId", excludeId);
             }
             else
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Login = $login;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Login = $login;";
             }
             command.Parameters.AddWithValue("$login", login);
             long count = (long)command.ExecuteScalar();
@@ -219,12 +323,12 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             if (excludeId > 0)
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Email = $email AND Id != $excludeId;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Adres_email = $email AND ID_Uzytkownika != $excludeId;";
                 command.Parameters.AddWithValue("$excludeId", excludeId);
             }
             else
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Email = $email;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Adres_email = $email;";
             }
             command.Parameters.AddWithValue("$email", email);
             long count = (long)command.ExecuteScalar();
@@ -238,12 +342,12 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             if (excludeId > 0)
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE PESEL = $pesel AND Id != $excludeId;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE PESEL = $pesel AND ID_Uzytkownika != $excludeId;";
                 command.Parameters.AddWithValue("$excludeId", excludeId);
             }
             else
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE PESEL = $pesel;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE PESEL = $pesel;";
             }
             command.Parameters.AddWithValue("$pesel", pesel);
             long count = (long)command.ExecuteScalar();
