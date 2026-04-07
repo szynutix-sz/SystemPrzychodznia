@@ -54,14 +54,14 @@
             labelFirstName = new Label();
             labelLogin = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
+            textBoxPostCode = new MaskedTextBox();
+            textBoxPESEL = new MaskedTextBox();
+            textBoxPhone = new MaskedTextBox();
             buttonUnlockEditing = new Button();
             tabControlEditUser = new TabControl();
             tabPageUserData = new TabPage();
             tabPageUserUpra = new TabPage();
             checkedListBoxUprawnienia = new CheckedListBox();
-            textBoxPostCode = new MaskedTextBox();
-            textBoxPESEL = new MaskedTextBox();
-            textBoxPhone = new MaskedTextBox();
             tableLayoutPanel1.SuspendLayout();
             tabControlEditUser.SuspendLayout();
             tabPageUserData.SuspendLayout();
@@ -331,6 +331,28 @@
             tableLayoutPanel1.TabIndex = 0;
             tableLayoutPanel1.Paint += tableLayoutPanel1_Paint;
             // 
+            // textBoxPostCode
+            // 
+            textBoxPostCode.Location = new Point(384, 143);
+            textBoxPostCode.Mask = "00-000";
+            textBoxPostCode.Name = "textBoxPostCode";
+            textBoxPostCode.Size = new Size(375, 31);
+            textBoxPostCode.TabIndex = 5;
+            // 
+            // textBoxPESEL
+            // 
+            textBoxPESEL.Location = new Point(384, 283);
+            textBoxPESEL.Name = "textBoxPESEL";
+            textBoxPESEL.Size = new Size(375, 31);
+            textBoxPESEL.TabIndex = 30;
+            // 
+            // textBoxPhone
+            // 
+            textBoxPhone.Location = new Point(384, 423);
+            textBoxPhone.Name = "textBoxPhone";
+            textBoxPhone.Size = new Size(375, 31);
+            textBoxPhone.TabIndex = 31;
+            // 
             // buttonUnlockEditing
             // 
             buttonUnlockEditing.Location = new Point(396, 563);
@@ -380,28 +402,6 @@
             checkedListBoxUprawnienia.Name = "checkedListBoxUprawnienia";
             checkedListBoxUprawnienia.Size = new Size(769, 452);
             checkedListBoxUprawnienia.TabIndex = 0;
-            // 
-            // textBoxPostCode
-            // 
-            textBoxPostCode.Location = new Point(384, 143);
-            textBoxPostCode.Mask = "00-000";
-            textBoxPostCode.Name = "textBoxPostCode";
-            textBoxPostCode.Size = new Size(375, 31);
-            textBoxPostCode.TabIndex = 5;
-            // 
-            // textBoxPESEL
-            // 
-            textBoxPESEL.Location = new Point(384, 283);
-            textBoxPESEL.Name = "textBoxPESEL";
-            textBoxPESEL.Size = new Size(375, 31);
-            textBoxPESEL.TabIndex = 30;
-            // 
-            // textBoxPhone
-            // 
-            textBoxPhone.Location = new Point(384, 423);
-            textBoxPhone.Name = "textBoxPhone";
-            textBoxPhone.Size = new Size(375, 31);
-            textBoxPhone.TabIndex = 31;
             // 
             // FormEditUser
             // 
