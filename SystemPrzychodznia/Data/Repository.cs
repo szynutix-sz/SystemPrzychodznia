@@ -111,6 +111,28 @@ COMMIT;
             }
         }
 
+        public List<string> GetUprawnienia()
+        {
+            List<string> uprawnienia = new List<string>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+SELECT 
+    Nazwa
+FROM Uprawnienie
+WHERE 
+    Nazwa NOT LIKE 'SuperAdmin'";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                uprawnienia.Add(reader.GetString(0));
+            }
+            return uprawnienia;
+        }
+
         public List<User> GetList(SearchTerms s)
         {
             var users = new List<User>();

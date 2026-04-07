@@ -70,6 +70,14 @@ namespace SystemPrzychodznia
             BirthDateTimePicker.Format = DateTimePickerFormat.Custom;
             BirthDateTimePicker.CustomFormat = "yyyy-MM-dd";
             //MessageBox.Show(BirthDateTimePicker.Value.ToString("yyyy-MM-dd"), "OK");
+
+            List<string> uprawnienia = _userService.GetUprawnienia();
+
+            foreach (string item in uprawnienia)
+            {
+                checkedListBoxUprawnienia.Items.Add(item);
+            }
         }
+
     }
 }

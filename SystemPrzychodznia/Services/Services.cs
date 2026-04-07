@@ -39,6 +39,8 @@ namespace SystemPrzychodznia.Services
 
         public void ForgetUser(int id) => _repository.ForgetUser(id);
 
+        public List<string> GetUprawnienia() => _repository.GetUprawnienia();
+
         public ValidationResult EditUser(UserFull user)
         {
             var validation = _validator.ValidateUserFull(user, user.Id);

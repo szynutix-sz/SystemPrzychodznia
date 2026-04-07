@@ -134,11 +134,28 @@ WHERE Login = 'SuperAdmin'
                   WHERE u.Login = 'SuperAdmin');
 
 -- ============================================================
--- 9. Dodanie uprawnienia 'Admin' (jeśli nie istnieje)
+-- 9. Dodanie uprawnień' (jeśli nie istnieją)
 -- ============================================================
+INSERT INTO Uprawnienie (Nazwa)
+SELECT 'SuperAdmin'
+WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');
+
+
 INSERT INTO Uprawnienie (Nazwa)
 SELECT 'Admin'
 WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Admin');
+
+INSERT INTO Uprawnienie (Nazwa)
+SELECT 'Lekarz'
+WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Lekarz');
+
+INSERT INTO Uprawnienie (Nazwa)
+SELECT 'Recepcja'
+WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Recepcja');
+
+INSERT INTO Uprawnienie (Nazwa)
+SELECT 'Brak_roli'
+WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Brak_roli');
 
 -- ============================================================
 -- 10. Nadanie uprawnienia 'Admin' dla SuperAdmina
@@ -147,7 +164,7 @@ INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
 SELECT u.ID_Uzytkownika, p.ID_Uprawnienia
 FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'SuperAdmin'
-  AND p.Nazwa = 'Admin'
+  AND p.Nazwa = 'SuperAdmin'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up
                   WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
                     AND up.ID_Uprawnienia = p.ID_Uprawnienia);";

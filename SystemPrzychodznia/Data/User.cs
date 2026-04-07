@@ -10,6 +10,8 @@
         public string PESEL { get; set; } = string.Empty; // składnia 11 cyfr
 
         public string Email { get; set; } = string.Empty; //Unikalny, składnia nazwa_użytkownika@nazwa_domeny_niższa.nazwa_domeny_wyższa” 
+
+        public List<string> Uprawnienia { get; set; } = new List<string>(); // Lista uprawnień użytkownika, np. "Admin", "User", "Doctor"
     }
 
     public class UserFull : User
