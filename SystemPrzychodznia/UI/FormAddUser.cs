@@ -46,21 +46,7 @@ namespace SystemPrzychodznia
                 if (valRe.IsValid == true)
                 {
                     MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
-                    textBoxLogin.Clear();
-                    textBoxFirstName.Clear();
-                    textBoxLastName.Clear();
-                    textBoxLocality.Clear();
-                    textBoxPostCode.Clear();
-                    textBoxStreet.Clear();
-                    textBoxPropertyNumber.Clear();
-                    textBoxHouseUnitNumber.Clear();
-                    textBoxPESEL.Clear();
-                    BirthDateTimePicker.Value = DateTime.Today;
-                    comboBoxGender.SelectedIndex = -1;
-                    textBoxEmail.Clear();
-                    textBoxPhone.Clear();
-                    textBoxPass.Clear();
-                    textBoxPassRepeat.Clear();
+                    this.Close();
                 }
                 else
                 {
