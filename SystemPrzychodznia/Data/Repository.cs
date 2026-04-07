@@ -20,7 +20,7 @@ namespace SystemPrzychodznia.Data
 
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)
+                    INSERT INTO Uzytkownicy (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)
                     VALUES ($login ,$firstName, $lastName, $locality, $postalCode, $street, $propertyNumber, $houseUnitNumber, $pesel, $birthDate, $gender , $email, $phone, $password);";
                 command.Parameters.AddWithValue("$login", user.Login);
                 command.Parameters.AddWithValue("$firstName", user.FirstName);
@@ -57,7 +57,7 @@ namespace SystemPrzychodznia.Data
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT Login, FirstName, LastName, Email, PESEL FROM Users
+                SELECT Login, FirstName, LastName, Email, PESEL FROM Uzytkownicy
                 WHERE Status = 'A' AND
                 Login LIKE '%' || $login || '%' AND
                 FirstName LIKE '%' || $firstName || '%' AND
@@ -94,7 +94,7 @@ namespace SystemPrzychodznia.Data
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    UPDATE Users
+                    UPDATE Uzytkownicy
                     SET Login = $login,
                         FirstName = $firstName,
                         LastName = $lastName,
@@ -147,7 +147,7 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             command.CommandText = @"
                 SELECT Id, Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender, Email, Phone
-                FROM Users
+                FROM Uzytkownicy
                 WHERE Status = 'A' AND
                 Login = $login;";
 
@@ -188,7 +188,7 @@ namespace SystemPrzychodznia.Data
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-            command.CommandText = "UPDATE Users SET Status = 'I' WHERE Id = $id;";
+            command.CommandText = "UPDATE Uzytkownicy SET Status = 'I' WHERE Id = $id;";
             command.Parameters.AddWithValue("$id", id);
             command.ExecuteNonQuery();
         }
@@ -200,12 +200,12 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             if (excludeId > 0)
             {
-                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Login = $login AND Id != $excludeId;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Login = $login AND Id != $excludeId;";
                 command.Parameters.AddWithValue("$excludeId", excludeId);
             }
             else
             {
-                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Login = $login;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Login = $login;";
             }
             command.Parameters.AddWithValue("$login", login);
             long count = (long)command.ExecuteScalar();
@@ -219,12 +219,12 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             if (excludeId > 0)
             {
-                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Email = $email AND Id != $excludeId;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Email = $email AND Id != $excludeId;";
                 command.Parameters.AddWithValue("$excludeId", excludeId);
             }
             else
             {
-                command.CommandText = "SELECT COUNT(*) FROM Users WHERE Email = $email;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE Email = $email;";
             }
             command.Parameters.AddWithValue("$email", email);
             long count = (long)command.ExecuteScalar();
@@ -238,12 +238,12 @@ namespace SystemPrzychodznia.Data
             var command = connection.CreateCommand();
             if (excludeId > 0)
             {
-                command.CommandText = "SELECT COUNT(*) FROM Users WHERE PESEL = $pesel AND Id != $excludeId;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE PESEL = $pesel AND Id != $excludeId;";
                 command.Parameters.AddWithValue("$excludeId", excludeId);
             }
             else
             {
-                command.CommandText = "SELECT COUNT(*) FROM Users WHERE PESEL = $pesel;";
+                command.CommandText = "SELECT COUNT(*) FROM Uzytkownicy WHERE PESEL = $pesel;";
             }
             command.Parameters.AddWithValue("$pesel", pesel);
             long count = (long)command.ExecuteScalar();

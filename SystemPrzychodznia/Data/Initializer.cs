@@ -13,7 +13,7 @@ namespace SystemPrzychodznia.Data
 
             var createTableCmd = connection.CreateCommand();
             createTableCmd.CommandText = @"
-                CREATE TABLE IF NOT EXISTS Users (
+                CREATE TABLE IF NOT EXISTS Uzytkownicy (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Login TEXT NOT NULL UNIQUE,
                     FirstName TEXT NOT NULL,
@@ -30,23 +30,23 @@ namespace SystemPrzychodznia.Data
                     Phone TEXT NOT NULL,
                     Password TEXT NOT NULL,
                     Status TEXT NOT NULL DEFAULT 'A'
-                )";
+                );";
             createTableCmd.ExecuteNonQuery();
 
-            
+            // po co jest ta częśc?
             try
             {
                 var alterCmd = connection.CreateCommand();
-                alterCmd.CommandText = "ALTER TABLE Users ADD COLUMN Phone TEXT NOT NULL DEFAULT '';";
+                alterCmd.CommandText = "ALTER TABLE Uzytkownicy ADD COLUMN Phone TEXT NOT NULL DEFAULT '';";
                 alterCmd.ExecuteNonQuery();
             }
             catch { }
 
             var createAdminCmd = connection.CreateCommand();
             createAdminCmd.CommandText = @"
-                INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)
+                INSERT INTO Uzytkownicy (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL,BirthDate, Gender,     Email                               , Phone      , Password)
                 SELECT          'SuperAdmin','-',     '-',       '-',      '-',       '-',     '-',             '-',           '-',    '2026/03/17',      '-',     'customer_service@ict_supplier.com', '000000000', 'AdminPass'
-                WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'SuperAdmin');
+                WHERE NOT EXISTS (SELECT 1 FROM Uzytkownicy WHERE Login = 'SuperAdmin');
 ";
             createAdminCmd.ExecuteNonQuery();
 
