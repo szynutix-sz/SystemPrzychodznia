@@ -30,13 +30,10 @@
         {
             buttonEditUser = new Button();
             buttonForgetUser = new Button();
-            textBoxPhone = new TextBox();
             textBoxEmail = new TextBox();
-            textBoxPESEL = new TextBox();
             textBoxHouseUnitNumber = new TextBox();
             textBoxPropertyNumber = new TextBox();
             textBoxStreet = new TextBox();
-            textBoxPostCode = new TextBox();
             textBoxLocality = new TextBox();
             textBoxLastName = new TextBox();
             textBoxFirstName = new TextBox();
@@ -62,6 +59,9 @@
             tabPageUserData = new TabPage();
             tabPageUserUpra = new TabPage();
             checkedListBoxUprawnienia = new CheckedListBox();
+            textBoxPostCode = new MaskedTextBox();
+            textBoxPESEL = new MaskedTextBox();
+            textBoxPhone = new MaskedTextBox();
             tableLayoutPanel1.SuspendLayout();
             tabControlEditUser.SuspendLayout();
             tabPageUserData.SuspendLayout();
@@ -88,26 +88,12 @@
             buttonForgetUser.UseVisualStyleBackColor = true;
             buttonForgetUser.Click += buttonForgetUser_Click;
             // 
-            // textBoxPhone
-            // 
-            textBoxPhone.Location = new Point(384, 423);
-            textBoxPhone.Name = "textBoxPhone";
-            textBoxPhone.Size = new Size(375, 31);
-            textBoxPhone.TabIndex = 29;
-            // 
             // textBoxEmail
             // 
             textBoxEmail.Location = new Point(384, 388);
             textBoxEmail.Name = "textBoxEmail";
             textBoxEmail.Size = new Size(375, 31);
             textBoxEmail.TabIndex = 28;
-            // 
-            // textBoxPESEL
-            // 
-            textBoxPESEL.Location = new Point(384, 283);
-            textBoxPESEL.Name = "textBoxPESEL";
-            textBoxPESEL.Size = new Size(375, 31);
-            textBoxPESEL.TabIndex = 27;
             // 
             // textBoxHouseUnitNumber
             // 
@@ -129,13 +115,6 @@
             textBoxStreet.Name = "textBoxStreet";
             textBoxStreet.Size = new Size(375, 31);
             textBoxStreet.TabIndex = 24;
-            // 
-            // textBoxPostCode
-            // 
-            textBoxPostCode.Location = new Point(384, 143);
-            textBoxPostCode.Name = "textBoxPostCode";
-            textBoxPostCode.Size = new Size(375, 31);
-            textBoxPostCode.TabIndex = 23;
             // 
             // textBoxLocality
             // 
@@ -306,6 +285,7 @@
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Controls.Add(textBoxPostCode, 1, 4);
             tableLayoutPanel1.Controls.Add(labelLogin, 0, 0);
             tableLayoutPanel1.Controls.Add(labelFirstName, 0, 1);
             tableLayoutPanel1.Controls.Add(labelLastName, 0, 2);
@@ -325,12 +305,11 @@
             tableLayoutPanel1.Controls.Add(textBoxFirstName, 1, 1);
             tableLayoutPanel1.Controls.Add(textBoxLastName, 1, 2);
             tableLayoutPanel1.Controls.Add(textBoxLocality, 1, 3);
-            tableLayoutPanel1.Controls.Add(textBoxPostCode, 1, 4);
             tableLayoutPanel1.Controls.Add(textBoxStreet, 1, 5);
             tableLayoutPanel1.Controls.Add(textBoxPropertyNumber, 1, 6);
             tableLayoutPanel1.Controls.Add(textBoxHouseUnitNumber, 1, 7);
-            tableLayoutPanel1.Controls.Add(textBoxPESEL, 1, 8);
             tableLayoutPanel1.Controls.Add(textBoxEmail, 1, 11);
+            tableLayoutPanel1.Controls.Add(textBoxPESEL, 1, 8);
             tableLayoutPanel1.Controls.Add(textBoxPhone, 1, 12);
             tableLayoutPanel1.Location = new Point(3, 3);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -402,6 +381,28 @@
             checkedListBoxUprawnienia.Size = new Size(769, 452);
             checkedListBoxUprawnienia.TabIndex = 0;
             // 
+            // textBoxPostCode
+            // 
+            textBoxPostCode.Location = new Point(384, 143);
+            textBoxPostCode.Mask = "00-000";
+            textBoxPostCode.Name = "textBoxPostCode";
+            textBoxPostCode.Size = new Size(375, 31);
+            textBoxPostCode.TabIndex = 5;
+            // 
+            // textBoxPESEL
+            // 
+            textBoxPESEL.Location = new Point(384, 283);
+            textBoxPESEL.Name = "textBoxPESEL";
+            textBoxPESEL.Size = new Size(375, 31);
+            textBoxPESEL.TabIndex = 30;
+            // 
+            // textBoxPhone
+            // 
+            textBoxPhone.Location = new Point(384, 423);
+            textBoxPhone.Name = "textBoxPhone";
+            textBoxPhone.Size = new Size(375, 31);
+            textBoxPhone.TabIndex = 31;
+            // 
             // FormEditUser
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -425,13 +426,10 @@
         #endregion
         private Button buttonEditUser;
         private Button buttonForgetUser;
-        private TextBox textBoxPhone;
         private TextBox textBoxEmail;
-        private TextBox textBoxPESEL;
         private TextBox textBoxHouseUnitNumber;
         private TextBox textBoxPropertyNumber;
         private TextBox textBoxStreet;
-        private TextBox textBoxPostCode;
         private TextBox textBoxLocality;
         private TextBox textBoxLastName;
         private TextBox textBoxFirstName;
@@ -457,5 +455,8 @@
         private TabPage tabPageUserData;
         private TabPage tabPageUserUpra;
         private CheckedListBox checkedListBoxUprawnienia;
+        private MaskedTextBox textBoxPostCode;
+        private MaskedTextBox textBoxPESEL;
+        private MaskedTextBox textBoxPhone;
     }
 }

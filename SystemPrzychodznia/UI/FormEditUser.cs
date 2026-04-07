@@ -35,7 +35,7 @@ namespace SystemPrzychodznia
             userBeforeValid.FirstName = textBoxFirstName.Text.Trim();
             userBeforeValid.LastName = textBoxLastName.Text.Trim();
             userBeforeValid.Locality = textBoxLocality.Text.Trim();
-            userBeforeValid.PostalCode = textBoxPostCode.Text.Trim();
+            userBeforeValid.PostalCode = textBoxPostCode.Text.Trim().Replace("-","");
             userBeforeValid.Street = textBoxStreet.Text.Trim();
             userBeforeValid.PropertyNumber = textBoxPropertyNumber.Text.Trim();
             userBeforeValid.HouseUnitNumber = textBoxHouseUnitNumber.Text.Trim();
