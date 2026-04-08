@@ -41,35 +41,27 @@ namespace SystemPrzychodznia
                 userBeforeValid.Phone = textBoxPhone.Text.Trim();
                 userBeforeValid.Password = textBoxPass.Text;
 
-<<<<<<< HEAD
-                try
-                {
-                    ValidationResult valRe = _userService.AddUser(userBeforeValid);
-
-                    if (valRe.IsValid == true)
-                    {
-                        MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
-
-                    }
-                    else
-                    {
-                        string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
-                        MessageBox.Show(errorMessage, "Błąd walidacji");
-                    }
-=======
 
                 foreach (var item in checkedListBoxUprawnienia.CheckedItems)
                 {
                     userBeforeValid.Uprawnienia.Add(item.ToString());
                 }
 
-                ValidationResult valRe = _userService.AddUser(userBeforeValid);
-
-                if (valRe.IsValid == true)
+                try
                 {
-                    MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
-                    this.Close();
->>>>>>> master
+
+                    ValidationResult valRe = _userService.AddUser(userBeforeValid);
+
+                    if (valRe.IsValid == true)
+                    {
+                        MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
+                        this.Close();
+                    }
+                    else
+                    {
+                        string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                        MessageBox.Show(errorMessage, "Błąd walidacji");
+                    }
                 }
                 catch (Exception ex)
                 {
