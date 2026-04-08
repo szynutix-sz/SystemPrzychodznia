@@ -169,19 +169,6 @@ WHERE u.Login = 'SuperAdmin'
                   WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
                     AND up.ID_Uprawnienia = p.ID_Uprawnienia);";
             createTableCmd.ExecuteNonQuery();
-
-
-                INSERT OR IGNORE INTO UserRoles (UserId, RoleId) 
-                SELECT 
-                    (SELECT Id FROM Users WHERE Login = 'Lekarz1'),
-                    (SELECT Id FROM Roles WHERE Name = 'Lekarz')
-                WHERE EXISTS (SELECT 1 FROM Users WHERE Login = 'Lekarz1');
-
-                -- Lekarz musi zostać dodany do tabeli Doctors, aby mógł brać udział w wizytach
-                INSERT OR IGNORE INTO Doctors (UserId)
-                SELECT Id FROM Users WHERE Login = 'Lekarz1';
-            ";
-            insertInitialDataCmd.ExecuteNonQuery();
         }
     }
 }
