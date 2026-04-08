@@ -457,6 +457,113 @@ WHERE u.ID_Uzytkownika = $userId
             long count = (long)command.ExecuteScalar();
             return count > 0;
         }
+        public List<User> GetUsersByRole(string roleName)
+        {
+            var users = new List<User>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT u.Login, u.FirstName, u.LastName, u.Email, u.PESEL 
+                FROM Users u
+                JOIN UserRoles ur ON u.Id = ur.UserId
+                JOIN Roles r ON ur.RoleId = r.Id
+                WHERE u.Status = 'A' AND r.Name = $roleName;";
+
+            command.Parameters.AddWithValue("$roleName", roleName);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new User
+                {
+                    Login = reader.GetString(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Email = reader.GetString(3),
+                    PESEL = reader.GetString(4)
+                });
+            }
+            return users;
+        }
+
+        public void ForgetSystemUser(int userId, int adminId, string randomString, string fakePesel, string fakeDate)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                //Zmiana danych na losowe, ustawienie flagi RODO i zmiana statusu na 'F' (Forgotten)
+                var cmdUser = connection.CreateCommand();
+                cmdUser.Transaction = transaction;
+                cmdUser.CommandText = @"
+                    UPDATE Users 
+                    SET FirstName = $rand,
+                        LastName = $rand,
+                        PESEL = $pesel,
+                        BirthDate = $date,
+                        Gender = 'M',
+                        Status = 'F',
+                        ForgottenDate = CURRENT_TIMESTAMP,
+                        ForgottenBy = $adminId
+                    WHERE Id = $userId;";
+
+                cmdUser.Parameters.AddWithValue("$rand", randomString);
+                cmdUser.Parameters.AddWithValue("$pesel", fakePesel);
+                cmdUser.Parameters.AddWithValue("$date", fakeDate);
+                cmdUser.Parameters.AddWithValue("$adminId", adminId);
+                cmdUser.Parameters.AddWithValue("$userId", userId);
+                cmdUser.ExecuteNonQuery();
+
+                //Usunięcie ról (żeby nie mógł się zalogować ani nic robić)
+                var cmdRoles = connection.CreateCommand();
+                cmdRoles.Transaction = transaction;
+                cmdRoles.CommandText = "DELETE FROM UserRoles WHERE UserId = $userId;";
+                cmdRoles.Parameters.AddWithValue("$userId", userId);
+                cmdRoles.ExecuteNonQuery();
+
+                transaction.Commit();
+            }
+            catch (SqliteException) { transaction.Rollback(); throw; }
+            catch (Exception) { transaction.Rollback(); throw; }
+        }
+
+        public List<ForgottenUser> GetForgottenUsers(string searchId = null)
+        {
+            var users = new List<ForgottenUser>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            string query = @"
+                SELECT Id, FirstName || ' ' || LastName, ForgottenDate, ForgottenBy 
+                FROM Users 
+                WHERE ForgottenDate IS NOT NULL AND Status = 'F'";
+
+            if (!string.IsNullOrWhiteSpace(searchId))
+            {
+                query += " AND Id = $id";
+                command.Parameters.AddWithValue("$id", searchId);
+            }
+
+            command.CommandText = query;
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new ForgottenUser
+                {
+                    Identyfikator = reader.GetInt32(0),
+                    ImieINazwiskoPoZapomnieniu = reader.GetString(1),
+                    DataZapomnienia = reader.GetString(2),
+                    IdKtoZapomnial = reader.GetInt32(3)
+                });
+            }
+            return users;
+        }
 
 
     }
