@@ -426,6 +426,50 @@ WHERE u.Id = $userId
             }
             return users;
         }
+        public List<User> GetUsersByMultipleRoles(List<string> roleNames)
+        {
+            var users = new List<User>();
+
+            if (roleNames == null || roleNames.Count == 0) return users;
+
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+
+            var parameters = new List<string>();
+            for (int i = 0; i < roleNames.Count; i++)
+            {
+                string paramName = $"$r{i}";
+                parameters.Add(paramName);
+                command.Parameters.AddWithValue(paramName, roleNames[i]);
+            }
+
+            string inClause = string.Join(", ", parameters);
+
+            command.CommandText = $@"
+                SELECT u.Login, u.FirstName, u.LastName, u.Email, u.PESEL 
+                FROM Users u
+                JOIN UserRoles ur ON u.Id = ur.UserId
+                JOIN Roles r ON ur.RoleId = r.Id
+                WHERE u.IsForgotten = 0 AND r.Name IN ({inClause})
+                GROUP BY u.Id
+                HAVING COUNT(DISTINCT r.Id) = {roleNames.Count};";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new User
+                {
+                    Login = reader.GetString(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Email = reader.GetString(3),
+                    PESEL = reader.GetString(4)
+                });
+            }
+            return users;
+        }
 
         public void ForgetSystemUser(int userId, int adminId, string randomString, string fakePesel, string fakeDate)
         {

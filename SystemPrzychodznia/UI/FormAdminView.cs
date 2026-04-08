@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using SystemPrzychodznia.Data;
 using SystemPrzychodznia.Services;
+using SystemPrzychodznia.UI;
 
 namespace SystemPrzychodznia
 {
@@ -27,7 +28,7 @@ namespace SystemPrzychodznia
             UserList.Text = "Lista użytkowników";
         }
 
-        
+
         private void FormatGridColumnsForUsers()
         {
             if (dgvUsers.Columns.Contains("Login")) dgvUsers.Columns["Login"].HeaderText = "Login";
@@ -166,7 +167,7 @@ namespace SystemPrzychodznia
 
         private void comboBoxRoleSearch_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+
             if (sender is ComboBox comboBox && !string.IsNullOrEmpty(comboBox.Text))
             {
                 string selectedRole = comboBox.Text;
@@ -202,6 +203,41 @@ namespace SystemPrzychodznia
 
                 // Przywracamy ładne nazwy kolumn
                 FormatGridColumnsForUsers();
+            }
+        }
+
+        private void btnOpenFilter_Click(object sender, EventArgs e)
+        {
+            // 1. Pobieramy wszystkie role z bazy
+            var allRoles = _userService.GetUprawnienia();
+
+            // 2. Otwieramy nasz nowy popup, przekazując mu te role
+            using (var filterForm = new FormRoleFilter(allRoles))
+            {
+                // Pokaż okienko i poczekaj, aż użytkownik kliknie "Zastosuj" (DialogResult.OK)
+                if (filterForm.ShowDialog() == DialogResult.OK)
+                {
+                    var selected = filterForm.SelectedRoles;
+
+                    // 3. Sprawdzamy, czy cokolwiek zaznaczył
+                    if (selected.Count > 0)
+                    {
+                        var users = _userService.GetUsersByMultipleRoles(selected);
+
+                        _bindingSource.DataSource = users;
+                        dgvUsers.DataSource = _bindingSource;
+
+                        UserList.Text = $"Lista użytkowników (Filtry: {string.Join(", ", selected)})";
+                    }
+                    else
+                    {
+                        // Jeśli nic nie zaznaczył, pokazujemy wszystkich
+                        LoadUsers();
+                        UserList.Text = "Wszyscy użytkownicy";
+                    }
+
+                    FormatGridColumnsForUsers();
+                }
             }
         }
     }

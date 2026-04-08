@@ -78,6 +78,7 @@ namespace SystemPrzychodznia.Services
             return userBeforeValid;
         }
         public List<User> GetUsersByRole(string roleName) => _repository.GetUsersByRole(roleName);
+        public List<User> GetUsersByMultipleRoles(List<string> roleNames) => _repository.GetUsersByMultipleRoles(roleNames);
 
         public List<ForgottenUser> GetForgottenUsers(string searchId = null) => _repository.GetForgottenUsers(searchId);
 

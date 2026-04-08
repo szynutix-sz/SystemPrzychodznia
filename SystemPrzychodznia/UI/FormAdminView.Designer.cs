@@ -46,8 +46,7 @@
             buttonClearSearch = new Button();
             btnLoadForgotten = new Button();
             btnForget = new Button();
-            comboBoxRoleSearches = new ComboBox();
-            label1 = new Label();
+            btnOpenFilter = new Button();
             UserList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
             tableLayoutPanel1.SuspendLayout();
@@ -250,34 +249,22 @@
             btnForget.UseVisualStyleBackColor = true;
             btnForget.Click += btnForget_Click;
             // 
-            // comboBoxRoleSearches
+            // btnOpenFilter
             // 
-            comboBoxRoleSearches.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBoxRoleSearches.FormattingEnabled = true;
-            comboBoxRoleSearches.Items.AddRange(new object[] { "Administrator", "Recepcja", "Lekarz", "Pacjent" });
-            comboBoxRoleSearches.Location = new Point(224, 63);
-            comboBoxRoleSearches.Name = "comboBoxRoleSearches";
-            comboBoxRoleSearches.Size = new Size(121, 23);
-            comboBoxRoleSearches.TabIndex = 9;
-            comboBoxRoleSearches.SelectedIndexChanged += comboBoxRoleSearches_SelectedIndexChanged;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(125, 63);
-            label1.Name = "label1";
-            label1.Size = new Size(93, 15);
-            label1.TabIndex = 10;
-            label1.Text = "Wyszukaj po roli";
-            label1.Click += label1_Click_1;
+            btnOpenFilter.Location = new Point(735, 63);
+            btnOpenFilter.Name = "btnOpenFilter";
+            btnOpenFilter.Size = new Size(161, 23);
+            btnOpenFilter.TabIndex = 7;
+            btnOpenFilter.Text = "Filtruj role ⚙️";
+            btnOpenFilter.UseVisualStyleBackColor = true;
+            btnOpenFilter.Click += btnOpenFilter_Click;
             // 
             // FormAdminView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1203, 359);
-            Controls.Add(label1);
-            Controls.Add(comboBoxRoleSearches);
+            Controls.Add(btnOpenFilter);
             Controls.Add(btnForget);
             Controls.Add(btnLoadForgotten);
             Controls.Add(buttonClearSearch);
@@ -295,7 +282,6 @@
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -318,7 +304,6 @@
         private Button buttonClearSearch;
         private Button btnLoadForgotten;
         private Button btnForget;
-        private ComboBox comboBoxRoleSearches;
-        private Label label1;
+        private Button btnOpenFilter;
     }
 }
