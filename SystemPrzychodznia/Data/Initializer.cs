@@ -1,5 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
-//test
+
 namespace SystemPrzychodznia.Data
 {
     internal static class DatabaseInitializer
@@ -124,17 +124,62 @@ namespace SystemPrzychodznia.Data
                 INSERT OR IGNORE INTO Roles (Name) VALUES ('Lekarz');
                 INSERT OR IGNORE INTO Roles (Name) VALUES ('Pacjent');
 
-                -- Wstawienie konta SuperAdmin, jeśli nie istnieje
+                -- ==========================================
+                -- 1. SUPERADMIN
+                -- ==========================================
+                -- ZMARTWYCHWSTANIE SUPERADMINA (Resetowanie danych, jeśli ktoś go zapomniał RODO)
+                UPDATE Users 
+                SET FirstName = '-', 
+                    LastName = '-', 
+                    PESEL = '00000000000', 
+                    BirthDate = '2026/03/17', 
+                    Gender = '-', 
+                    Email = 'admin@przychodnia.pl', 
+                    Password = 'AdminPass',
+                    Status = 'A', 
+                    ForgottenDate = NULL, 
+                    ForgottenBy = NULL
+                WHERE Login = 'SuperAdmin' AND Status = 'F';
+
                 INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL, BirthDate, Gender, Email, Phone, Password)
                 SELECT 'SuperAdmin', '-', '-', '-', '-', '-', '-', '-', '00000000000', '2026/03/17', '-', 'admin@przychodnia.pl', '000000000', 'AdminPass'
                 WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'SuperAdmin');
 
-                -- Przypisanie roli 'Administrator' (Id=1) do konta 'SuperAdmin' (Id=1)
                 INSERT OR IGNORE INTO UserRoles (UserId, RoleId) 
                 SELECT 
                     (SELECT Id FROM Users WHERE Login = 'SuperAdmin'),
                     (SELECT Id FROM Roles WHERE Name = 'Administrator')
                 WHERE EXISTS (SELECT 1 FROM Users WHERE Login = 'SuperAdmin');
+
+                -- ==========================================
+                -- 2. KONTO TESTOWE: RECEPCJONISTA
+                -- ==========================================
+                INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL, BirthDate, Gender, Email, Phone, Password)
+                SELECT 'Recepcja1', 'Anna', 'Nowak', 'Warszawa', '00-001', 'Kwiatowa', '1', '2', '11111111111', '1990/05/20', 'K', 'recepcja@przychodnia.pl', '111222333', 'RecPass123'
+                WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'Recepcja1');
+
+                INSERT OR IGNORE INTO UserRoles (UserId, RoleId) 
+                SELECT 
+                    (SELECT Id FROM Users WHERE Login = 'Recepcja1'),
+                    (SELECT Id FROM Roles WHERE Name = 'Recepcjonista')
+                WHERE EXISTS (SELECT 1 FROM Users WHERE Login = 'Recepcja1');
+
+                -- ==========================================
+                -- 3. KONTO TESTOWE: LEKARZ
+                -- ==========================================
+                INSERT INTO Users (Login, FirstName, LastName, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber, PESEL, BirthDate, Gender, Email, Phone, Password)
+                SELECT 'Lekarz1', 'Jan', 'Kowalski', 'Kraków', '30-002', 'Lekarska', '10', '', '22222222222', '1985/10/10', 'M', 'lekarz@przychodnia.pl', '444555666', 'LekPass123'
+                WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'Lekarz1');
+
+                INSERT OR IGNORE INTO UserRoles (UserId, RoleId) 
+                SELECT 
+                    (SELECT Id FROM Users WHERE Login = 'Lekarz1'),
+                    (SELECT Id FROM Roles WHERE Name = 'Lekarz')
+                WHERE EXISTS (SELECT 1 FROM Users WHERE Login = 'Lekarz1');
+
+                -- Lekarz musi zostać dodany do tabeli Doctors, aby mógł brać udział w wizytach
+                INSERT OR IGNORE INTO Doctors (UserId)
+                SELECT Id FROM Users WHERE Login = 'Lekarz1';
             ";
             insertInitialDataCmd.ExecuteNonQuery();
         }

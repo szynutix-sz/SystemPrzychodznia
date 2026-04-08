@@ -37,4 +37,11 @@
 
         public string Password { get; set; } = string.Empty; // W praktyce hasło powinno być przechowywane w formie zaszyfrowanej (hash), ale dla uproszczenia trzymamy je jako tekst
     }
+    public class ForgottenUser
+    {
+        public int Identyfikator { get; set; }
+        public string ImieINazwiskoPoZapomnieniu { get; set; }
+        public string DataZapomnienia { get; set; }
+        public int IdKtoZapomnial { get; set; }
+    }
 }

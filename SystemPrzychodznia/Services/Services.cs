@@ -50,5 +50,26 @@ public ValidationResult AddUser(UserFull user)
             return new ValidationResult(true);
 
         }
+        public List<User> GetUsersByRole(string roleName) => _repository.GetUsersByRole(roleName);
+
+        public List<ForgottenUser> GetForgottenUsers(string searchId = null) => _repository.GetForgottenUsers(searchId);
+
+        public void ForgetSystemUser(int userIdToForget, int currentAdminId)
+        {
+            //Losowy ciąg znaków (imie, nazwisko)
+            string randomString = Guid.NewGuid().ToString("N").Substring(0, 10);
+
+            // Data i zgodny, ale losowy PESEL aby przechodzilo przez walidator
+            // Ustawiamy sztywną datę urodzenia: 1900-01-01
+            string fakeDate = "1900-01-01";
+
+            // Pesel musi zaczynać się od 000101 (zgodnie z metodą WyciagnijDateZPesel w Validator.cs)
+            // Pozostałe 5 cyfr generujemy losowo, aby zachować wymóg pola UNIQUE w bazie
+            Random rng = new Random();
+            string randomSuffix = rng.Next(10000, 99999).ToString();
+            string fakePesel = "000101" + randomSuffix;
+
+            _repository.ForgetSystemUser(userIdToForget, currentAdminId, randomString, fakePesel, fakeDate);
+        }
     }
 }

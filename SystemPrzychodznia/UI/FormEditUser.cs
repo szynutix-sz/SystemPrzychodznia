@@ -81,5 +81,9 @@ namespace SystemPrzychodznia
 
         }
 
+        private void buttonForgetUser_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
