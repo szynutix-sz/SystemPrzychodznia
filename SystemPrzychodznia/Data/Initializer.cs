@@ -12,12 +12,12 @@ namespace SystemPrzychodznia.Data
             connection.Open();
             var createTableCmd = connection.CreateCommand();
 
-            // Tłumaczymy bazę prowadzącego/kumpla na angielski, zachowując jej strukturę relacyjną!
+
             createTableCmd.CommandText = @"
 PRAGMA foreign_keys = ON;
 
 -- ============================================================
--- 1. Tabela Addresses (Projekt kumpla: Adres)
+-- 1. Tabela Addresses
 -- ============================================================
 CREATE TABLE IF NOT EXISTS Addresses (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS Addresses (
 );
 
 -- ============================================================
--- 2. Tabela Users (Projekt kumpla: Uzytkownik)
+-- 2. Tabela Users
 -- ============================================================
 CREATE TABLE IF NOT EXISTS Users (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 -- ============================================================
--- 3. Tabela PasswordHistory (Projekt kumpla: Historia_Hasel)
+-- 3. Tabela PasswordHistory
 -- ============================================================
 CREATE TABLE IF NOT EXISTS PasswordHistory (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS PasswordHistory (
 );
 
 -- ============================================================
--- 4. Tabela Roles (Projekt kumpla: Uprawnienie)
+-- 4. Tabela Roles
 -- ============================================================
 CREATE TABLE IF NOT EXISTS Roles (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS Roles (
 );
 
 -- ============================================================
--- 5. Tabela UserRoles (Projekt kumpla: Uzytkownik_Uprawnienie)
+-- 5. Tabela UserRoles
 -- ============================================================
 CREATE TABLE IF NOT EXISTS UserRoles (
     UserId INTEGER NOT NULL,
