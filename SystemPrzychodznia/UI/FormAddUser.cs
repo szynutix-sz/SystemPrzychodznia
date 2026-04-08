@@ -30,7 +30,7 @@ namespace SystemPrzychodznia
                 userBeforeValid.FirstName = textBoxFirstName.Text.Trim();
                 userBeforeValid.LastName = textBoxLastName.Text.Trim();
                 userBeforeValid.Locality = textBoxLocality.Text.Trim();
-                userBeforeValid.PostalCode = textBoxPostCode.Text.Trim();
+                userBeforeValid.PostalCode = textBoxPostCode.Text.Trim().Replace("-","");
                 userBeforeValid.Street = textBoxStreet.Text.Trim();
                 userBeforeValid.PropertyNumber = textBoxPropertyNumber.Text.Trim();
                 userBeforeValid.HouseUnitNumber = textBoxHouseUnitNumber.Text.Trim();
@@ -41,6 +41,12 @@ namespace SystemPrzychodznia
                 userBeforeValid.Phone = textBoxPhone.Text.Trim();
                 userBeforeValid.Password = textBoxPass.Text;
 
+
+                foreach (var item in checkedListBoxUprawnienia.CheckedItems)
+                {
+                    userBeforeValid.Uprawnienia.Add(item.ToString());
+                }
+
                 try
                 {
                     ValidationResult valRe = _userService.AddUser(userBeforeValid);
@@ -48,27 +54,14 @@ namespace SystemPrzychodznia
                     if (valRe.IsValid == true)
                     {
                         MessageBox.Show("Dodano użytkownika", "Dodano użytkownika");
-                        textBoxLogin.Clear();
-                        textBoxFirstName.Clear();
-                        textBoxLastName.Clear();
-                        textBoxLocality.Clear();
-                        textBoxPostCode.Clear();
-                        textBoxStreet.Clear();
-                        textBoxPropertyNumber.Clear();
-                        textBoxHouseUnitNumber.Clear();
-                        textBoxPESEL.Clear();
-                        BirthDateTimePicker.Value = DateTime.Today;
-                        comboBoxGender.SelectedIndex = -1;
-                        textBoxEmail.Clear();
-                        textBoxPhone.Clear();
-                        textBoxPass.Clear();
-                        textBoxPassRepeat.Clear();
+                        this.Close();
                     }
                     else
                     {
                         string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
                         MessageBox.Show(errorMessage, "Błąd walidacji");
                     }
+
                 }
                 catch (Exception ex)
                 {
@@ -91,6 +84,14 @@ namespace SystemPrzychodznia
             BirthDateTimePicker.Format = DateTimePickerFormat.Custom;
             BirthDateTimePicker.CustomFormat = "yyyy-MM-dd";
             //MessageBox.Show(BirthDateTimePicker.Value.ToString("yyyy-MM-dd"), "OK");
+
+            List<string> uprawnienia = _userService.GetUprawnienia();
+
+            foreach (string item in uprawnienia)
+            {
+                checkedListBoxUprawnienia.Items.Add(item);
+            }
         }
+
     }
 }

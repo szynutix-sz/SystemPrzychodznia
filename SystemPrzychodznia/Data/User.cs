@@ -10,13 +10,15 @@
         public string PESEL { get; set; } = string.Empty; // składnia 11 cyfr
 
         public string Email { get; set; } = string.Empty; //Unikalny, składnia nazwa_użytkownika@nazwa_domeny_niższa.nazwa_domeny_wyższa” 
+
+       
     }
 
     public class UserFull : User
     {
         public int Id { get; set; } // Unikalny identyfikator użytkownika (autogenerowany)
 
-
+        public List<string> Uprawnienia { get; set; } = new List<string>(); // Lista uprawnień użytkownika, np. "Admin", "User", "Doctor"
         public string Locality { get; set; } = string.Empty;
 
         public string PostalCode { get; set; } = string.Empty; // składnia 5 cyfr

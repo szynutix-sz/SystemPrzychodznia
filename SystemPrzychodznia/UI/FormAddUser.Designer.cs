@@ -28,7 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            buttonSendUser = new Button();
+            tabControlAddUser = new TabControl();
+            tabPageUserData = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
+            textBoxPhone = new MaskedTextBox();
             labelLogin = new Label();
             labelFirstName = new Label();
             labelLastName = new Label();
@@ -52,22 +56,57 @@
             textBoxFirstName = new TextBox();
             textBoxLastName = new TextBox();
             textBoxLocality = new TextBox();
-            textBoxPostCode = new TextBox();
             textBoxStreet = new TextBox();
             textBoxPropertyNumber = new TextBox();
             textBoxHouseUnitNumber = new TextBox();
-            textBoxPESEL = new TextBox();
             textBoxEmail = new TextBox();
-            textBoxPhone = new TextBox();
-            buttonSendUser = new Button();
+            textBoxPESEL = new MaskedTextBox();
+            textBoxPostCode = new MaskedTextBox();
+            tabPageUprawnienia = new TabPage();
+            checkedListBoxUprawnienia = new CheckedListBox();
+            tabControlAddUser.SuspendLayout();
+            tabPageUserData.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
+            tabPageUprawnienia.SuspendLayout();
             SuspendLayout();
+            // 
+            // buttonSendUser
+            // 
+            buttonSendUser.Location = new Point(391, 735);
+            buttonSendUser.Name = "buttonSendUser";
+            buttonSendUser.Size = new Size(374, 33);
+            buttonSendUser.TabIndex = 1;
+            buttonSendUser.Text = "Dodaj Użytkownika";
+            buttonSendUser.UseVisualStyleBackColor = true;
+            buttonSendUser.Click += buttonSendUser_Click;
+            // 
+            // tabControlAddUser
+            // 
+            tabControlAddUser.Controls.Add(tabPageUserData);
+            tabControlAddUser.Controls.Add(tabPageUprawnienia);
+            tabControlAddUser.Location = new Point(12, 12);
+            tabControlAddUser.Name = "tabControlAddUser";
+            tabControlAddUser.SelectedIndex = 0;
+            tabControlAddUser.Size = new Size(760, 721);
+            tabControlAddUser.TabIndex = 2;
+            // 
+            // tabPageUserData
+            // 
+            tabPageUserData.Controls.Add(tableLayoutPanel1);
+            tabPageUserData.Location = new Point(4, 34);
+            tabPageUserData.Name = "tabPageUserData";
+            tabPageUserData.Padding = new Padding(3);
+            tabPageUserData.Size = new Size(752, 683);
+            tabPageUserData.TabIndex = 0;
+            tabPageUserData.Text = "Dane Użytkownika";
+            tabPageUserData.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Controls.Add(textBoxPhone, 1, 14);
             tableLayoutPanel1.Controls.Add(labelLogin, 0, 0);
             tableLayoutPanel1.Controls.Add(labelFirstName, 0, 3);
             tableLayoutPanel1.Controls.Add(labelLastName, 0, 4);
@@ -91,14 +130,13 @@
             tableLayoutPanel1.Controls.Add(textBoxFirstName, 1, 3);
             tableLayoutPanel1.Controls.Add(textBoxLastName, 1, 4);
             tableLayoutPanel1.Controls.Add(textBoxLocality, 1, 5);
-            tableLayoutPanel1.Controls.Add(textBoxPostCode, 1, 6);
             tableLayoutPanel1.Controls.Add(textBoxStreet, 1, 7);
             tableLayoutPanel1.Controls.Add(textBoxPropertyNumber, 1, 8);
             tableLayoutPanel1.Controls.Add(textBoxHouseUnitNumber, 1, 9);
-            tableLayoutPanel1.Controls.Add(textBoxPESEL, 1, 10);
             tableLayoutPanel1.Controls.Add(textBoxEmail, 1, 13);
-            tableLayoutPanel1.Controls.Add(textBoxPhone, 1, 14);
-            tableLayoutPanel1.Location = new Point(11, 12);
+            tableLayoutPanel1.Controls.Add(textBoxPESEL, 1, 10);
+            tableLayoutPanel1.Controls.Add(textBoxPostCode, 1, 6);
+            tableLayoutPanel1.Location = new Point(0, 6);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 15;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 6.66666555F));
@@ -116,8 +154,16 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 6.66666555F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 6.66666555F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 6.66666555F));
-            tableLayoutPanel1.Size = new Size(761, 708);
-            tableLayoutPanel1.TabIndex = 0;
+            tableLayoutPanel1.Size = new Size(746, 670);
+            tableLayoutPanel1.TabIndex = 2;
+            // 
+            // textBoxPhone
+            // 
+            textBoxPhone.Location = new Point(376, 619);
+            textBoxPhone.Mask = "000000000";
+            textBoxPhone.Name = "textBoxPhone";
+            textBoxPhone.Size = new Size(367, 31);
+            textBoxPhone.TabIndex = 3;
             // 
             // labelLogin
             // 
@@ -132,7 +178,7 @@
             // labelFirstName
             // 
             labelFirstName.AutoSize = true;
-            labelFirstName.Location = new Point(3, 141);
+            labelFirstName.Location = new Point(3, 132);
             labelFirstName.Name = "labelFirstName";
             labelFirstName.Size = new Size(46, 25);
             labelFirstName.TabIndex = 1;
@@ -141,7 +187,7 @@
             // labelLastName
             // 
             labelLastName.AutoSize = true;
-            labelLastName.Location = new Point(3, 188);
+            labelLastName.Location = new Point(3, 176);
             labelLastName.Name = "labelLastName";
             labelLastName.Size = new Size(87, 25);
             labelLastName.TabIndex = 2;
@@ -150,7 +196,7 @@
             // labelLocality
             // 
             labelLocality.AutoSize = true;
-            labelLocality.Location = new Point(3, 235);
+            labelLocality.Location = new Point(3, 220);
             labelLocality.Name = "labelLocality";
             labelLocality.Size = new Size(112, 25);
             labelLocality.TabIndex = 3;
@@ -159,7 +205,7 @@
             // labelPostalCode
             // 
             labelPostalCode.AutoSize = true;
-            labelPostalCode.Location = new Point(3, 282);
+            labelPostalCode.Location = new Point(3, 264);
             labelPostalCode.Name = "labelPostalCode";
             labelPostalCode.Size = new Size(124, 25);
             labelPostalCode.TabIndex = 4;
@@ -168,7 +214,7 @@
             // labelStreet
             // 
             labelStreet.AutoSize = true;
-            labelStreet.Location = new Point(3, 329);
+            labelStreet.Location = new Point(3, 308);
             labelStreet.Name = "labelStreet";
             labelStreet.Size = new Size(49, 25);
             labelStreet.TabIndex = 5;
@@ -177,7 +223,7 @@
             // labelPropertyNumber
             // 
             labelPropertyNumber.AutoSize = true;
-            labelPropertyNumber.Location = new Point(3, 376);
+            labelPropertyNumber.Location = new Point(3, 352);
             labelPropertyNumber.Name = "labelPropertyNumber";
             labelPropertyNumber.Size = new Size(124, 25);
             labelPropertyNumber.TabIndex = 6;
@@ -186,7 +232,7 @@
             // labelHouseUnitNumber
             // 
             labelHouseUnitNumber.AutoSize = true;
-            labelHouseUnitNumber.Location = new Point(3, 423);
+            labelHouseUnitNumber.Location = new Point(3, 396);
             labelHouseUnitNumber.Name = "labelHouseUnitNumber";
             labelHouseUnitNumber.Size = new Size(118, 25);
             labelHouseUnitNumber.TabIndex = 7;
@@ -195,7 +241,7 @@
             // labelPESEL
             // 
             labelPESEL.AutoSize = true;
-            labelPESEL.Location = new Point(3, 470);
+            labelPESEL.Location = new Point(3, 440);
             labelPESEL.Name = "labelPESEL";
             labelPESEL.Size = new Size(58, 25);
             labelPESEL.TabIndex = 8;
@@ -204,7 +250,7 @@
             // labelBirthDate
             // 
             labelBirthDate.AutoSize = true;
-            labelBirthDate.Location = new Point(3, 517);
+            labelBirthDate.Location = new Point(3, 484);
             labelBirthDate.Name = "labelBirthDate";
             labelBirthDate.Size = new Size(134, 25);
             labelBirthDate.TabIndex = 9;
@@ -213,7 +259,7 @@
             // labelGender
             // 
             labelGender.AutoSize = true;
-            labelGender.Location = new Point(3, 564);
+            labelGender.Location = new Point(3, 528);
             labelGender.Name = "labelGender";
             labelGender.Size = new Size(44, 25);
             labelGender.TabIndex = 10;
@@ -222,7 +268,7 @@
             // labelEmail
             // 
             labelEmail.AutoSize = true;
-            labelEmail.Location = new Point(3, 611);
+            labelEmail.Location = new Point(3, 572);
             labelEmail.Name = "labelEmail";
             labelEmail.Size = new Size(112, 25);
             labelEmail.TabIndex = 11;
@@ -231,7 +277,7 @@
             // labelPhone
             // 
             labelPhone.AutoSize = true;
-            labelPhone.Location = new Point(3, 658);
+            labelPhone.Location = new Point(3, 616);
             labelPhone.Name = "labelPhone";
             labelPhone.Size = new Size(136, 25);
             labelPhone.TabIndex = 12;
@@ -240,7 +286,7 @@
             // labelPass
             // 
             labelPass.AutoSize = true;
-            labelPass.Location = new Point(3, 47);
+            labelPass.Location = new Point(3, 44);
             labelPass.Name = "labelPass";
             labelPass.Size = new Size(58, 25);
             labelPass.TabIndex = 13;
@@ -249,7 +295,7 @@
             // labelPassReapeat
             // 
             labelPassReapeat.AutoSize = true;
-            labelPassReapeat.Location = new Point(3, 94);
+            labelPassReapeat.Location = new Point(3, 88);
             labelPassReapeat.Name = "labelPassReapeat";
             labelPassReapeat.Size = new Size(124, 25);
             labelPassReapeat.TabIndex = 14;
@@ -259,138 +305,148 @@
             // 
             BirthDateTimePicker.CustomFormat = "yyyy-MM-dd";
             BirthDateTimePicker.ImeMode = ImeMode.Off;
-            BirthDateTimePicker.Location = new Point(383, 520);
+            BirthDateTimePicker.Location = new Point(376, 487);
             BirthDateTimePicker.Name = "BirthDateTimePicker";
-            BirthDateTimePicker.Size = new Size(374, 31);
+            BirthDateTimePicker.Size = new Size(367, 31);
             BirthDateTimePicker.TabIndex = 15;
             // 
             // comboBoxGender
             // 
             comboBoxGender.FormattingEnabled = true;
             comboBoxGender.Items.AddRange(new object[] { "M", "K" });
-            comboBoxGender.Location = new Point(383, 567);
+            comboBoxGender.Location = new Point(376, 531);
             comboBoxGender.Name = "comboBoxGender";
-            comboBoxGender.Size = new Size(374, 33);
+            comboBoxGender.Size = new Size(367, 33);
             comboBoxGender.TabIndex = 16;
             // 
             // textBoxLogin
             // 
-            textBoxLogin.Location = new Point(383, 3);
+            textBoxLogin.Location = new Point(376, 3);
             textBoxLogin.Name = "textBoxLogin";
-            textBoxLogin.Size = new Size(374, 31);
+            textBoxLogin.Size = new Size(367, 31);
             textBoxLogin.TabIndex = 17;
             // 
             // textBoxPass
             // 
-            textBoxPass.Location = new Point(383, 50);
+            textBoxPass.Location = new Point(376, 47);
             textBoxPass.Name = "textBoxPass";
-            textBoxPass.Size = new Size(374, 31);
+            textBoxPass.Size = new Size(367, 31);
             textBoxPass.TabIndex = 18;
             // 
             // textBoxPassRepeat
             // 
-            textBoxPassRepeat.Location = new Point(383, 97);
+            textBoxPassRepeat.Location = new Point(376, 91);
             textBoxPassRepeat.Name = "textBoxPassRepeat";
-            textBoxPassRepeat.Size = new Size(374, 31);
+            textBoxPassRepeat.Size = new Size(367, 31);
             textBoxPassRepeat.TabIndex = 19;
             // 
             // textBoxFirstName
             // 
-            textBoxFirstName.Location = new Point(383, 144);
+            textBoxFirstName.Location = new Point(376, 135);
             textBoxFirstName.Name = "textBoxFirstName";
-            textBoxFirstName.Size = new Size(374, 31);
+            textBoxFirstName.Size = new Size(367, 31);
             textBoxFirstName.TabIndex = 20;
             // 
             // textBoxLastName
             // 
-            textBoxLastName.Location = new Point(383, 191);
+            textBoxLastName.Location = new Point(376, 179);
             textBoxLastName.Name = "textBoxLastName";
-            textBoxLastName.Size = new Size(374, 31);
+            textBoxLastName.Size = new Size(367, 31);
             textBoxLastName.TabIndex = 21;
             // 
             // textBoxLocality
             // 
-            textBoxLocality.Location = new Point(383, 238);
+            textBoxLocality.Location = new Point(376, 223);
             textBoxLocality.Name = "textBoxLocality";
-            textBoxLocality.Size = new Size(374, 31);
+            textBoxLocality.Size = new Size(367, 31);
             textBoxLocality.TabIndex = 22;
-            // 
-            // textBoxPostCode
-            // 
-            textBoxPostCode.Location = new Point(383, 285);
-            textBoxPostCode.Name = "textBoxPostCode";
-            textBoxPostCode.Size = new Size(374, 31);
-            textBoxPostCode.TabIndex = 23;
             // 
             // textBoxStreet
             // 
-            textBoxStreet.Location = new Point(383, 332);
+            textBoxStreet.Location = new Point(376, 311);
             textBoxStreet.Name = "textBoxStreet";
-            textBoxStreet.Size = new Size(374, 31);
+            textBoxStreet.Size = new Size(367, 31);
             textBoxStreet.TabIndex = 24;
             // 
             // textBoxPropertyNumber
             // 
-            textBoxPropertyNumber.Location = new Point(383, 379);
+            textBoxPropertyNumber.Location = new Point(376, 355);
             textBoxPropertyNumber.Name = "textBoxPropertyNumber";
-            textBoxPropertyNumber.Size = new Size(374, 31);
+            textBoxPropertyNumber.Size = new Size(367, 31);
             textBoxPropertyNumber.TabIndex = 25;
             // 
             // textBoxHouseUnitNumber
             // 
-            textBoxHouseUnitNumber.Location = new Point(383, 426);
+            textBoxHouseUnitNumber.Location = new Point(376, 399);
             textBoxHouseUnitNumber.Name = "textBoxHouseUnitNumber";
-            textBoxHouseUnitNumber.Size = new Size(374, 31);
+            textBoxHouseUnitNumber.Size = new Size(367, 31);
             textBoxHouseUnitNumber.TabIndex = 26;
-            // 
-            // textBoxPESEL
-            // 
-            textBoxPESEL.Location = new Point(383, 473);
-            textBoxPESEL.Name = "textBoxPESEL";
-            textBoxPESEL.Size = new Size(374, 31);
-            textBoxPESEL.TabIndex = 27;
             // 
             // textBoxEmail
             // 
-            textBoxEmail.Location = new Point(383, 614);
+            textBoxEmail.Location = new Point(376, 575);
             textBoxEmail.Name = "textBoxEmail";
-            textBoxEmail.Size = new Size(374, 31);
+            textBoxEmail.Size = new Size(367, 31);
             textBoxEmail.TabIndex = 28;
             // 
-            // textBoxPhone
+            // textBoxPESEL
             // 
-            textBoxPhone.Location = new Point(383, 661);
-            textBoxPhone.Name = "textBoxPhone";
-            textBoxPhone.Size = new Size(374, 31);
-            textBoxPhone.TabIndex = 29;
+            textBoxPESEL.Location = new Point(376, 443);
+            textBoxPESEL.Mask = "00000000000";
+            textBoxPESEL.Name = "textBoxPESEL";
+            textBoxPESEL.Size = new Size(367, 31);
+            textBoxPESEL.TabIndex = 3;
             // 
-            // buttonSendUser
+            // textBoxPostCode
             // 
-            buttonSendUser.Location = new Point(394, 727);
-            buttonSendUser.Name = "buttonSendUser";
-            buttonSendUser.Size = new Size(374, 33);
-            buttonSendUser.TabIndex = 1;
-            buttonSendUser.Text = "Dodaj Użytkownika";
-            buttonSendUser.UseVisualStyleBackColor = true;
-            buttonSendUser.Click += buttonSendUser_Click;
+            textBoxPostCode.Location = new Point(376, 267);
+            textBoxPostCode.Mask = "00-000";
+            textBoxPostCode.Name = "textBoxPostCode";
+            textBoxPostCode.Size = new Size(367, 31);
+            textBoxPostCode.TabIndex = 29;
+            // 
+            // tabPageUprawnienia
+            // 
+            tabPageUprawnienia.Controls.Add(checkedListBoxUprawnienia);
+            tabPageUprawnienia.Location = new Point(4, 34);
+            tabPageUprawnienia.Name = "tabPageUprawnienia";
+            tabPageUprawnienia.Padding = new Padding(3);
+            tabPageUprawnienia.Size = new Size(752, 683);
+            tabPageUprawnienia.TabIndex = 1;
+            tabPageUprawnienia.Text = "Uprawnienia";
+            tabPageUprawnienia.UseVisualStyleBackColor = true;
+            // 
+            // checkedListBoxUprawnienia
+            // 
+            checkedListBoxUprawnienia.FormattingEnabled = true;
+            checkedListBoxUprawnienia.Location = new Point(6, 2);
+            checkedListBoxUprawnienia.Name = "checkedListBoxUprawnienia";
+            checkedListBoxUprawnienia.Size = new Size(740, 676);
+            checkedListBoxUprawnienia.TabIndex = 0;
             // 
             // FormAddUser
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(786, 833);
+            ClientSize = new Size(786, 772);
+            Controls.Add(tabControlAddUser);
             Controls.Add(buttonSendUser);
-            Controls.Add(tableLayoutPanel1);
             Name = "FormAddUser";
             Text = "Dodaj Użytkownika";
             Load += FormAddUser_Load;
+            tabControlAddUser.ResumeLayout(false);
+            tabPageUserData.ResumeLayout(false);
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            tabPageUprawnienia.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-
+        private Button buttonSendUser;
+        private TabControl tabControlAddUser;
+        private TabPage tabPageUserData;
+        private TabPage tabPageUprawnienia;
         private TableLayoutPanel tableLayoutPanel1;
         private Label labelLogin;
         private Label labelFirstName;
@@ -415,13 +471,13 @@
         private TextBox textBoxFirstName;
         private TextBox textBoxLastName;
         private TextBox textBoxLocality;
-        private TextBox textBoxPostCode;
         private TextBox textBoxStreet;
         private TextBox textBoxPropertyNumber;
         private TextBox textBoxHouseUnitNumber;
-        private TextBox textBoxPESEL;
         private TextBox textBoxEmail;
-        private TextBox textBoxPhone;
-        private Button buttonSendUser;
+        private MaskedTextBox textBoxPhone;
+        private MaskedTextBox textBoxPESEL;
+        private MaskedTextBox textBoxPostCode;
+        private CheckedListBox checkedListBoxUprawnienia;
     }
 }

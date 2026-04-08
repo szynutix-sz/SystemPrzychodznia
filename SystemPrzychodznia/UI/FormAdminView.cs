@@ -39,11 +39,21 @@ namespace SystemPrzychodznia
 
             // Opcjonalne formatowanie kolumn
             dgvUsers.Columns["Login"].HeaderText = "Login";
+            dgvUsers.Columns["Login"].Width = 250;
+
             dgvUsers.Columns["FirstName"].HeaderText = "Imię";
+            dgvUsers.Columns["FirstName"].Width = 250;
+
             dgvUsers.Columns["LastName"].HeaderText = "Nazwisko";
+            dgvUsers.Columns["LastName"].Width = 250;
+
             dgvUsers.Columns["Email"].HeaderText = "Email";
+            dgvUsers.Columns["Email"].Width = 350;
+
             dgvUsers.Columns["PESEL"].HeaderText = "PESEL";
-            dgvUsers.AutoResizeColumns();
+            dgvUsers.Columns["PESEL"].Width = 150;
+
+
         }
 
         private void FormAdminView_Load(object sender, EventArgs e)
