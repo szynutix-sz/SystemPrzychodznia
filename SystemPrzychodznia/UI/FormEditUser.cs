@@ -159,7 +159,8 @@ namespace SystemPrzychodznia
 
             if (result == DialogResult.Yes)
             {
-                _userService.ForgetUser(uF.Id);
+                // Tutaj podajemy Id usuwanego użytkownika (uF.Id) oraz Id admina (1)
+                _userService.ForgetSystemUser(uF.Id, 1);
                 MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
                 this.Close();
             }

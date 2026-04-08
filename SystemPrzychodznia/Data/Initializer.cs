@@ -10,165 +10,139 @@ namespace SystemPrzychodznia.Data
         {
             using var connection = new SqliteConnection(ConnectionString);
             connection.Open();
-
-
             var createTableCmd = connection.CreateCommand();
+
+            // Tłumaczymy bazę prowadzącego/kumpla na angielski, zachowując jej strukturę relacyjną!
             createTableCmd.CommandText = @"
 PRAGMA foreign_keys = ON;
 
 -- ============================================================
--- 1. Tabela Adres
+-- 1. Tabela Addresses (Projekt kumpla: Adres)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS Adres (
-    ID_Adresu INTEGER PRIMARY KEY AUTOINCREMENT,
-    Miejscowosc TEXT NOT NULL,
-    Kod_pocztowy TEXT NOT NULL,
-    Ulica TEXT NOT NULL,
-    Numer_posesji_domu TEXT NOT NULL,
-    Numer_lokalu_mieszkania TEXT
+CREATE TABLE IF NOT EXISTS Addresses (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Locality TEXT NOT NULL,
+    PostalCode TEXT NOT NULL,
+    Street TEXT NOT NULL,
+    PropertyNumber TEXT NOT NULL,
+    HouseUnitNumber TEXT
 );
 
 -- ============================================================
--- 2. Tabela Uzytkownik
+-- 2. Tabela Users (Projekt kumpla: Uzytkownik)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS Uzytkownik (
-    ID_Uzytkownika INTEGER PRIMARY KEY AUTOINCREMENT,
-    ID_Adresu INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS Users (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    AddressId INTEGER NOT NULL,
     Login TEXT UNIQUE NOT NULL,
-    Imie TEXT NOT NULL,
-    Nazwisko TEXT NOT NULL,
+    FirstName TEXT NOT NULL,
+    LastName TEXT NOT NULL,
     PESEL TEXT UNIQUE NOT NULL,
-    Data_urodzenia TEXT NOT NULL,
-    Plec TEXT NOT NULL CHECK (Plec IN ('K', 'M', 'Inna')),
-    Adres_email TEXT UNIQUE NOT NULL,
-    Numer_telefonu TEXT NOT NULL,
-    Blokada_konta_do TEXT,
-    Czy_zapomniany INTEGER NOT NULL DEFAULT 0 CHECK (Czy_zapomniany IN (0,1)),
-    Data_zapomnienia TEXT,
-    ID_Kto_Zapomnial INTEGER,
-    FOREIGN KEY (ID_Adresu) REFERENCES Adres(ID_Adresu) ON DELETE RESTRICT,
-    FOREIGN KEY (ID_Kto_Zapomnial) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE SET NULL
+    BirthDate TEXT NOT NULL,
+    Gender TEXT NOT NULL CHECK (Gender IN ('K', 'M', 'Inna')),
+    Email TEXT UNIQUE NOT NULL,
+    Phone TEXT NOT NULL,
+    BlockedUntil TEXT,
+    IsForgotten INTEGER NOT NULL DEFAULT 0 CHECK (IsForgotten IN (0,1)),
+    ForgottenDate TEXT,
+    ForgottenBy INTEGER,
+    FOREIGN KEY (AddressId) REFERENCES Addresses(Id) ON DELETE RESTRICT,
+    FOREIGN KEY (ForgottenBy) REFERENCES Users(Id) ON DELETE SET NULL
 );
 
 -- ============================================================
--- 3. Tabela Historia_Hasel (przechowuje hasła)
+-- 3. Tabela PasswordHistory (Projekt kumpla: Historia_Hasel)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS Historia_Hasel (
-    ID_Hasla INTEGER PRIMARY KEY AUTOINCREMENT,
-    ID_Uzytkownika INTEGER NOT NULL,
-    Haslo_Hash TEXT NOT NULL,
-    Data_ustawienia TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ID_Uzytkownika) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS PasswordHistory (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId INTEGER NOT NULL,
+    PasswordHash TEXT NOT NULL,
+    CreatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
 );
 
 -- ============================================================
--- 4. Tabela Uprawnienie
+-- 4. Tabela Roles (Projekt kumpla: Uprawnienie)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS Uprawnienie (
-    ID_Uprawnienia INTEGER PRIMARY KEY AUTOINCREMENT,
-    Nazwa TEXT UNIQUE NOT NULL
+CREATE TABLE IF NOT EXISTS Roles (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT UNIQUE NOT NULL
 );
 
 -- ============================================================
--- 5. Tabela Uzytkownik_Uprawnienie (łączeniowa)
+-- 5. Tabela UserRoles (Projekt kumpla: Uzytkownik_Uprawnienie)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS Uzytkownik_Uprawnienie (
-    ID_Uzytkownika INTEGER NOT NULL,
-    ID_Uprawnienia INTEGER NOT NULL,
-    PRIMARY KEY (ID_Uzytkownika, ID_Uprawnienia),
-    FOREIGN KEY (ID_Uzytkownika) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE CASCADE,
-    FOREIGN KEY (ID_Uprawnienia) REFERENCES Uprawnienie(ID_Uprawnienia) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS UserRoles (
+    UserId INTEGER NOT NULL,
+    RoleId INTEGER NOT NULL,
+    PRIMARY KEY (UserId, RoleId),
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+    FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE CASCADE
 );
 
--- ============================================================
--- 6. Wstawienie domyślnego adresu (jeśli potrzeba dla SuperAdmina)
--- ============================================================
-INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
-SELECT '-', '-', '-', '-', '-'
-WHERE NOT EXISTS (SELECT 1 FROM Adres WHERE ID_Adresu = 1);
-
--- ============================================================
--- 7. Wstawienie użytkownika SuperAdmin (jeśli nie istnieje)
--- ============================================================
-INSERT INTO Uzytkownik (
-    ID_Adresu,
-    Login,
-    Imie,
-    Nazwisko,
-    PESEL,
-    Data_urodzenia,
-    Plec,
-    Adres_email,
-    Numer_telefonu,
-    Blokada_konta_do,
-    Czy_zapomniany,
-    Data_zapomnienia,
-    ID_Kto_Zapomnial
-)
-SELECT 
-    1,                                    -- ID_Adresu (zakładamy, że pierwszy adres ma ID=1)
-    'SuperAdmin',
-    '-',
-    '-',
-    '-',
-    '2026-03-17',                         -- format YYYY-MM-DD
-    'Inna',                                  -- Plec (wartość dozwolona: K/M/Inna, tu '-' nie jest dozwolone – poprawiam na 'Inna')
-    'customer_service@ict_supplier.com',
-    '000000000',
-    NULL,                                 -- brak blokady
-    0,                                    -- nie zapomniany
-    NULL,
-    NULL
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Login = 'SuperAdmin');
-
--- ============================================================
--- 8. Wstawienie hasła dla SuperAdmina (jeśli użytkownik został dodany)
---    UWAGA: W rzeczywistej aplikacji hasło powinno być silnie zahaszowane
--- ============================================================
-INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
-SELECT ID_Uzytkownika, 'AdminPass'   -- W PRODUKCJI: użyj hasha np. '$2y$10$...' 
-FROM Uzytkownik
-WHERE Login = 'SuperAdmin'
-  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h 
-                  JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika 
-                  WHERE u.Login = 'SuperAdmin');
-
--- ============================================================
--- 9. Dodanie uprawnień' (jeśli nie istnieją)
--- ============================================================
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'SuperAdmin'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');
-
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Admin'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Admin');
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Lekarz'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Lekarz');
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Recepcja'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Recepcja');
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Brak_roli'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Brak_roli');
-
--- ============================================================
--- 10. Nadanie uprawnienia 'SuperAdmin' dla SuperAdmina
--- ============================================================
-INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-SELECT u.ID_Uzytkownika, p.ID_Uprawnienia
-FROM Uzytkownik u, Uprawnienie p
-WHERE u.Login = 'SuperAdmin'
-  AND p.Nazwa = 'SuperAdmin'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up
-                  WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
-                    AND up.ID_Uprawnienia = p.ID_Uprawnienia);";
+CREATE TABLE IF NOT EXISTS Specializations (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL UNIQUE);
+CREATE TABLE IF NOT EXISTS Rooms (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS Doctors (UserId INTEGER PRIMARY KEY, FOREIGN KEY (UserId) REFERENCES Users(Id));
+CREATE TABLE IF NOT EXISTS DoctorSpecializations (UserId INTEGER NOT NULL, SpecializationId INTEGER NOT NULL, PRIMARY KEY (UserId, SpecializationId), FOREIGN KEY (UserId) REFERENCES Doctors(UserId), FOREIGN KEY (SpecializationId) REFERENCES Specializations(Id));
+CREATE TABLE IF NOT EXISTS Patients (Id INTEGER PRIMARY KEY AUTOINCREMENT, FirstName TEXT NOT NULL, LastName TEXT NOT NULL, PESEL TEXT NOT NULL UNIQUE, BirthDate TEXT NOT NULL, Gender TEXT NOT NULL, AddressId INTEGER NOT NULL, Email TEXT UNIQUE, Phone TEXT NOT NULL, FOREIGN KEY (AddressId) REFERENCES Addresses(Id) ON DELETE RESTRICT);
+CREATE TABLE IF NOT EXISTS Appointments (Id INTEGER PRIMARY KEY AUTOINCREMENT, PatientId INTEGER NOT NULL, DoctorId INTEGER NOT NULL, RoomId INTEGER NOT NULL, ScheduledDate TEXT NOT NULL, Status TEXT NOT NULL DEFAULT 'Registered', Symptoms TEXT, Recommendations TEXT, FOREIGN KEY (PatientId) REFERENCES Patients(Id), FOREIGN KEY (DoctorId) REFERENCES Doctors(UserId), FOREIGN KEY (RoomId) REFERENCES Rooms(Id));
+";
             createTableCmd.ExecuteNonQuery();
+
+            // ============================================================
+            // WSTAWIANIE DANYCH DOMYŚLNYCH I KONT TESTOWYCH
+            // ============================================================
+            var insertDataCmd = connection.CreateCommand();
+            insertDataCmd.CommandText = @"
+-- ROLE
+INSERT OR IGNORE INTO Roles (Name) VALUES ('SuperAdmin'), ('Administrator'), ('Lekarz'), ('Recepcja'), ('Brak_roli');
+
+-- ==========================================
+-- 1. SUPERADMIN (Zmartwychwstanie i inicjalizacja)
+-- ==========================================
+UPDATE Users SET FirstName = '-', LastName = '-', PESEL = '00000000000', BirthDate = '2026-03-17', Gender = 'Inna', Email = 'customer_service@ict_supplier.com', Phone = '000000000', IsForgotten = 0, ForgottenDate = NULL, ForgottenBy = NULL WHERE Login = 'SuperAdmin' AND IsForgotten = 1;
+
+INSERT INTO Addresses (Id, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber) SELECT 1, '-', '-', '-', '-', '-' WHERE NOT EXISTS (SELECT 1 FROM Addresses WHERE Id = 1);
+
+INSERT INTO Users (Id, AddressId, Login, FirstName, LastName, PESEL, BirthDate, Gender, Email, Phone, BlockedUntil, IsForgotten)
+SELECT 1, 1, 'SuperAdmin', '-', '-', '-', '2026-03-17', 'Inna', 'customer_service@ict_supplier.com', '000000000', NULL, 0
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'SuperAdmin');
+
+INSERT INTO PasswordHistory (UserId, PasswordHash) SELECT 1, 'AdminPass' WHERE NOT EXISTS (SELECT 1 FROM PasswordHistory WHERE UserId = 1);
+
+-- DODANIE RÓL DLA SUPERADMINA (SuperAdmin oraz Administrator)
+INSERT OR IGNORE INTO UserRoles (UserId, RoleId) SELECT 1, (SELECT Id FROM Roles WHERE Name = 'SuperAdmin');
+INSERT OR IGNORE INTO UserRoles (UserId, RoleId) SELECT 1, (SELECT Id FROM Roles WHERE Name = 'Administrator');
+
+-- ==========================================
+-- 2. KONTO TESTOWE: RECEPCJONISTA
+-- ==========================================
+INSERT INTO Addresses (Id, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber) SELECT 2, 'Warszawa', '00-001', 'Kwiatowa', '1', '2' WHERE NOT EXISTS (SELECT 1 FROM Addresses WHERE Id = 2);
+
+INSERT INTO Users (Id, AddressId, Login, FirstName, LastName, PESEL, BirthDate, Gender, Email, Phone, BlockedUntil, IsForgotten)
+SELECT 2, 2, 'Recepcja1', 'Anna', 'Nowak', '11111111111', '1990-05-20', 'K', 'recepcja@przychodnia.pl', '111222333', NULL, 0
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'Recepcja1');
+
+INSERT INTO PasswordHistory (UserId, PasswordHash) SELECT 2, 'RecPass123' WHERE NOT EXISTS (SELECT 1 FROM PasswordHistory WHERE UserId = 2);
+
+INSERT OR IGNORE INTO UserRoles (UserId, RoleId) SELECT 2, (SELECT Id FROM Roles WHERE Name = 'Recepcja');
+
+-- ==========================================
+-- 3. KONTO TESTOWE: LEKARZ
+-- ==========================================
+INSERT INTO Addresses (Id, Locality, PostalCode, Street, PropertyNumber, HouseUnitNumber) SELECT 3, 'Kraków', '30-002', 'Lekarska', '10', '' WHERE NOT EXISTS (SELECT 1 FROM Addresses WHERE Id = 3);
+
+INSERT INTO Users (Id, AddressId, Login, FirstName, LastName, PESEL, BirthDate, Gender, Email, Phone, BlockedUntil, IsForgotten)
+SELECT 3, 3, 'Lekarz1', 'Jan', 'Kowalski', '22222222222', '1985-10-10', 'M', 'lekarz@przychodnia.pl', '444555666', NULL, 0
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Login = 'Lekarz1');
+
+INSERT INTO PasswordHistory (UserId, PasswordHash) SELECT 3, 'LekPass123' WHERE NOT EXISTS (SELECT 1 FROM PasswordHistory WHERE UserId = 3);
+
+INSERT OR IGNORE INTO UserRoles (UserId, RoleId) SELECT 3, (SELECT Id FROM Roles WHERE Name = 'Lekarz');
+
+INSERT OR IGNORE INTO Doctors (UserId) SELECT 3;
+";
+            insertDataCmd.ExecuteNonQuery();
         }
     }
 }

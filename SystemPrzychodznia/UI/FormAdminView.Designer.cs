@@ -254,7 +254,7 @@
             // 
             comboBoxRoleSearches.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxRoleSearches.FormattingEnabled = true;
-            comboBoxRoleSearches.Items.AddRange(new object[] { "Administrator", "Recepcjonista", "Lekarz", "Pacjent" });
+            comboBoxRoleSearches.Items.AddRange(new object[] { "Administrator", "Recepcja", "Lekarz", "Pacjent" });
             comboBoxRoleSearches.Location = new Point(224, 63);
             comboBoxRoleSearches.Name = "comboBoxRoleSearches";
             comboBoxRoleSearches.Size = new Size(121, 23);
