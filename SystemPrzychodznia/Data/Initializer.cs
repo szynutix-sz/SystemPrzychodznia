@@ -12,7 +12,7 @@ namespace SystemPrzychodznia.Data
             connection.Open();
             var createTableCmd = connection.CreateCommand();
 
-            // Tłumaczymy bazę prowadzącego/kumpla na angielski, zachowując jej strukturę relacyjną!
+
             createTableCmd.CommandText = @"
 PRAGMA foreign_keys = ON;
 

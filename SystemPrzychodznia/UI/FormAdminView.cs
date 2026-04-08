@@ -27,7 +27,7 @@ namespace SystemPrzychodznia
             UserList.Text = "Lista użytkowników";
         }
 
-        // Metoda pomocnicza zapobiegająca crashom aplikacji przy zmianie danych
+        
         private void FormatGridColumnsForUsers()
         {
             if (dgvUsers.Columns.Contains("Login")) dgvUsers.Columns["Login"].HeaderText = "Login";
@@ -113,7 +113,7 @@ namespace SystemPrzychodznia
                 // Upewniamy się, że zaznaczono zwykłego usera, a nie tego z listy zapomnianych
                 if (_bindingSource.Current is User currentUser)
                 {
-                    // Pobieramy pełne dane, żeby poznać ID użytkownika (ponieważ klasa User w widoku go nie ma)
+                    // Pobieramy pełne dane, żeby poznać ID użytkownika 
                     var fullUser = _userService.GetUserFull(currentUser.Login);
 
                     // ZABEZPIECZENIE: Blokada usuwania SuperAdmina
@@ -123,7 +123,7 @@ namespace SystemPrzychodznia
                         return; // Przerwij działanie metody!
                     }
 
-                    int currentAdminId = 1; // UWAGA: Zakładamy że Admin ma Id = 1. W przyszłości podmień to na ID zalogowanego admina
+                    int currentAdminId = 1; // UWAGA: Zakładamy że Admin ma Id = 1.
 
                     var confirmResult = MessageBox.Show("Czy na pewno chcesz zanonimizować tego użytkownika? Tej operacji nie można cofnąć.",
                                                  "Potwierdzenie RODO", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
