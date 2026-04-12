@@ -48,11 +48,9 @@ namespace SystemPrzychodznia
             userBeforeValid.Phone = textBoxPhone.Text.Trim();
             userBeforeValid.Password = "DummyPassword"; // Nie jest edytowane, ale musi być przekazane do walidacji, więc ustawiamy na wartość tymczasową
 
-            foreach (Uprawnienie u in uF.Uprawnienia)
+            foreach (Uprawnienie u in userBeforeValid.Uprawnienia)
             {
-                Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Id == uF.Id);
-                if (up != null) up.Posiadane = u.Posiadane;
-
+                u.Posiadane = checkedListBoxUprawnienia.CheckedItems.Contains(u.Nazwa);
             }
 
             // trzeba by tą cześć przenieść do serwisu, by logike oddzielić od UI
@@ -105,7 +103,7 @@ namespace SystemPrzychodznia
             checkedListBoxUprawnienia.Items.Clear();
             foreach (Uprawnienie uprawnienie in uF.Uprawnienia)
             {
-                checkedListBoxUprawnienia.Items.Add(uprawnienie.Nazwa, uprawnienie.Posiadane);
+                checkedListBoxUprawnienia.Items.Add(uprawnienie.Nazwa, uprawnienie.Posiadane == true);
             }
 
 

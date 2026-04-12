@@ -9,6 +9,6 @@ namespace SystemPrzychodznia.Data
         public int Id { get; set; } = 0;
         public string Nazwa { get; set; } = string.Empty;
 
-        public bool Posiadane { get; set; } = false;
+        public bool? Posiadane { get; set; } = false;
     }
 }

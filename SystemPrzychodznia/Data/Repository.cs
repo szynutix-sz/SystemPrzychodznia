@@ -172,7 +172,7 @@ SELECT
     ID_Uprawnienia
 FROM Uprawnienie
 WHERE 
-    Nazwa NOT LIKE 'SuperAdmin'";
+    ID_Uprawnienia  != 1;";
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -208,7 +208,25 @@ WHERE
     AND Imie LIKE '%' || $firstName || '%'
     AND Nazwisko LIKE '%' || $lastName || '%'
     AND Adres_email LIKE '%' || $email || '%'
-    AND PESEL LIKE '%' || $pesel || '%';";
+    AND PESEL LIKE '%' || $pesel || '%'";
+
+
+            foreach (Uprawnienie u in s.Uprawnienia)
+            {
+                if (u.Posiadane == true)
+                {
+                    command.CommandText += $"\n AND ID_Uzytkownika IN (SELECT ID_Uzytkownika FROM Uzytkownik_Uprawnienie WHERE ID_Uprawnienia = {u.Id})";
+                    // można bez parametrów, bo u.Id jest intem i pochodzi z bazy danych, więc nie ma ryzyka SQL Injection
+                }
+                else if (u.Posiadane == false)
+                {
+                    command.CommandText += $"\n AND ID_Uzytkownika NOT IN (SELECT ID_Uzytkownika FROM Uzytkownik_Uprawnienie WHERE ID_Uprawnienia = {u.Id})";
+                    // można bez parametrów, bo u.Id jest intem i pochodzi z bazy danych, więc nie ma ryzyka SQL Injection
+                }
+                // jeśli u.Posiadane == null, to nie filtrujemy po tym uprawnieniu
+            }
+
+            command.CommandText += ";";
 
             command.Parameters.AddWithValue("$login", s.Login);
             command.Parameters.AddWithValue("$firstName", s.FirstName);
@@ -401,7 +419,7 @@ WHERE ID_Uzytkownika = $userId
             // Następnie dodajemy nowe uprawnienia
             foreach (Uprawnienie uprawnienie in noweUprawnienia)
             {
-                if (!uprawnienie.Posiadane)
+                if (uprawnienie.Posiadane == false)
                     continue; // pomijamy uprawnienia, które nie są zaznaczone jako posiadane
                 var insertCommand = connection.CreateCommand();
                 insertCommand.CommandText = @"

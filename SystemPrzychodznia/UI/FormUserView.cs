@@ -11,6 +11,7 @@ namespace SystemPrzychodznia
         public FormUserView()
         {
             InitializeComponent();
+            populateUprawnienia();
             LoadUsers();
         }
 
@@ -21,6 +22,9 @@ namespace SystemPrzychodznia
             textBoxLastName.Text = "";
             textBoxPESEL.Text = "";
             textBoxEmail.Text = "";
+            
+            populateUprawnienia();
+
             LoadUsers();
             UserList.Text = "Lista użytkowników";
         }
@@ -33,6 +37,22 @@ namespace SystemPrzychodznia
             s.LastName = textBoxLastName.Text;
             s.PESEL = textBoxPESEL.Text;
             s.Email = textBoxEmail.Text;
+
+            List<CheckBox> checkBoxes = flowLayoutPanelUprawnienia.Controls.OfType<CheckBox>().ToList();
+
+            foreach (CheckBox box in checkBoxes)
+            {
+                if (box == null) continue;
+
+                bool? p = null;
+                if (box.CheckState == CheckState.Checked) p = true;
+
+                else if (box.CheckState == CheckState.Indeterminate) p = false;
+                // z niewiadomych przyczyn Indeterminate jest traktowane jako negatywne, a nie jako nieznane
+
+                s.Uprawnienia.Add(new Uprawnienie { Id = (int)box.Tag, Posiadane = p, Nazwa = box.Text });
+            }
+
             var users = _userService.GetListUsers(s);
 
             _bindingSource.DataSource = users;
@@ -61,17 +81,25 @@ namespace SystemPrzychodznia
 
 
         }
-
-        private void FormAdminView_Load(object sender, EventArgs e)
+        private void populateUprawnienia()
         {
+            flowLayoutPanelUprawnienia.Controls.Clear();
             foreach (Uprawnienie u in _userService.GetUprawnienia())
             {
                 CheckBox cBox = new CheckBox();
                 cBox.Text = u.Nazwa;
                 cBox.ThreeState = true;
-                cBox.Width = 200;
+                cBox.Width = 110;
+                cBox.Height = 40;
+                cBox.Tag = u.Id;
+                cBox.CheckState = CheckState.Unchecked;
                 flowLayoutPanelUprawnienia.Controls.Add(cBox);
             }
+        }
+        private void FormAdminView_Load(object sender, EventArgs e)
+        {
+            populateUprawnienia();
+           
         }
 
         private void buttonAddUser_Click(object sender, EventArgs e)
