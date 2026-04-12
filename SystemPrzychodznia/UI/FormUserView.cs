@@ -48,6 +48,8 @@ namespace SystemPrzychodznia
 
             populateUprawnienia();
             LoadUsers();
+
+            this.Text = $"System Psychodnia - Zalogowano jako: {_currentUser.Login}";
         }
 
         private void ClearSearchFields()
