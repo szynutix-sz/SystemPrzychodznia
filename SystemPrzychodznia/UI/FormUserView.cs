@@ -17,36 +17,16 @@ namespace SystemPrzychodznia
             _userService = userService;
             _currentUser = _userService.GetUserFull(userID.Id);
 
-          
 
-
-            foreach (Uprawnienie u in _currentUser.Uprawnienia)
+            if (_currentUser.Uprawnienia.Exists(u =>
+               (u.Id == 1 && u.Posiadane == true) ||
+               (u.Id == 2 && u.Posiadane == true)
+               )
+              )
             {
-
-                if (u.Posiadane == true)
-                {
-                    switch (u.Id)
-                    {
-                        case 1:
-                            //superadmin do nothing
-                            _canLoadUsers = true;
-                            break;
-                        case 2:
-                            //admin
-                            _canLoadUsers = true;
-                            break;
-                        case 3:
-                            //lekarz
-                            break;
-                        case 4:
-                            //recepcja
-                            break;
-                        case 5:
-                            //brak_roli
-                            break;
-                    }
-                }
+                _canLoadUsers = true;
             }
+
 
             InitializeComponent();
 
