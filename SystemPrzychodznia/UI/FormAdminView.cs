@@ -34,8 +34,14 @@ namespace SystemPrzychodznia
             s.PESEL = textBoxPESEL.Text;
             s.Email = textBoxEmail.Text;
             var users = _userService.GetListUsers(s);
+
             _bindingSource.DataSource = users;
             dgvUsers.DataSource = _bindingSource;
+
+            if (users.Count == 0)
+            {
+                MessageBox.Show("Nie znaleziono użytkowników spełniających kryteria wyszukiwania.", "Brak wyników");
+            }
 
             // Opcjonalne formatowanie kolumn
             dgvUsers.Columns["Login"].HeaderText = "Login";
@@ -72,7 +78,7 @@ namespace SystemPrzychodznia
 
         private void FormAdminView_Activated(object sender, EventArgs e)
         {
-            ClearSearchFields();
+            //ClearSearchFields();
         }
 
         private void buttonSearchUser_Click(object sender, EventArgs e)
