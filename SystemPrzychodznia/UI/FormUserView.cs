@@ -64,7 +64,14 @@ namespace SystemPrzychodznia
 
         private void FormAdminView_Load(object sender, EventArgs e)
         {
-            _userService.GetUprawnienia();
+            foreach (Uprawnienie u in _userService.GetUprawnienia())
+            {
+                CheckBox cBox = new CheckBox();
+                cBox.Text = u.Nazwa;
+                cBox.ThreeState = true;
+                cBox.Width = 200;
+                flowLayoutPanelUprawnienia.Controls.Add(cBox);
+            }
         }
 
         private void buttonAddUser_Click(object sender, EventArgs e)

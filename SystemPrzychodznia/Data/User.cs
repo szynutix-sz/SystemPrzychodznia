@@ -1,4 +1,6 @@
-﻿namespace SystemPrzychodznia.Data
+﻿using System.CodeDom;
+
+namespace SystemPrzychodznia.Data
 {
     public class User
     {
@@ -38,5 +40,38 @@
         public string Phone { get; set; } = string.Empty; // składnia 9 cyfr, np. "123456789"
 
         public string Password { get; set; } = string.Empty; // W praktyce hasło powinno być przechowywane w formie zaszyfrowanej (hash), ale dla uproszczenia trzymamy je jako tekst
+
+        public static bool operator ==(UserFull lhs, UserFull rhs)
+        {
+            bool value = lhs.Login == rhs.Login && lhs.FirstName == rhs.FirstName;
+
+            value = value && lhs.LastName == rhs.LastName && lhs.Locality == rhs.Locality;
+            value = value && lhs.PostalCode == rhs.PostalCode && lhs.Street == rhs.Street;
+            value = value && lhs.PropertyNumber == rhs.PropertyNumber && lhs.HouseUnitNumber == rhs.HouseUnitNumber;
+            value = value && lhs.PESEL == rhs.PESEL && lhs.BirthDate == rhs.BirthDate;
+            value = value && lhs.Gender == rhs.Gender;
+            value = value && lhs.Email == rhs.Email && lhs.Phone == rhs.Phone;
+
+
+            foreach(Uprawnienie ulhs in lhs.Uprawnienia)
+            {
+                Uprawnienie urhs = rhs.Uprawnienia.Find(u => u.Id == ulhs.Id);
+                if (urhs == null)
+                {
+                    value = false;
+                    break;
+                }
+                value = value && (ulhs.Posiadane == urhs.Posiadane);
+            }
+
+            return value;
+
+        }
+
+        public static bool operator !=(UserFull lhs, UserFull rhs)
+        {
+            return !(lhs == rhs);
+        }
+
     }
 }

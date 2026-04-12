@@ -48,33 +48,15 @@ namespace SystemPrzychodznia
             userBeforeValid.Phone = textBoxPhone.Text.Trim();
             userBeforeValid.Password = "DummyPassword"; // Nie jest edytowane, ale musi być przekazane do walidacji, więc ustawiamy na wartość tymczasową
 
+            foreach (Uprawnienie u in uF.Uprawnienia)
+            {
+                Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Id == uF.Id);
+                if (up != null) up.Posiadane = u.Posiadane;
 
+            }
 
             // trzeba by tą cześć przenieść do serwisu, by logike oddzielić od UI
-            bool somethingChanged = userBeforeValid.Login != uF.Login || userBeforeValid.FirstName != uF.FirstName;
-
-            somethingChanged = somethingChanged || userBeforeValid.LastName != uF.LastName || userBeforeValid.Locality != uF.Locality;
-            somethingChanged = somethingChanged || userBeforeValid.PostalCode != uF.PostalCode || userBeforeValid.Street != uF.Street;
-            somethingChanged = somethingChanged || userBeforeValid.PropertyNumber != uF.PropertyNumber || userBeforeValid.HouseUnitNumber != uF.HouseUnitNumber;
-            somethingChanged = somethingChanged || userBeforeValid.PESEL != uF.PESEL || userBeforeValid.BirthDate != uF.BirthDate;
-            somethingChanged = somethingChanged || userBeforeValid.Gender != uF.Gender;
-            somethingChanged = somethingChanged || userBeforeValid.Email != uF.Email || userBeforeValid.Phone != uF.Phone;
-
-            foreach (string item in checkedListBoxUprawnienia.Items)
-            {
-                if (checkedListBoxUprawnienia.CheckedItems.Contains(item) && uF.Uprawnienia.Exists(u => u.Nazwa == item && u.Posiadane == false))
-                {
-                    somethingChanged = somethingChanged || true;
-                    Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Nazwa == item);
-                    up.Posiadane = true;
-                }
-                else if (!checkedListBoxUprawnienia.CheckedItems.Contains(item) && uF.Uprawnienia.Exists(u => u.Nazwa == item && u.Posiadane == true))
-                {
-                    somethingChanged = somethingChanged || true;
-                    Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Nazwa == item);
-                    up.Posiadane = false;
-                }
-            }
+            bool somethingChanged = !(userBeforeValid == uF);
 
             if (somethingChanged == true)
             {
