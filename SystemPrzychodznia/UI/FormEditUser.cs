@@ -115,7 +115,8 @@ namespace SystemPrzychodznia
             textBoxEmail.Text = uF.Email;
             textBoxPhone.Text = uF.Phone;
             this.Text = $"Podgląd użytkownika: {uF.Login}";
-            
+
+            checkedListBoxUprawnienia.Items.Clear();
             foreach (string uprawnienie in _userService.GetUprawnienia())
             {
                 checkedListBoxUprawnienia.Items.Add(uprawnienie, uF.Uprawnienia.Contains(uprawnienie));

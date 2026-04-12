@@ -70,7 +70,7 @@
             // 
             // buttonEditUser
             // 
-            buttonEditUser.Location = new Point(397, 514);
+            buttonEditUser.Location = new Point(397, 515);
             buttonEditUser.Name = "buttonEditUser";
             buttonEditUser.Size = new Size(381, 44);
             buttonEditUser.TabIndex = 1;
@@ -355,7 +355,7 @@
             // 
             // buttonUnlockEditing
             // 
-            buttonUnlockEditing.Location = new Point(396, 563);
+            buttonUnlockEditing.Location = new Point(396, 565);
             buttonUnlockEditing.Name = "buttonUnlockEditing";
             buttonUnlockEditing.Size = new Size(382, 41);
             buttonUnlockEditing.TabIndex = 3;
