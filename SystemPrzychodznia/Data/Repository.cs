@@ -186,7 +186,7 @@ WHERE
             return uprawnienia;
         }
 
-        public List<User> GetList(SearchTerms s)
+        public List<User> GetListUsers(SearchTerms s)
         {
             var users = new List<User>();
             using var connection = new SqliteConnection(_connectionString);
@@ -410,6 +410,43 @@ WHERE
             command.CommandText = "UPDATE Uzytkownik SET Czy_zapomniany = 1 WHERE ID_Uzytkownika = $id;";
             command.Parameters.AddWithValue("$id", id);
             command.ExecuteNonQuery();
+        }
+
+        public List<ForgottenUser> GetListForgottenUsers()
+        {
+            var users = new List<ForgottenUser>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+SELECT 
+    Login, 
+    Imie AS FirstName, 
+    Nazwisko AS LastName, 
+    Data_zapomnienia, 
+    ID_Kto_Zapomnial,
+    Id_Uzytkownika
+FROM Uzytkownik
+WHERE 
+    Czy_zapomniany = 1";
+
+            command.CommandText += ";";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new ForgottenUser
+                {
+                    Login = reader.GetString(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    DateForgotten = reader.GetString(3),
+                    ForgottenBy = reader.GetInt32(4),
+                    Id = reader.GetInt32(5)
+                });
+            }
+            return users;
         }
 
         public void ZmieńUprawnienia(int userId, List<Uprawnienie> noweUprawnienia)

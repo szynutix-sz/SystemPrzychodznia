@@ -2,12 +2,24 @@
 
 namespace SystemPrzychodznia.Data
 {
-    public class User
+    public class BaseUser
     {
         public int Id { get; set; } // Unikalny identyfikator użytkownika (autogenerowany)
         public string Login { get; set; } = string.Empty; // Unkialny login użytkownika
         public string FirstName { get; set; } = string.Empty;
+
         public string LastName { get; set; } = string.Empty;
+    }
+
+    public class ForgottenUser : BaseUser
+    {
+        public string DateForgotten { get; set; } = string.Empty ;
+
+        public int ForgottenBy { get; set; } = 0;
+    }
+
+    public class User : BaseUser
+    {
 
         public string PESEL { get; set; } = string.Empty; // składnia 11 cyfr
 

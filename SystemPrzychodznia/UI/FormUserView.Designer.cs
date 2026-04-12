@@ -34,7 +34,7 @@ namespace SystemPrzychodznia
             dgvUsers = new DataGridView();
             buttonAddUser = new Button();
             buttonSearchUser = new Button();
-            tableLayoutPanel1 = new TableLayoutPanel();
+            tableLayoutPanelUsers = new TableLayoutPanel();
             labelLogin = new Label();
             labelFirstName = new Label();
             labelLastName = new Label();
@@ -48,16 +48,22 @@ namespace SystemPrzychodznia
             buttonClearSearch = new Button();
             tabControlUserView = new TabControl();
             tabPageAdminViewUsers = new TabPage();
-            tabPageAdminViewForgotten = new TabPage();
-            tabPageAbout = new TabPage();
             groupBoxRoles = new GroupBox();
             flowLayoutPanelUprawnienia = new FlowLayoutPanel();
+            tabPageAdminViewForgotten = new TabPage();
+            groupBoxForgotten = new GroupBox();
+            dgvForgotten = new DataGridView();
+            tableLayoutPanelForgotten = new TableLayoutPanel();
+            tabPageAbout = new TabPage();
             UserList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
-            tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanelUsers.SuspendLayout();
             tabControlUserView.SuspendLayout();
             tabPageAdminViewUsers.SuspendLayout();
             groupBoxRoles.SuspendLayout();
+            tabPageAdminViewForgotten.SuspendLayout();
+            groupBoxForgotten.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvForgotten).BeginInit();
             SuspendLayout();
             // 
             // UserList
@@ -104,31 +110,31 @@ namespace SystemPrzychodznia
             buttonSearchUser.UseVisualStyleBackColor = true;
             buttonSearchUser.Click += buttonSearchUser_Click;
             // 
-            // tableLayoutPanel1
+            // tableLayoutPanelUsers
             // 
-            tableLayoutPanel1.ColumnCount = 5;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.Controls.Add(labelLogin, 0, 0);
-            tableLayoutPanel1.Controls.Add(labelFirstName, 1, 0);
-            tableLayoutPanel1.Controls.Add(labelLastName, 2, 0);
-            tableLayoutPanel1.Controls.Add(labelPESEL, 3, 0);
-            tableLayoutPanel1.Controls.Add(labelEmail, 4, 0);
-            tableLayoutPanel1.Controls.Add(textBoxLogin, 0, 1);
-            tableLayoutPanel1.Controls.Add(textBoxFirstName, 1, 1);
-            tableLayoutPanel1.Controls.Add(textBoxLastName, 2, 1);
-            tableLayoutPanel1.Controls.Add(textBoxPESEL, 3, 1);
-            tableLayoutPanel1.Controls.Add(textBoxEmail, 4, 1);
-            tableLayoutPanel1.Location = new Point(166, 6);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 2;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel1.Size = new Size(1359, 91);
-            tableLayoutPanel1.TabIndex = 3;
+            tableLayoutPanelUsers.ColumnCount = 5;
+            tableLayoutPanelUsers.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanelUsers.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanelUsers.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanelUsers.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanelUsers.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
+            tableLayoutPanelUsers.Controls.Add(labelLogin, 0, 0);
+            tableLayoutPanelUsers.Controls.Add(labelFirstName, 1, 0);
+            tableLayoutPanelUsers.Controls.Add(labelLastName, 2, 0);
+            tableLayoutPanelUsers.Controls.Add(labelPESEL, 3, 0);
+            tableLayoutPanelUsers.Controls.Add(labelEmail, 4, 0);
+            tableLayoutPanelUsers.Controls.Add(textBoxLogin, 0, 1);
+            tableLayoutPanelUsers.Controls.Add(textBoxFirstName, 1, 1);
+            tableLayoutPanelUsers.Controls.Add(textBoxLastName, 2, 1);
+            tableLayoutPanelUsers.Controls.Add(textBoxPESEL, 3, 1);
+            tableLayoutPanelUsers.Controls.Add(textBoxEmail, 4, 1);
+            tableLayoutPanelUsers.Location = new Point(166, 6);
+            tableLayoutPanelUsers.Name = "tableLayoutPanelUsers";
+            tableLayoutPanelUsers.RowCount = 2;
+            tableLayoutPanelUsers.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanelUsers.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanelUsers.Size = new Size(1359, 91);
+            tableLayoutPanelUsers.TabIndex = 3;
             // 
             // labelLogin
             // 
@@ -228,7 +234,7 @@ namespace SystemPrzychodznia
             tabControlUserView.Location = new Point(12, 12);
             tabControlUserView.Name = "tabControlUserView";
             tabControlUserView.SelectedIndex = 0;
-            tabControlUserView.Size = new Size(1691, 964);
+            tabControlUserView.Size = new Size(1691, 956);
             tabControlUserView.TabIndex = 5;
             // 
             // tabPageAdminViewUsers
@@ -238,33 +244,14 @@ namespace SystemPrzychodznia
             tabPageAdminViewUsers.Controls.Add(UserList);
             tabPageAdminViewUsers.Controls.Add(buttonClearSearch);
             tabPageAdminViewUsers.Controls.Add(buttonSearchUser);
-            tabPageAdminViewUsers.Controls.Add(tableLayoutPanel1);
+            tabPageAdminViewUsers.Controls.Add(tableLayoutPanelUsers);
             tabPageAdminViewUsers.Location = new Point(4, 34);
             tabPageAdminViewUsers.Name = "tabPageAdminViewUsers";
             tabPageAdminViewUsers.Padding = new Padding(3);
-            tabPageAdminViewUsers.Size = new Size(1683, 926);
+            tabPageAdminViewUsers.Size = new Size(1683, 918);
             tabPageAdminViewUsers.TabIndex = 0;
             tabPageAdminViewUsers.Text = "Użytkownicy";
             tabPageAdminViewUsers.UseVisualStyleBackColor = true;
-            // 
-            // tabPageAdminViewForgotten
-            // 
-            tabPageAdminViewForgotten.Location = new Point(4, 34);
-            tabPageAdminViewForgotten.Name = "tabPageAdminViewForgotten";
-            tabPageAdminViewForgotten.Size = new Size(1683, 926);
-            tabPageAdminViewForgotten.TabIndex = 2;
-            tabPageAdminViewForgotten.Text = "Zapomnieni";
-            tabPageAdminViewForgotten.UseVisualStyleBackColor = true;
-            // 
-            // tabPageAbout
-            // 
-            tabPageAbout.Location = new Point(4, 34);
-            tabPageAbout.Name = "tabPageAbout";
-            tabPageAbout.Padding = new Padding(3);
-            tabPageAbout.Size = new Size(1683, 926);
-            tabPageAbout.TabIndex = 1;
-            tabPageAbout.Text = "O Programie";
-            tabPageAbout.UseVisualStyleBackColor = true;
             // 
             // groupBoxRoles
             // 
@@ -283,11 +270,64 @@ namespace SystemPrzychodznia
             flowLayoutPanelUprawnienia.Size = new Size(1655, 68);
             flowLayoutPanelUprawnienia.TabIndex = 0;
             // 
+            // tabPageAdminViewForgotten
+            // 
+            tabPageAdminViewForgotten.Controls.Add(groupBoxForgotten);
+            tabPageAdminViewForgotten.Controls.Add(tableLayoutPanelForgotten);
+            tabPageAdminViewForgotten.Location = new Point(4, 34);
+            tabPageAdminViewForgotten.Name = "tabPageAdminViewForgotten";
+            tabPageAdminViewForgotten.Size = new Size(1683, 918);
+            tabPageAdminViewForgotten.TabIndex = 2;
+            tabPageAdminViewForgotten.Text = "Zapomnieni";
+            tabPageAdminViewForgotten.UseVisualStyleBackColor = true;
+            // 
+            // groupBoxForgotten
+            // 
+            groupBoxForgotten.Controls.Add(dgvForgotten);
+            groupBoxForgotten.Location = new Point(3, 156);
+            groupBoxForgotten.Name = "groupBoxForgotten";
+            groupBoxForgotten.Size = new Size(1677, 759);
+            groupBoxForgotten.TabIndex = 1;
+            groupBoxForgotten.TabStop = false;
+            groupBoxForgotten.Text = "Zapomnieni Użytkownicy";
+            // 
+            // dgvForgotten
+            // 
+            dgvForgotten.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvForgotten.Location = new Point(6, 30);
+            dgvForgotten.Name = "dgvForgotten";
+            dgvForgotten.RowHeadersWidth = 62;
+            dgvForgotten.Size = new Size(1665, 723);
+            dgvForgotten.TabIndex = 0;
+            // 
+            // tableLayoutPanelForgotten
+            // 
+            tableLayoutPanelForgotten.ColumnCount = 2;
+            tableLayoutPanelForgotten.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanelForgotten.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanelForgotten.Location = new Point(3, 3);
+            tableLayoutPanelForgotten.Name = "tableLayoutPanelForgotten";
+            tableLayoutPanelForgotten.RowCount = 2;
+            tableLayoutPanelForgotten.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanelForgotten.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanelForgotten.Size = new Size(1677, 150);
+            tableLayoutPanelForgotten.TabIndex = 0;
+            // 
+            // tabPageAbout
+            // 
+            tabPageAbout.Location = new Point(4, 34);
+            tabPageAbout.Name = "tabPageAbout";
+            tabPageAbout.Padding = new Padding(3);
+            tabPageAbout.Size = new Size(1683, 918);
+            tabPageAbout.TabIndex = 1;
+            tabPageAbout.Text = "O Programie";
+            tabPageAbout.UseVisualStyleBackColor = true;
+            // 
             // FormUserView
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1711, 966);
+            ClientSize = new Size(1711, 980);
             Controls.Add(tabControlUserView);
             Name = "FormUserView";
             Text = "System Przychodnia";
@@ -295,11 +335,14 @@ namespace SystemPrzychodznia
             Load += FormAdminView_Load;
             UserList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvUsers).EndInit();
-            tableLayoutPanel1.ResumeLayout(false);
-            tableLayoutPanel1.PerformLayout();
+            tableLayoutPanelUsers.ResumeLayout(false);
+            tableLayoutPanelUsers.PerformLayout();
             tabControlUserView.ResumeLayout(false);
             tabPageAdminViewUsers.ResumeLayout(false);
             groupBoxRoles.ResumeLayout(false);
+            tabPageAdminViewForgotten.ResumeLayout(false);
+            groupBoxForgotten.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvForgotten).EndInit();
             ResumeLayout(false);
         }
 
@@ -309,7 +352,7 @@ namespace SystemPrzychodznia
         private DataGridView dgvUsers;
         private Button buttonAddUser;
         private Button buttonSearchUser;
-        private TableLayoutPanel tableLayoutPanel1;
+        private TableLayoutPanel tableLayoutPanelUsers;
         private Label labelLogin;
         private Label labelFirstName;
         private Label labelLastName;
@@ -327,5 +370,8 @@ namespace SystemPrzychodznia
         private TabPage tabPageAdminViewForgotten;
         private GroupBox groupBoxRoles;
         private FlowLayoutPanel flowLayoutPanelUprawnienia;
+        private TableLayoutPanel tableLayoutPanelForgotten;
+        private GroupBox groupBoxForgotten;
+        private DataGridView dgvForgotten;
     }
 }

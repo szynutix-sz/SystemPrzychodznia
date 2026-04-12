@@ -31,9 +31,9 @@ namespace SystemPrzychodznia.Services
                     return new ValidationResult(true);
                 }
 
-        
 
-        public List<User> GetListUsers(SearchTerms s) => _repository.GetList(s);
+        public List<ForgottenUser> GetListForgottenUsers() => _repository.GetListForgottenUsers();
+        public List<User> GetListUsers(SearchTerms s) => _repository.GetListUsers(s);
 
         public UserFull GetUserFull(int id) => _repository.GetUserFull(id);
 
@@ -54,8 +54,6 @@ namespace SystemPrzychodznia.Services
             return new ValidationResult(true);
 
         }
-
-        public List<Uprawnienie> GetUserUprawnienia() => _repository.GetUprawnienia();
 
         public UserFull PrepareRawStrings(UserFull user)
         /// Metoda przygotowująca surowe dane do walidacji, np. usuwająca zbędne spacje

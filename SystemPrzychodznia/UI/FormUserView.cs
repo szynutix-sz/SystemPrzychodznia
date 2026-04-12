@@ -7,13 +7,14 @@ namespace SystemPrzychodznia
     public partial class FormUserView : Form
     {
         private readonly UserService _userService;
-        private BindingSource _bindingSource = new BindingSource();
+        private BindingSource _bindingSourceUsers = new BindingSource();
+        private BindingSource _bindingSourceForgotten = new BindingSource();
         private UserFull _currentUser;
         private bool _canLoadUsers = false;
 
         public FormUserView(IdHolder userID, UserService userService)
         {
-            
+
             _userService = userService;
             _currentUser = _userService.GetUserFull(userID.Id);
 
@@ -48,6 +49,7 @@ namespace SystemPrzychodznia
 
             populateUprawnienia();
             LoadUsers();
+            LoadForgottenUsers();
 
             this.Text = $"System Psychodnia - Zalogowano jako: {_currentUser.Login}";
         }
@@ -59,7 +61,7 @@ namespace SystemPrzychodznia
             textBoxLastName.Text = "";
             textBoxPESEL.Text = "";
             textBoxEmail.Text = "";
-            
+
             populateUprawnienia();
 
             LoadUsers();
@@ -93,8 +95,8 @@ namespace SystemPrzychodznia
 
             var users = _userService.GetListUsers(s);
 
-            _bindingSource.DataSource = users;
-            dgvUsers.DataSource = _bindingSource;
+            _bindingSourceUsers.DataSource = users;
+            dgvUsers.DataSource = _bindingSourceUsers;
 
             if (users.Count == 0)
             {
@@ -119,6 +121,33 @@ namespace SystemPrzychodznia
 
 
         }
+
+        private void LoadForgottenUsers()
+        {
+            if (_canLoadUsers == false) return;
+
+            var users = _userService.GetListForgottenUsers();
+
+            _bindingSourceForgotten.DataSource = users;
+            dgvForgotten.DataSource = _bindingSourceForgotten;
+
+            // Opcjonalne formatowanie kolumn
+            dgvForgotten.Columns["Id"].HeaderText = "Id";
+            dgvForgotten.Columns["Id"].Width = 50;
+
+            dgvForgotten.Columns["Login"].HeaderText = "Login";
+            dgvForgotten.Columns["Login"].Width = 250;
+
+            dgvForgotten.Columns["FirstName"].HeaderText = "Imię";
+            dgvForgotten.Columns["FirstName"].Width = 250;
+
+            dgvForgotten.Columns["LastName"].HeaderText = "Nazwisko";
+            dgvForgotten.Columns["LastName"].Width = 250;
+
+           
+
+
+        }
         private void populateUprawnienia()
         {
             flowLayoutPanelUprawnienia.Controls.Clear();
@@ -137,7 +166,7 @@ namespace SystemPrzychodznia
         private void FormAdminView_Load(object sender, EventArgs e)
         {
             populateUprawnienia();
-           
+
         }
 
         private void buttonAddUser_Click(object sender, EventArgs e)
@@ -175,7 +204,7 @@ namespace SystemPrzychodznia
         {
             if (e.RowIndex >= 0)
             {
-                var selectedUser = (User)_bindingSource[e.RowIndex];
+                var selectedUser = (User)_bindingSourceUsers[e.RowIndex];
                 using (Form EditUser = new FormEditUser(_userService, selectedUser))
                 {
                     EditUser.ShowDialog();
@@ -183,9 +212,5 @@ namespace SystemPrzychodznia
             }
         }
 
-        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }
