@@ -401,63 +401,38 @@ WHERE u.ID_Uzytkownika = $userId
             }
 }
 
-        public bool CzyIstniejeLogin(string login, int excludeId = 0)
+        public const int VAL_LOGIN = 0;
+        public const int VAL_EMAIL = 1;
+        public const int VAL_PESEL = 2;
+        public bool CzyIstniejeDanyUżytkowik(string wartoscAtrybutu, int jakiAtrybut, bool exlude = false, int excludeId = -1)
+        // funkcja do sprawdzenia czy istnieje już użytkownik z danym loginem, emailem lub PESELem.
+        // Jeśli exlude=true, to sprawdzamy czy istnieje inny użytkownik z tym atrybutem niż ten o ID=excludeId (przydatne przy edycji danych)
+        // jakiAtrybut: UserRepository.VAL_LOGIN, UserRepository.VAL_EMAIL, UserRepository.VAL_PESEL
         {
+            string atrybut = jakiAtrybut switch
+            {
+                VAL_LOGIN => "Login",
+                VAL_EMAIL => "Adres_email",
+                VAL_PESEL => "PESEL",
+                _ => throw new ArgumentException("Nieprawidłowy atrybut do sprawdzenia.")
+            };
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-            if (excludeId > 0)
+            if (exlude)
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Login = $login AND ID_Uzytkownika != $excludeId;";
+                command.CommandText = $"SELECT COUNT(*) FROM Uzytkownik WHERE {atrybut} = $wartoscAtrybutu AND ID_Uzytkownika != $excludeId;";
                 command.Parameters.AddWithValue("$excludeId", excludeId);
             }
             else
             {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Login = $login;";
+                command.CommandText = $"SELECT COUNT(*) FROM Uzytkownik WHERE {atrybut} = $wartoscAtrybutu;";
             }
-            command.Parameters.AddWithValue("$login", login);
-            long count = (long)command.ExecuteScalar();
+            
+            command.Parameters.AddWithValue("$wartoscAtrybutu", wartoscAtrybutu);
+            long count = (long)command.ExecuteScalar(); //bez long jest błąd przy castowaniu
             return count > 0;
         }
-
-        public bool CzyIstniejeEmail(string email, int excludeId = 0)
-        {
-            using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
-            var command = connection.CreateCommand();
-            if (excludeId > 0)
-            {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Adres_email = $email AND ID_Uzytkownika != $excludeId;";
-                command.Parameters.AddWithValue("$excludeId", excludeId);
-            }
-            else
-            {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE Adres_email = $email;";
-            }
-            command.Parameters.AddWithValue("$email", email);
-            long count = (long)command.ExecuteScalar();
-            return count > 0;
-        }
-
-        public bool CzyIstnieje_PESEL(string pesel, int excludeId = 0)
-        {
-            using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
-            var command = connection.CreateCommand();
-            if (excludeId > 0)
-            {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE PESEL = $pesel AND ID_Uzytkownika != $excludeId;";
-                command.Parameters.AddWithValue("$excludeId", excludeId);
-            }
-            else
-            {
-                command.CommandText = "SELECT COUNT(*) FROM Uzytkownik WHERE PESEL = $pesel;";
-            }
-            command.Parameters.AddWithValue("$pesel", pesel);
-            long count = (long)command.ExecuteScalar();
-            return count > 0;
-        }
-
 
     }
 }

@@ -14,7 +14,7 @@ namespace SystemPrzychodznia.Services
             _repository = repository;
         }
 
-        public ValidationResult ValidateUserFull(UserFull user, int excludeId = 0)
+        public ValidationResult ValidateUserFull(UserFull user, bool editing)
         {
             var errors = new List<string>();
 
@@ -85,14 +85,17 @@ namespace SystemPrzychodznia.Services
                 errors.Add("Hasło jest wymagane");
 
             // Walidacja unikalności loginu, email, PESEL
-            if (!string.IsNullOrWhiteSpace(user.Login) && _repository.CzyIstniejeLogin(user.Login))
-                errors.Add("Login jest już zajęty");
+            if (!string.IsNullOrWhiteSpace(user.Login) &&
+                _repository.CzyIstniejeDanyUżytkowik(user.Login,UserRepository.VAL_LOGIN, editing, user.Id))
+                errors.Add("Podany Login jest już zajęty");
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && _repository.CzyIstniejeEmail(user.Email))
-                errors.Add("Email jest już zajęty");
+            if (!string.IsNullOrWhiteSpace(user.Email) && 
+                _repository.CzyIstniejeDanyUżytkowik(user.Email, UserRepository.VAL_EMAIL, editing, user.Id))
+                errors.Add("Podany Email jest już zajęty");
 
-            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 && _repository.CzyIstnieje_PESEL(user.PESEL))
-                errors.Add("PESEL jest już w systemie");
+            if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 &&
+                _repository.CzyIstniejeDanyUżytkowik(user.PESEL, UserRepository.VAL_PESEL, editing, user.Id))
+                errors.Add("Podany PESEL jest już w systemie");
 
             // Walidacja formatu hasła - minimum 6 znaków
             if (!string.IsNullOrWhiteSpace(user.Password) && user.Password.Length < 6)

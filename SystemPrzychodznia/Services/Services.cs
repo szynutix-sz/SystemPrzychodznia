@@ -18,10 +18,10 @@ namespace SystemPrzychodznia.Services
             _validator = new Validator(_repository);
         }
 
-        public ValidationResult ValidateUserFull(UserFull user) => _validator.ValidateUserFull(user);
+        public ValidationResult ValidateUserFull(UserFull user, bool editing) => _validator.ValidateUserFull(user, editing);
         public ValidationResult AddUser(UserFull user)
                 {
-                    var validation = ValidateUserFull(user);
+                    var validation = ValidateUserFull(user, false);
                     if (!validation.IsValid)
                     {
                         return validation;
@@ -43,7 +43,7 @@ namespace SystemPrzychodznia.Services
 
         public ValidationResult EditUser(UserFull user)
         {
-            var validation = _validator.ValidateUserFull(user, user.Id);
+            var validation = _validator.ValidateUserFull(user, true);
 
             if (!validation.IsValid)
             {
