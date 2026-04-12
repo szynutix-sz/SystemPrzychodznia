@@ -125,6 +125,19 @@ namespace SystemPrzychodznia.Services
                     errors.Add("Data urodzenia nie zgadza się z datą zakodowaną w PESEL");
             }
 
+            // Walidacja płeć zgadza się z płcią zakodowaną w PESEL
+            if (!string.IsNullOrWhiteSpace(user.Gender)
+                && (user.Gender == "M" || user.Gender == "K")
+                && !string.IsNullOrWhiteSpace(user.PESEL)
+                && CzySameLiczby(user.PESEL))
+            {
+                if (!CzyPlecZgadzaSieZPesel(user.Gender, user.PESEL))
+                {
+                    errors.Add("Płeć nie zgadza się z płcią zakodowaną w PESEL");
+                }
+            }
+
+            
             return new ValidationResult(errors.Count == 0) { Errors = errors };
         }
 
@@ -145,6 +158,21 @@ namespace SystemPrzychodznia.Services
             else                    { rok = 1900 + rok2; miesiac = miesKod; }
 
             return $"{rok:D4}-{miesiac:D2}-{dzien:D2}";
+        }
+
+        private string WyciagnijPlecZPesel(string pesel)
+        {
+            int plecKod = int.Parse(pesel.Substring(9, 1));
+            string plec = (plecKod % 2 == 0) ? "K" : "M";
+            return plec;
+        }
+
+        private bool CzyPlecZgadzaSieZPesel(string plec, string pesel)
+        {
+            if (string.IsNullOrWhiteSpace(plec) || string.IsNullOrWhiteSpace(pesel) || pesel.Length != 11 || !CzySameLiczby(pesel))
+                return false;
+            string plecZPesel = WyciagnijPlecZPesel(pesel);
+            return plec == plecZPesel;
         }
 
         // Sprawdza czy string zawiera tylko cyfry

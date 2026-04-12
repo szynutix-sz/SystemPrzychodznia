@@ -147,7 +147,7 @@
             // comboBoxGender
             // 
             comboBoxGender.FormattingEnabled = true;
-            comboBoxGender.Items.AddRange(new object[] { "Mężczyzna", "Kobieta" });
+            comboBoxGender.Items.AddRange(new object[] { "M", "K" });
             comboBoxGender.Location = new Point(384, 353);
             comboBoxGender.Name = "comboBoxGender";
             comboBoxGender.Size = new Size(375, 33);
