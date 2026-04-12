@@ -6,11 +6,66 @@ namespace SystemPrzychodznia
 
     public partial class FormUserView : Form
     {
-        private readonly UserService _userService = new UserService();
+        private readonly UserService _userService;
         private BindingSource _bindingSource = new BindingSource();
-        public FormUserView()
+        private UserFull _currentUser;
+        private bool _canLoadUsers = false;
+
+        public FormUserView(IdHolder userID, UserService userService)
         {
+            
+            _userService = userService;
+            _currentUser = _userService.GetUserFull(userID.Id);
+
+          
+
+
+            foreach (Uprawnienie u in _currentUser.Uprawnienia)
+            {
+
+                if (u.Posiadane == true)
+                {
+                    switch (u.Id)
+                    {
+                        case 1:
+                            //superadmin do nothing
+                            _canLoadUsers = true;
+                            break;
+                        case 2:
+                            //admin
+                            _canLoadUsers = true;
+                            break;
+                        case 3:
+                            //lekarz
+                            break;
+                        case 4:
+                            //recepcja
+                            break;
+                        case 5:
+                            //brak_roli
+                            break;
+                    }
+                }
+            }
+
             InitializeComponent();
+
+            tabControlUserView.TabPages.Clear();
+
+
+            if (_currentUser.Uprawnienia.Exists(u =>
+                (u.Id == 1 && u.Posiadane == true) ||
+                (u.Id == 2 && u.Posiadane == true)
+                )
+               )
+            {
+                tabControlUserView.TabPages.Add(tabPageAdminViewUsers);
+                tabControlUserView.TabPages.Add(tabPageAdminViewForgotten);
+            }
+
+            tabControlUserView.TabPages.Add(tabPageAbout);
+
+
             populateUprawnienia();
             LoadUsers();
         }
@@ -31,6 +86,7 @@ namespace SystemPrzychodznia
 
         private void LoadUsers()
         {
+            if (_canLoadUsers == false) return;
             SearchTerms s = new SearchTerms();
             s.Login = textBoxLogin.Text;
             s.FirstName = textBoxFirstName.Text;

@@ -16,8 +16,13 @@ namespace SystemPrzychodznia
 
             DatabaseInitializer.Initialize();
 
+            UserService _userService = new UserService();
+            IdHolder _userID = new IdHolder();
+
             ApplicationConfiguration.Initialize();
-            Application.Run(new FormUserView());
+            
+            Application.Run(new FormLogin(_userID, _userService));
+            Application.Run(new FormUserView(_userID, _userService));
         }
     }
 }

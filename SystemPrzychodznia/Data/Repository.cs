@@ -388,6 +388,17 @@ WHERE
 
 
             users[0].Uprawnienia = GetUserUprawnienia(users[0].Id);
+
+            if (users[0].Id == 1) //jest to superadmin
+            {
+                users[0].Uprawnienia.Add(new Uprawnienie
+                {
+                    Id = 1,
+                    Nazwa = "SuperAdmin",
+                    Posiadane = true
+                });
+            }
+
             return users[0];
         }
 

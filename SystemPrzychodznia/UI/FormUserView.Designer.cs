@@ -1,4 +1,6 @@
-﻿namespace SystemPrzychodznia
+﻿using SystemPrzychodznia.Data;
+
+namespace SystemPrzychodznia
 {
     partial class FormUserView
     {
