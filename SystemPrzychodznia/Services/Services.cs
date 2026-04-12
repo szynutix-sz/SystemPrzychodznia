@@ -39,7 +39,7 @@ namespace SystemPrzychodznia.Services
 
         public void ForgetUser(int id) => _repository.ForgetUser(id);
 
-        public List<string> GetUprawnienia() => _repository.GetUprawnienia();
+        public List<Uprawnienie> GetUprawnienia() => _repository.GetUprawnienia();
 
         public ValidationResult EditUser(UserFull user)
         {
@@ -55,7 +55,7 @@ namespace SystemPrzychodznia.Services
 
         }
 
-        public List<string> GetUserUprawnienia() => _repository.GetUprawnienia();
+        public List<Uprawnienie> GetUserUprawnienia() => _repository.GetUprawnienia();
 
         public UserFull PrepareRawStrings(UserFull user)
         /// Metoda przygotowująca surowe dane do walidacji, np. usuwająca zbędne spacje

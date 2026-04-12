@@ -18,7 +18,7 @@
     {
         
 
-        public List<string> Uprawnienia { get; set; } = new List<string>(); // Lista uprawnień użytkownika, np. "Admin", "User", "Doctor"
+        public List<Uprawnienie> Uprawnienia { get; set; } = new List<Uprawnienie>(); // Lista uprawnień użytkownika, np. "Admin", "User", "Doctor"
         public string Locality { get; set; } = string.Empty;
 
         public string PostalCode { get; set; } = string.Empty; // składnia 5 cyfr

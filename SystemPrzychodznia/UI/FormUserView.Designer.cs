@@ -1,6 +1,6 @@
 ﻿namespace SystemPrzychodznia
 {
-    partial class FormAdminView
+    partial class FormUserView
     {
         /// <summary>
         ///  Required designer variable.
@@ -44,17 +44,26 @@
             textBoxPESEL = new TextBox();
             textBoxEmail = new TextBox();
             buttonClearSearch = new Button();
+            tabControlUserView = new TabControl();
+            tabPageAdminViewUsers = new TabPage();
+            tabPageAdminViewForgotten = new TabPage();
+            tabPageAbout = new TabPage();
+            groupBoxRoles = new GroupBox();
+            flowLayoutPanelUprawnienia = new FlowLayoutPanel();
             UserList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
             tableLayoutPanel1.SuspendLayout();
+            tabControlUserView.SuspendLayout();
+            tabPageAdminViewUsers.SuspendLayout();
+            groupBoxRoles.SuspendLayout();
             SuspendLayout();
             // 
             // UserList
             // 
             UserList.Controls.Add(dgvUsers);
-            UserList.Location = new Point(12, 104);
+            UserList.Location = new Point(6, 206);
             UserList.Name = "UserList";
-            UserList.Size = new Size(1694, 483);
+            UserList.Size = new Size(1671, 699);
             UserList.TabIndex = 0;
             UserList.TabStop = false;
             UserList.Text = "Lista Użytkowników";
@@ -69,13 +78,13 @@
             dgvUsers.Name = "dgvUsers";
             dgvUsers.ReadOnly = true;
             dgvUsers.RowHeadersWidth = 62;
-            dgvUsers.Size = new Size(1688, 453);
+            dgvUsers.Size = new Size(1665, 669);
             dgvUsers.TabIndex = 0;
             dgvUsers.CellDoubleClick += dgvUsers_CellDoubleClick;
             // 
             // buttonAddUser
             // 
-            buttonAddUser.Location = new Point(18, 15);
+            buttonAddUser.Location = new Point(6, 6);
             buttonAddUser.Name = "buttonAddUser";
             buttonAddUser.Size = new Size(149, 91);
             buttonAddUser.TabIndex = 1;
@@ -85,9 +94,9 @@
             // 
             // buttonSearchUser
             // 
-            buttonSearchUser.Location = new Point(1543, 63);
+            buttonSearchUser.Location = new Point(1531, 54);
             buttonSearchUser.Name = "buttonSearchUser";
-            buttonSearchUser.Size = new Size(163, 43);
+            buttonSearchUser.Size = new Size(146, 43);
             buttonSearchUser.TabIndex = 2;
             buttonSearchUser.Text = "Wyszukaj";
             buttonSearchUser.UseVisualStyleBackColor = true;
@@ -111,7 +120,7 @@
             tableLayoutPanel1.Controls.Add(textBoxLastName, 2, 1);
             tableLayoutPanel1.Controls.Add(textBoxPESEL, 3, 1);
             tableLayoutPanel1.Controls.Add(textBoxEmail, 4, 1);
-            tableLayoutPanel1.Location = new Point(178, 15);
+            tableLayoutPanel1.Location = new Point(166, 6);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 2;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
@@ -201,25 +210,84 @@
             // 
             // buttonClearSearch
             // 
-            buttonClearSearch.Location = new Point(1543, 14);
+            buttonClearSearch.Location = new Point(1531, 5);
             buttonClearSearch.Name = "buttonClearSearch";
-            buttonClearSearch.Size = new Size(160, 43);
+            buttonClearSearch.Size = new Size(146, 43);
             buttonClearSearch.TabIndex = 4;
             buttonClearSearch.Text = "Wyczyść";
             buttonClearSearch.UseVisualStyleBackColor = true;
             buttonClearSearch.Click += buttonClearSearch_Click;
             // 
-            // FormAdminView
+            // tabControlUserView
+            // 
+            tabControlUserView.Controls.Add(tabPageAdminViewUsers);
+            tabControlUserView.Controls.Add(tabPageAdminViewForgotten);
+            tabControlUserView.Controls.Add(tabPageAbout);
+            tabControlUserView.Location = new Point(12, 12);
+            tabControlUserView.Name = "tabControlUserView";
+            tabControlUserView.SelectedIndex = 0;
+            tabControlUserView.Size = new Size(1691, 964);
+            tabControlUserView.TabIndex = 5;
+            // 
+            // tabPageAdminViewUsers
+            // 
+            tabPageAdminViewUsers.Controls.Add(groupBoxRoles);
+            tabPageAdminViewUsers.Controls.Add(buttonAddUser);
+            tabPageAdminViewUsers.Controls.Add(UserList);
+            tabPageAdminViewUsers.Controls.Add(buttonClearSearch);
+            tabPageAdminViewUsers.Controls.Add(buttonSearchUser);
+            tabPageAdminViewUsers.Controls.Add(tableLayoutPanel1);
+            tabPageAdminViewUsers.Location = new Point(4, 34);
+            tabPageAdminViewUsers.Name = "tabPageAdminViewUsers";
+            tabPageAdminViewUsers.Padding = new Padding(3);
+            tabPageAdminViewUsers.Size = new Size(1683, 926);
+            tabPageAdminViewUsers.TabIndex = 0;
+            tabPageAdminViewUsers.Text = "Użytkownicy";
+            tabPageAdminViewUsers.UseVisualStyleBackColor = true;
+            // 
+            // tabPageAdminViewForgotten
+            // 
+            tabPageAdminViewForgotten.Location = new Point(4, 34);
+            tabPageAdminViewForgotten.Name = "tabPageAdminViewForgotten";
+            tabPageAdminViewForgotten.Size = new Size(1683, 926);
+            tabPageAdminViewForgotten.TabIndex = 2;
+            tabPageAdminViewForgotten.Text = "Zapomnieni";
+            tabPageAdminViewForgotten.UseVisualStyleBackColor = true;
+            // 
+            // tabPageAbout
+            // 
+            tabPageAbout.Location = new Point(4, 34);
+            tabPageAbout.Name = "tabPageAbout";
+            tabPageAbout.Padding = new Padding(3);
+            tabPageAbout.Size = new Size(1683, 926);
+            tabPageAbout.TabIndex = 1;
+            tabPageAbout.Text = "O Programie";
+            tabPageAbout.UseVisualStyleBackColor = true;
+            // 
+            // groupBoxRoles
+            // 
+            groupBoxRoles.Controls.Add(flowLayoutPanelUprawnienia);
+            groupBoxRoles.Location = new Point(9, 103);
+            groupBoxRoles.Name = "groupBoxRoles";
+            groupBoxRoles.Size = new Size(1665, 102);
+            groupBoxRoles.TabIndex = 5;
+            groupBoxRoles.TabStop = false;
+            groupBoxRoles.Text = "Uprawnienia";
+            // 
+            // flowLayoutPanelUprawnienia
+            // 
+            flowLayoutPanelUprawnienia.Location = new Point(10, 28);
+            flowLayoutPanelUprawnienia.Name = "flowLayoutPanelUprawnienia";
+            flowLayoutPanelUprawnienia.Size = new Size(1655, 68);
+            flowLayoutPanelUprawnienia.TabIndex = 0;
+            // 
+            // FormUserView
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1718, 599);
-            Controls.Add(buttonClearSearch);
-            Controls.Add(tableLayoutPanel1);
-            Controls.Add(buttonSearchUser);
-            Controls.Add(buttonAddUser);
-            Controls.Add(UserList);
-            Name = "FormAdminView";
+            ClientSize = new Size(1711, 966);
+            Controls.Add(tabControlUserView);
+            Name = "FormUserView";
             Text = "System Przychodnia";
             Activated += FormAdminView_Activated;
             Load += FormAdminView_Load;
@@ -227,6 +295,9 @@
             ((System.ComponentModel.ISupportInitialize)dgvUsers).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            tabControlUserView.ResumeLayout(false);
+            tabPageAdminViewUsers.ResumeLayout(false);
+            groupBoxRoles.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -248,5 +319,11 @@
         private TextBox textBoxPESEL;
         private TextBox textBoxEmail;
         private Button buttonClearSearch;
+        private TabControl tabControlUserView;
+        private TabPage tabPageAdminViewUsers;
+        private TabPage tabPageAbout;
+        private TabPage tabPageAdminViewForgotten;
+        private GroupBox groupBoxRoles;
+        private FlowLayoutPanel flowLayoutPanelUprawnienia;
     }
 }

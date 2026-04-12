@@ -44,7 +44,8 @@ namespace SystemPrzychodznia
 
                 foreach (var item in checkedListBoxUprawnienia.CheckedItems)
                 {
-                    userBeforeValid.Uprawnienia.Add(item.ToString());
+                    Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Nazwa == item.ToString());
+                    up.Posiadane = true;
                 }
 
                 try
@@ -85,11 +86,11 @@ namespace SystemPrzychodznia
             BirthDateTimePicker.CustomFormat = "yyyy-MM-dd";
             //MessageBox.Show(BirthDateTimePicker.Value.ToString("yyyy-MM-dd"), "OK");
 
-            List<string> uprawnienia = _userService.GetUprawnienia();
+            List<Uprawnienie> uprawnienia = _userService.GetUprawnienia();
 
-            foreach (string item in uprawnienia)
+            foreach (Uprawnienie item in uprawnienia)
             {
-                checkedListBoxUprawnienia.Items.Add(item);
+                checkedListBoxUprawnienia.Items.Add(item.Nazwa);
             }
         }
 

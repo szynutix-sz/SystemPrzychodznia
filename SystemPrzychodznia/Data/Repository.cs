@@ -133,15 +133,15 @@ SELECT ID_Uzytkownika FROM Uzytkownik WHERE Login = $login;
 
         }
 
-        public List<string> GetUserUprawnienia(int user_id)
+        public List<Uprawnienie> GetUserUprawnienia(int user_id)
         {
-            List<string> uprawnienia = new List<string>();
+            List<Uprawnienie> uprawnienia = GetUprawnienia();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-SELECT Uprawnienie.Nazwa
+SELECT Uprawnienie.ID_Uprawnienia
 FROM Uzytkownik_Uprawnienie
 JOIN Uprawnienie ON Uzytkownik_Uprawnienie.ID_Uprawnienia = Uprawnienie.ID_Uprawnienia
 WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;'";
@@ -150,20 +150,26 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;'";
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                uprawnienia.Add(reader.GetString(0));
+                int i = reader.GetInt32(0);
+                if (i == 1)
+                    continue; // pomijamy SuperAdmina, który nie jest normalnym uprawnieniem do przypisywania   
+                Uprawnienie up = uprawnienia.Find(u => u.Id == i);
+                up.Posiadane = true; 
+
             }
             return uprawnienia;
         }
-        public List<string> GetUprawnienia()
+        public List<Uprawnienie> GetUprawnienia()
         {
-            List<string> uprawnienia = new List<string>();
+            List<Uprawnienie> uprawnienia = new List<Uprawnienie>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
             var command = connection.CreateCommand();
             command.CommandText = @"
 SELECT 
-    Nazwa
+    Nazwa,
+    ID_Uprawnienia
 FROM Uprawnienie
 WHERE 
     Nazwa NOT LIKE 'SuperAdmin'";
@@ -171,7 +177,11 @@ WHERE
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                uprawnienia.Add(reader.GetString(0));
+                uprawnienia.Add(new Uprawnienie
+                {
+                    Nazwa = reader.GetString(0),
+                    Id = reader.GetInt32(1)
+                });
             }
             return uprawnienia;
         }
@@ -226,6 +236,10 @@ WHERE
         {
             try
             {
+                if (user.Id == 1)
+                {
+                    throw new UnauthorizedAccessException("Nie można edytować SuperAdmin");
+                }
                 using var connection = new SqliteConnection(_connectionString);
                 connection.Open();
                 var command = connection.CreateCommand();
@@ -354,6 +368,7 @@ WHERE
                 });
             }
 
+
             users[0].Uprawnienia = GetUserUprawnienia(users[0].Id);
             return users[0];
         }
@@ -368,7 +383,7 @@ WHERE
             command.ExecuteNonQuery();
         }
 
-        public void ZmieńUprawnienia(int userId, List<string> noweUprawnienia)
+        public void ZmieńUprawnienia(int userId, List<Uprawnienie> noweUprawnienia)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
@@ -384,21 +399,17 @@ WHERE ID_Uzytkownika = $userId
             deleteCommand.Parameters.AddWithValue("$userId", userId);
             deleteCommand.ExecuteNonQuery();
             // Następnie dodajemy nowe uprawnienia
-            foreach (var uprawnienie in noweUprawnienia)
+            foreach (Uprawnienie uprawnienie in noweUprawnienia)
             {
+                if (!uprawnienie.Posiadane)
+                    continue; // pomijamy uprawnienia, które nie są zaznaczone jako posiadane
                 var insertCommand = connection.CreateCommand();
                 insertCommand.CommandText = @"
 INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-SELECT u.ID_Uzytkownika, p.ID_Uprawnienia
-FROM Uzytkownik u, Uprawnienie p
-WHERE u.ID_Uzytkownika = $userId
-  AND p.Nazwa = $uprawnienie
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up
-                  WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
-                    AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+VALUES ( $userId , $uprawnienieId);
 ";
                 insertCommand.Parameters.AddWithValue("$userId", userId);
-                insertCommand.Parameters.AddWithValue("$uprawnienie", uprawnienie);
+                insertCommand.Parameters.AddWithValue("$uprawnienieId", uprawnienie.Id);
                 insertCommand.ExecuteNonQuery();
             }
 }

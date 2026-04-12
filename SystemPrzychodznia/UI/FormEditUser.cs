@@ -30,6 +30,8 @@ namespace SystemPrzychodznia
         {
             UserFull userBeforeValid = new UserFull();
 
+            userBeforeValid.Uprawnienia = _userService.GetUprawnienia();
+
             userBeforeValid.Id = uF.Id;
             userBeforeValid.Login = textBoxLogin.Text.Trim();
             userBeforeValid.FirstName = textBoxFirstName.Text.Trim();
@@ -60,15 +62,17 @@ namespace SystemPrzychodznia
 
             foreach (string item in checkedListBoxUprawnienia.Items)
             {
-                if (checkedListBoxUprawnienia.CheckedItems.Contains(item) && !uF.Uprawnienia.Contains(item))
+                if (checkedListBoxUprawnienia.CheckedItems.Contains(item) && uF.Uprawnienia.Exists(u => u.Nazwa == item && u.Posiadane == false))
                 {
                     somethingChanged = somethingChanged || true;
-                    userBeforeValid.Uprawnienia.Add(item);
+                    Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Nazwa == item);
+                    up.Posiadane = true;
                 }
-                else if (!checkedListBoxUprawnienia.CheckedItems.Contains(item) && uF.Uprawnienia.Contains(item))
+                else if (!checkedListBoxUprawnienia.CheckedItems.Contains(item) && uF.Uprawnienia.Exists(u => u.Nazwa == item && u.Posiadane == true))
                 {
                     somethingChanged = somethingChanged || true;
-                    userBeforeValid.Uprawnienia.Remove(item);
+                    Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Nazwa == item);
+                    up.Posiadane = false;
                 }
             }
 
@@ -117,9 +121,9 @@ namespace SystemPrzychodznia
             this.Text = $"Podgląd użytkownika: {uF.Login}";
 
             checkedListBoxUprawnienia.Items.Clear();
-            foreach (string uprawnienie in _userService.GetUprawnienia())
+            foreach (Uprawnienie uprawnienie in uF.Uprawnienia)
             {
-                checkedListBoxUprawnienia.Items.Add(uprawnienie, uF.Uprawnienia.Contains(uprawnienie));
+                checkedListBoxUprawnienia.Items.Add(uprawnienie.Nazwa, uprawnienie.Posiadane);
             }
 
 

@@ -17,7 +17,7 @@ namespace SystemPrzychodznia
             DatabaseInitializer.Initialize();
 
             ApplicationConfiguration.Initialize();
-            Application.Run(new FormAdminView());
+            Application.Run(new FormUserView());
         }
     }
 }

@@ -4,11 +4,11 @@ using SystemPrzychodznia.Services;
 namespace SystemPrzychodznia
 {
 
-    public partial class FormAdminView : Form
+    public partial class FormUserView : Form
     {
         private readonly UserService _userService = new UserService();
         private BindingSource _bindingSource = new BindingSource();
-        public FormAdminView()
+        public FormUserView()
         {
             InitializeComponent();
             LoadUsers();
@@ -64,7 +64,7 @@ namespace SystemPrzychodznia
 
         private void FormAdminView_Load(object sender, EventArgs e)
         {
-
+            _userService.GetUprawnienia();
         }
 
         private void buttonAddUser_Click(object sender, EventArgs e)
@@ -95,10 +95,10 @@ namespace SystemPrzychodznia
         private void buttonClearSearch_Click(object sender, EventArgs e)
         {
             ClearSearchFields();
-            
+
         }
 
-        private void dgvUsers_CellDoubleClick (object sender, DataGridViewCellEventArgs e)
+        private void dgvUsers_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
@@ -110,5 +110,9 @@ namespace SystemPrzychodznia
             }
         }
 
+        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
