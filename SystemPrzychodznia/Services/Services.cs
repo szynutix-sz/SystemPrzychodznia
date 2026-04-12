@@ -35,7 +35,7 @@ namespace SystemPrzychodznia.Services
 
         public List<User> GetListUsers(SearchTerms s) => _repository.GetList(s);
 
-        public UserFull GetUserFull(String s_Login) => _repository.GetUserFull(s_Login);
+        public UserFull GetUserFull(int id) => _repository.GetUserFull(id);
 
         public void ForgetUser(int id) => _repository.ForgetUser(id);
 

@@ -189,7 +189,8 @@ SELECT
     Imie AS FirstName, 
     Nazwisko AS LastName, 
     Adres_email AS Email, 
-    PESEL 
+    PESEL,
+    Id_Uzytkownika
 FROM Uzytkownik
 WHERE 
     Czy_zapomniany = 0
@@ -215,6 +216,7 @@ WHERE
                     LastName = reader.GetString(2),
                     Email = reader.GetString(3),
                     PESEL = reader.GetString(4),
+                    Id = reader.GetInt32(5)
                 });
             }
             return users;
@@ -289,7 +291,7 @@ COMMIT;";
                 throw;
             }
         }
-        public UserFull GetUserFull(string S_Login)
+        public UserFull GetUserFull(int id)
         {
             var users = new List<UserFull>();
             using var connection = new SqliteConnection(_connectionString);
@@ -315,7 +317,7 @@ COMMIT;";
 FROM Uzytkownik u
 JOIN Adres a ON u.ID_Adresu = a.ID_Adresu
 WHERE 
-    u.Login = $login
+    u.ID_Uzytkownika = $id
     AND (
         u.Blokada_konta_do IS NULL               -- konto nie jest zablokowane
         OR u.Blokada_konta_do <= CURRENT_TIMESTAMP  -- blokada już wygasła
@@ -323,7 +325,7 @@ WHERE
     AND u.Czy_zapomniany = 0;                    -- konto nie jest oznaczone jako zapomniane";
 
 
-            command.Parameters.AddWithValue("$login", S_Login);
+            command.Parameters.AddWithValue("id", id);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())

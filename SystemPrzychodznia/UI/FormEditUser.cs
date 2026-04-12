@@ -22,7 +22,7 @@ namespace SystemPrzychodznia
             InitializeComponent();
             _userService = service;
             _user = u;
-            uF = _userService.GetUserFull(_user.Login);
+
 
         }
 
@@ -79,7 +79,7 @@ namespace SystemPrzychodznia
                 if (valRe.IsValid == true)
                 {
                     MessageBox.Show("Zmieniono dane użytkownika", "Informacja");
-                    _user.Login = userBeforeValid.Login; // aktualizujemy login w obiekcie User, by przy kolejnych edycjach porównywać do aktualnego loginu, a nie tego z bazy
+                    FormEditUser_Load(null, null);
                     LockEditing();
                 }
                 else
@@ -100,7 +100,7 @@ namespace SystemPrzychodznia
         private void FormEditUser_Load(object sender, EventArgs e)
         {
 
-
+            uF = _userService.GetUserFull(_user.Id);
             textBoxLogin.Text = uF.Login;
             textBoxFirstName.Text = uF.FirstName;
             textBoxLastName.Text = uF.LastName;
@@ -175,7 +175,7 @@ namespace SystemPrzychodznia
         {
             if ( buttonEditUser.Enabled == true )
             {
-                uF = _userService.GetUserFull(_user.Login);
+                uF = _userService.GetUserFull(_user.Id);
                 FormEditUser_Load(null, null); // przywracamy dane z bazy, by anulować wprowadzone zmiany
                 LockEditing();
                 

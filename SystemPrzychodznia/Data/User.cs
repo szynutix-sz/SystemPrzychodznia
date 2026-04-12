@@ -2,7 +2,7 @@
 {
     public class User
     {
-
+        public int Id { get; set; } // Unikalny identyfikator użytkownika (autogenerowany)
         public string Login { get; set; } = string.Empty; // Unkialny login użytkownika
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
@@ -16,7 +16,7 @@
 
     public class UserFull : User
     {
-        public int Id { get; set; } // Unikalny identyfikator użytkownika (autogenerowany)
+        
 
         public List<string> Uprawnienia { get; set; } = new List<string>(); // Lista uprawnień użytkownika, np. "Admin", "User", "Doctor"
         public string Locality { get; set; } = string.Empty;
