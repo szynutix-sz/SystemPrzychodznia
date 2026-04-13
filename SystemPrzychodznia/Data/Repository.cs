@@ -463,17 +463,16 @@ WHERE ID_Uzytkownika = $userId
             var command = connection.CreateCommand();
             command.CommandText = @"
 SELECT 
-    Login, 
-    Imie AS FirstName, 
-    Nazwisko AS LastName, 
-    Data_zapomnienia, 
-    ID_Kto_Zapomnial,
-    Id_Uzytkownika
-FROM Uzytkownik
-WHERE 
-    Czy_zapomniany = 1";
-
-            command.CommandText += ";";
+    u.Login, 
+    u.Imie AS FirstName, 
+    u.Nazwisko AS LastName, 
+    u.Data_zapomnienia AS DateForgotten, 
+    u.ID_Kto_Zapomnial AS ForgottenBy,
+    u.Id_Uzytkownika,
+    COALESCE(admin.Login, 'Nieznany') AS ForgottenByLogin
+FROM Uzytkownik u
+LEFT JOIN Uzytkownik admin ON u.ID_Kto_Zapomnial = admin.ID_Uzytkownika
+WHERE u.Czy_zapomniany = 1;";
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -485,7 +484,8 @@ WHERE
                     LastName = reader.GetString(2),
                     DateForgotten = reader.GetString(3),
                     ForgottenBy = reader.GetInt32(4),
-                    Id = reader.GetInt32(5)
+                    Id = reader.GetInt32(5),
+                    ForgottenByLogin = reader.GetString(6)
                 });
             }
             return users;

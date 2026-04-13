@@ -54,7 +54,6 @@ namespace SystemPrzychodznia
             tabPageAdminViewForgotten = new TabPage();
             groupBoxForgotten = new GroupBox();
             dgvForgotten = new DataGridView();
-            tableLayoutPanelForgotten = new TableLayoutPanel();
             tabPageAbout = new TabPage();
             UserList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
@@ -285,7 +284,6 @@ namespace SystemPrzychodznia
             // tabPageAdminViewForgotten
             // 
             tabPageAdminViewForgotten.Controls.Add(groupBoxForgotten);
-            tabPageAdminViewForgotten.Controls.Add(tableLayoutPanelForgotten);
             tabPageAdminViewForgotten.Location = new Point(4, 34);
             tabPageAdminViewForgotten.Name = "tabPageAdminViewForgotten";
             tabPageAdminViewForgotten.Size = new Size(1683, 918);
@@ -296,15 +294,14 @@ namespace SystemPrzychodznia
             // groupBoxForgotten
             // 
             groupBoxForgotten.Controls.Add(dgvForgotten);
-            groupBoxForgotten.Location = new Point(3, 156);
+            groupBoxForgotten.Dock = DockStyle.Fill;
             groupBoxForgotten.Name = "groupBoxForgotten";
-            groupBoxForgotten.Size = new Size(1677, 759);
             groupBoxForgotten.TabIndex = 1;
             groupBoxForgotten.TabStop = false;
             groupBoxForgotten.Text = "Zapomnieni Użytkownicy";
             // 
             // dgvForgotten
-            // 
+            //
             dgvForgotten.AllowUserToAddRows = false;
             dgvForgotten.AllowUserToDeleteRows = false;
             dgvForgotten.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -315,19 +312,6 @@ namespace SystemPrzychodznia
             dgvForgotten.RowHeadersWidth = 62;
             dgvForgotten.Size = new Size(1665, 723);
             dgvForgotten.TabIndex = 0;
-            // 
-            // tableLayoutPanelForgotten
-            // 
-            tableLayoutPanelForgotten.ColumnCount = 2;
-            tableLayoutPanelForgotten.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanelForgotten.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tableLayoutPanelForgotten.Location = new Point(3, 3);
-            tableLayoutPanelForgotten.Name = "tableLayoutPanelForgotten";
-            tableLayoutPanelForgotten.RowCount = 2;
-            tableLayoutPanelForgotten.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanelForgotten.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanelForgotten.Size = new Size(1677, 150);
-            tableLayoutPanelForgotten.TabIndex = 0;
             // 
             // tabPageAbout
             // 
@@ -387,7 +371,6 @@ namespace SystemPrzychodznia
         private TabPage tabPageAdminViewForgotten;
         private GroupBox groupBoxRoles;
         private FlowLayoutPanel flowLayoutPanelUprawnienia;
-        private TableLayoutPanel tableLayoutPanelForgotten;
         private GroupBox groupBoxForgotten;
         private DataGridView dgvForgotten;
     }
