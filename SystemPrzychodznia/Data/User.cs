@@ -1,4 +1,5 @@
 ﻿using System.CodeDom;
+using SystemPrzychodznia.Services;
 
 namespace SystemPrzychodznia.Data
 {
@@ -16,6 +17,12 @@ namespace SystemPrzychodznia.Data
         public string DateForgotten { get; set; } = string.Empty ;
 
         public int ForgottenBy { get; set; } = 0;
+
+        public string PESEL { get; set; } = string.Empty;
+
+        public string BirthDate { get; set; } = string.Empty;
+
+        public string Gender { get; set; } = string.Empty;
     }
 
     public class User : BaseUser
@@ -83,6 +90,36 @@ namespace SystemPrzychodznia.Data
         public static bool operator !=(UserFull lhs, UserFull rhs)
         {
             return !(lhs == rhs);
+        }
+
+        public ForgottenUser Forget(int forgottenBy)
+        {
+            ForgottenUser f = new ForgottenUser();
+
+            Random rnd = new Random();
+
+            f.Id = Id;
+            f.Login = $"F{rnd.Next(1,1_000_000)}";
+            Login = f.Login;
+            f.FirstName = $"F{rnd.Next(1, 1_000_000)}";
+            FirstName = f.FirstName;
+            f.LastName = $"F{rnd.Next(1, 1_000_000)}";
+            LastName = f.LastName;
+            // f.DateForgotten - robione przez baze
+            f.ForgottenBy = forgottenBy;
+            f.BirthDate = $"{rnd.Next(1800, 2300)}-{rnd.Next(1, 13):D2}-{rnd.Next(1, 26):D2}";
+            BirthDate = f.BirthDate;
+
+            f.Gender = rnd.Next(0, 2) == 0 ? "M" : "K";
+            Gender = f.Gender;
+
+            f.PESEL = UserService.PESELfromData(f.BirthDate, f.Gender);
+            PESEL = f.PESEL;
+
+            Password = "DummyPassword";
+
+
+            return f;
         }
 
     }

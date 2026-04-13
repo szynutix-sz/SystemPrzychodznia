@@ -17,12 +17,13 @@ namespace SystemPrzychodznia
         private readonly UserService _userService;
         private User _user;
         private UserFull uF;
-        public FormEditUser(UserService service, User u)
+        private UserFull _editingUser;
+        public FormEditUser(UserService service, User u, UserFull editingUser)
         {
             InitializeComponent();
             _userService = service;
             _user = u;
-
+            _editingUser = editingUser;
 
         }
 
@@ -53,7 +54,6 @@ namespace SystemPrzychodznia
                 u.Posiadane = checkedListBoxUprawnienia.CheckedItems.Contains(u.Nazwa);
             }
 
-            // trzeba by tą cześć przenieść do serwisu, by logike oddzielić od UI
             bool somethingChanged = !(userBeforeValid == uF);
 
             if (somethingChanged == true)
@@ -144,8 +144,18 @@ namespace SystemPrzychodznia
 
             if (result == DialogResult.Yes)
             {
-                _userService.ForgetUser(uF.Id);
-                MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
+                ValidationResult valRe = _userService.ForgetUser(uF, _editingUser.Id);
+
+                if (valRe.IsValid == true)
+                {
+                    MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
+                }
+                else
+                {
+                    string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                    errorMessage += "\n Spróbuj ponownie. Mogł się wylosować już istniejący login";
+                    MessageBox.Show(errorMessage, "Błąd walidacji");
+                }
                 this.Close();
             }
         }
