@@ -144,17 +144,24 @@ namespace SystemPrzychodznia
 
             if (result == DialogResult.Yes)
             {
-                ValidationResult valRe = _userService.ForgetUser(uF, _editingUser.Id);
+                try
+                {
+                    ValidationResult valRe = _userService.ForgetUser(uF, _editingUser.Id);
 
-                if (valRe.IsValid == true)
-                {
-                    MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
+                    if (valRe.IsValid == true)
+                    {
+                        MessageBox.Show("Użytkownik został zapomniany.", "Informacja");
+                    }
+                    else
+                    {
+                        string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                        errorMessage += "\n Spróbuj ponownie. Mogł się wylosować już istniejący login";
+                        MessageBox.Show(errorMessage, "Błąd walidacji");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
-                    errorMessage += "\n Spróbuj ponownie. Mogł się wylosować już istniejący login";
-                    MessageBox.Show(errorMessage, "Błąd walidacji");
+                    MessageBox.Show("Wystąpił błąd podczas zapominania użytkownika:\n" + ex.Message, "Błąd");
                 }
                 this.Close();
             }

@@ -56,6 +56,14 @@ namespace SystemPrzychodznia.Services
 
         public List<Uprawnienie> GetUprawnienia() => _repository.GetUprawnienia();
 
+        public List<User> GetUsersByRole(int roleId)
+        {
+            var s = new SearchTerms();
+            foreach (var up in _repository.GetUprawnienia())
+                s.Uprawnienia.Add(new Uprawnienie { Id = up.Id, Nazwa = up.Nazwa, Posiadane = up.Id == roleId ? true : (bool?)null });
+            return _repository.GetListUsers(s);
+        }
+
         public ValidationResult EditUser(UserFull user)
         {
             var validation = _validator.ValidateUserFull(user, true);

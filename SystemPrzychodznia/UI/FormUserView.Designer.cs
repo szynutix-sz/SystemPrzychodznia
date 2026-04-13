@@ -33,6 +33,7 @@ namespace SystemPrzychodznia
             UserList = new GroupBox();
             dgvUsers = new DataGridView();
             buttonAddUser = new Button();
+            buttonRoles = new Button();
             buttonSearchUser = new Button();
             tableLayoutPanelUsers = new TableLayoutPanel();
             labelLogin = new Label();
@@ -94,11 +95,21 @@ namespace SystemPrzychodznia
             // 
             buttonAddUser.Location = new Point(6, 6);
             buttonAddUser.Name = "buttonAddUser";
-            buttonAddUser.Size = new Size(149, 91);
+            buttonAddUser.Size = new Size(149, 44);
             buttonAddUser.TabIndex = 1;
             buttonAddUser.Text = "Dodaj Użytkownika";
             buttonAddUser.UseVisualStyleBackColor = true;
             buttonAddUser.Click += buttonAddUser_Click;
+            // 
+            // buttonRoles
+            // 
+            buttonRoles.Location = new Point(6, 55);
+            buttonRoles.Name = "buttonRoles";
+            buttonRoles.Size = new Size(149, 44);
+            buttonRoles.TabIndex = 6;
+            buttonRoles.Text = "Przegląd ról";
+            buttonRoles.UseVisualStyleBackColor = true;
+            buttonRoles.Click += buttonRoles_Click;
             // 
             // buttonSearchUser
             // 
@@ -241,6 +252,7 @@ namespace SystemPrzychodznia
             // 
             tabPageAdminViewUsers.Controls.Add(groupBoxRoles);
             tabPageAdminViewUsers.Controls.Add(buttonAddUser);
+            tabPageAdminViewUsers.Controls.Add(buttonRoles);
             tabPageAdminViewUsers.Controls.Add(UserList);
             tabPageAdminViewUsers.Controls.Add(buttonClearSearch);
             tabPageAdminViewUsers.Controls.Add(buttonSearchUser);
@@ -293,9 +305,13 @@ namespace SystemPrzychodznia
             // 
             // dgvForgotten
             // 
+            dgvForgotten.AllowUserToAddRows = false;
+            dgvForgotten.AllowUserToDeleteRows = false;
             dgvForgotten.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvForgotten.Location = new Point(6, 30);
+            dgvForgotten.Dock = DockStyle.Fill;
+            dgvForgotten.Location = new Point(3, 27);
             dgvForgotten.Name = "dgvForgotten";
+            dgvForgotten.ReadOnly = true;
             dgvForgotten.RowHeadersWidth = 62;
             dgvForgotten.Size = new Size(1665, 723);
             dgvForgotten.TabIndex = 0;
@@ -351,6 +367,7 @@ namespace SystemPrzychodznia
         private GroupBox UserList;
         private DataGridView dgvUsers;
         private Button buttonAddUser;
+        private Button buttonRoles;
         private Button buttonSearchUser;
         private TableLayoutPanel tableLayoutPanelUsers;
         private Label labelLogin;

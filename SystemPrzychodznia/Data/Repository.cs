@@ -144,7 +144,7 @@ SELECT ID_Uzytkownika FROM Uzytkownik WHERE Login = $login;
 SELECT Uprawnienie.ID_Uprawnienia
 FROM Uzytkownik_Uprawnienie
 JOIN Uprawnienie ON Uzytkownik_Uprawnienie.ID_Uprawnienia = Uprawnienie.ID_Uprawnienia
-WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;'";
+WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
 
             command.Parameters.AddWithValue("$id", user_id);
             using var reader = command.ExecuteReader();
@@ -439,6 +439,7 @@ WHERE ID_Uzytkownika = $id;";
 
                 //Usunięcie uprawnień
                 var deleteCommand = connection.CreateCommand();
+                deleteCommand.Transaction = transaction;
                 deleteCommand.CommandText = @"
 DELETE FROM Uzytkownik_Uprawnienie 
 WHERE ID_Uzytkownika = $userId

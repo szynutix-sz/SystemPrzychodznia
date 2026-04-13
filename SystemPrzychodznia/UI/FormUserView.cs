@@ -103,23 +103,27 @@ namespace SystemPrzychodznia
                 MessageBox.Show("Nie znaleziono użytkowników spełniających kryteria wyszukiwania.", "Brak wyników");
             }
 
-            // Opcjonalne formatowanie kolumn
+            dgvUsers.Columns["Id"].Visible = false;
+
             dgvUsers.Columns["Login"].HeaderText = "Login";
-            dgvUsers.Columns["Login"].Width = 250;
+            dgvUsers.Columns["Login"].Width = 180;
 
             dgvUsers.Columns["FirstName"].HeaderText = "Imię";
-            dgvUsers.Columns["FirstName"].Width = 250;
+            dgvUsers.Columns["FirstName"].Width = 160;
 
             dgvUsers.Columns["LastName"].HeaderText = "Nazwisko";
-            dgvUsers.Columns["LastName"].Width = 250;
+            dgvUsers.Columns["LastName"].Width = 160;
 
             dgvUsers.Columns["Email"].HeaderText = "Email";
-            dgvUsers.Columns["Email"].Width = 350;
+            dgvUsers.Columns["Email"].Width = 240;
 
             dgvUsers.Columns["PESEL"].HeaderText = "PESEL";
-            dgvUsers.Columns["PESEL"].Width = 150;
+            dgvUsers.Columns["PESEL"].Width = 140;
 
-
+            dgvUsers.RowsDefaultCellStyle.BackColor = Color.White;
+            dgvUsers.AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue;
+            dgvUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvUsers.RowHeadersVisible = false;
         }
 
         private void LoadForgottenUsers()
@@ -131,22 +135,30 @@ namespace SystemPrzychodznia
             _bindingSourceForgotten.DataSource = users;
             dgvForgotten.DataSource = _bindingSourceForgotten;
 
-            // Opcjonalne formatowanie kolumn
-            dgvForgotten.Columns["Id"].HeaderText = "Id";
-            dgvForgotten.Columns["Id"].Width = 50;
+            dgvForgotten.Columns["Id"].Visible = false;
+            dgvForgotten.Columns["PESEL"].Visible = false;
+            dgvForgotten.Columns["BirthDate"].Visible = false;
+            dgvForgotten.Columns["Gender"].Visible = false;
 
-            dgvForgotten.Columns["Login"].HeaderText = "Login";
-            dgvForgotten.Columns["Login"].Width = 250;
+            dgvForgotten.Columns["Login"].HeaderText = "Zaszyfrowany Login";
+            dgvForgotten.Columns["Login"].Width = 220;
 
-            dgvForgotten.Columns["FirstName"].HeaderText = "Imię";
-            dgvForgotten.Columns["FirstName"].Width = 250;
+            dgvForgotten.Columns["FirstName"].HeaderText = "Zaszyfrowane Imię";
+            dgvForgotten.Columns["FirstName"].Width = 180;
 
-            dgvForgotten.Columns["LastName"].HeaderText = "Nazwisko";
-            dgvForgotten.Columns["LastName"].Width = 250;
+            dgvForgotten.Columns["LastName"].HeaderText = "Zaszyfrowane Nazwisko";
+            dgvForgotten.Columns["LastName"].Width = 180;
 
-           
+            dgvForgotten.Columns["DateForgotten"].HeaderText = "Data zapomnienia";
+            dgvForgotten.Columns["DateForgotten"].Width = 200;
 
+            dgvForgotten.Columns["ForgottenBy"].HeaderText = "ID Administratora";
+            dgvForgotten.Columns["ForgottenBy"].Width = 150;
 
+            dgvForgotten.RowsDefaultCellStyle.BackColor = Color.White;
+            dgvForgotten.AlternatingRowsDefaultCellStyle.BackColor = Color.MistyRose;
+            dgvForgotten.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvForgotten.RowHeadersVisible = false;
         }
         private void populateUprawnienia()
         {
@@ -173,9 +185,9 @@ namespace SystemPrzychodznia
         {
             using (Form AddUser = new FormAddUser(_userService))
             {
-
                 AddUser.ShowDialog();
             }
+            LoadUsers();
         }
 
         private void FormAdminView_Activated(object sender, EventArgs e)
@@ -200,6 +212,14 @@ namespace SystemPrzychodznia
 
         }
 
+        private void buttonRoles_Click(object sender, EventArgs e)
+        {
+            using (Form rolesForm = new FormRoles(_userService))
+            {
+                rolesForm.ShowDialog();
+            }
+        }
+
         private void dgvUsers_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -209,6 +229,8 @@ namespace SystemPrzychodznia
                 {
                     EditUser.ShowDialog();
                 }
+                LoadUsers();
+                LoadForgottenUsers();
             }
         }
 
