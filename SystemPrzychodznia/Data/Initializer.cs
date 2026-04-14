@@ -129,6 +129,7 @@ WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Login = 'SuperAdmin');
 -- ============================================================
 -- 8. Wstawienie hasła dla SuperAdmina (jeśli użytkownik został dodany)
 --    UWAGA: W rzeczywistej aplikacji hasło powinno być silnie zahaszowane
+--    (np. bcrypt, Argon2). Poniższy zapis to tylko przykład.
 -- ============================================================
 INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
 SELECT ID_Uzytkownika, 'AdminPass'   -- W PRODUKCJI: użyj hasha np. '$2y$10$...' 
@@ -163,7 +164,7 @@ SELECT 'Brak_roli'
 WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Brak_roli');
 
 -- ============================================================
--- 10. Nadanie uprawnienia 'SuperAdmin' dla SuperAdmina
+-- 10. Nadanie uprawnienia 'Admin' dla SuperAdmina
 -- ============================================================
 INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
 SELECT u.ID_Uzytkownika, p.ID_Uprawnienia
