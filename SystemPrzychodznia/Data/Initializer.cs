@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS Uzytkownik (
     Login TEXT UNIQUE NOT NULL,
     Imie TEXT NOT NULL,
     Nazwisko TEXT NOT NULL,
-    PESEL TEXT UNIQUE NOT NULL,
+    PESEL TEXT NOT NULL, -- Użytkownik zapomiany może mieć PESEL, ale nie będzie on unikalny
     Data_urodzenia TEXT NOT NULL,
     Plec TEXT NOT NULL CHECK (Plec IN ('K', 'M', 'Inna')),
     Adres_email TEXT UNIQUE NOT NULL,

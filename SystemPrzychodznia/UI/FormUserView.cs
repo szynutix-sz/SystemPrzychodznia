@@ -10,7 +10,6 @@ namespace SystemPrzychodznia
         private BindingSource _bindingSourceUsers = new BindingSource();
         private BindingSource _bindingSourceForgotten = new BindingSource();
         private UserFull _currentUser;
-        private bool _canLoadUsers = false;
 
         public FormUserView(IdHolder userID, UserService userService)
         {
@@ -19,37 +18,12 @@ namespace SystemPrzychodznia
             _currentUser = _userService.GetUserFull(userID.Id);
 
 
-            if (_currentUser.Uprawnienia.Exists(u =>
-               (u.Id == 1 && u.Posiadane == true) ||
-               (u.Id == 2 && u.Posiadane == true)
-               )
-              )
-            {
-                _canLoadUsers = true;
-            }
-
-
             InitializeComponent();
 
             tabControlUserView.TabPages.Clear();
 
+            grantTabsToCurrentUser();
 
-            if (_currentUser.Uprawnienia.Exists(u =>
-                (u.Id == 1 && u.Posiadane == true) ||
-                (u.Id == 2 && u.Posiadane == true)
-                )
-               )
-            {
-                tabControlUserView.TabPages.Add(tabPageAdminViewUsers);
-                tabControlUserView.TabPages.Add(tabPageAdminViewForgotten);
-            }
-
-            tabControlUserView.TabPages.Add(tabPageAbout);
-
-
-            populateUprawnienia();
-            LoadUsers();
-            LoadForgottenUsers();
 
             this.Text = $"System Psychodnia - Zalogowano jako: {_currentUser.Login}";
         }
@@ -70,7 +44,6 @@ namespace SystemPrzychodznia
 
         private void LoadUsers()
         {
-            if (_canLoadUsers == false) return;
             SearchTerms s = new SearchTerms();
             s.Login = textBoxLogin.Text;
             s.FirstName = textBoxFirstName.Text;
@@ -128,7 +101,6 @@ namespace SystemPrzychodznia
 
         private void LoadForgottenUsers()
         {
-            if (_canLoadUsers == false) return;
 
             var users = _userService.GetListForgottenUsers();
 

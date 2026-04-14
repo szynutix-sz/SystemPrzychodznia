@@ -109,6 +109,10 @@ namespace SystemPrzychodznia.Data
 
     public class ForgottenUser : UserFull 
     {
-    
+        public string DateForgotten { get; set; } = string.Empty;
+
+        public int ForgottenBy { get; set; } = 0;
+
+        public string ForgottenByLogin { get; set; } = string.Empty;
     }
 }
