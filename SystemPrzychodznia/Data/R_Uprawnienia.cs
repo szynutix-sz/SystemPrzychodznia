@@ -22,18 +22,37 @@ WHERE ID_Uzytkownika = $userId
         (SELECT ID_Uprawnienia FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');";
             deleteCommand.Parameters.AddWithValue("$userId", userId);
             deleteCommand.ExecuteNonQuery();
-            // Następnie dodajemy nowe uprawnienia
-            foreach (Uprawnienie uprawnienie in noweUprawnienia)
+
+            if (noweUprawnienia.Exists(u =>u.Posiadane == true && u.Id != 5))
             {
-                if (uprawnienie.Posiadane == false)
-                    continue; // pomijamy uprawnienia, które nie są zaznaczone jako posiadane
+                // Jeśli użytkownik ma uprawnienie inne niż "Brak roli" usuwamy "Brak roli" na poziome aplikacja
+                noweUprawnienia.Find(u => u.Id == 5).Posiadane = false;
+            }
+
+
+            // Następnie dodajemy nowe uprawnienia
+            if (noweUprawnienia.Exists(u => u.Posiadane == true))
+                foreach (Uprawnienie uprawnienie in noweUprawnienia)
+                {
+                    if (uprawnienie.Posiadane == false)
+                        continue; // pomijamy uprawnienia, które nie są zaznaczone jako posiadane lub jest to uprawnienie Brak_roli)
+                    var insertCommand = connection.CreateCommand();
+                    insertCommand.CommandText = @"
+    INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+    VALUES ( $userId , $uprawnienieId);
+    ";
+                    insertCommand.Parameters.AddWithValue("$userId", userId);
+                    insertCommand.Parameters.AddWithValue("$uprawnienieId", uprawnienie.Id);
+                    insertCommand.ExecuteNonQuery();
+                }
+            else // Jeśli użytkownik nie ma żadnych uprawnień, dodajemy uprawnienie "Brak roli"
+            {
                 var insertCommand = connection.CreateCommand();
                 insertCommand.CommandText = @"
-INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-VALUES ( $userId , $uprawnienieId);
-";
+    INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+    VALUES ( $userId , 5);
+    ";
                 insertCommand.Parameters.AddWithValue("$userId", userId);
-                insertCommand.Parameters.AddWithValue("$uprawnienieId", uprawnienie.Id);
                 insertCommand.ExecuteNonQuery();
             }
         }

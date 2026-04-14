@@ -99,6 +99,7 @@ COMMIT;
 
                 user.Id = GetUserID(user.Login);
 
+
                 ZmieńUprawnienia(user.Id, user.Uprawnienia);
 
             }
