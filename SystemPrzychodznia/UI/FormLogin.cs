@@ -69,5 +69,10 @@ namespace SystemPrzychodznia
             var result = _userService.RecoverPassword(login);
             MessageBox.Show(result.message, "Odzyskiwanie hasła", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private void textBoxPassword_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

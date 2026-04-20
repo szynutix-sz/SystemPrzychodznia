@@ -60,7 +60,7 @@
             // textBoxLogin
             // 
             textBoxLogin.Location = new Point(148, 51);
-            textBoxLogin.Margin = new Padding(2, 2, 2, 2);
+            textBoxLogin.Margin = new Padding(2);
             textBoxLogin.Name = "textBoxLogin";
             textBoxLogin.Size = new Size(157, 23);
             textBoxLogin.TabIndex = 2;
@@ -68,15 +68,17 @@
             // textBoxPassword
             // 
             textBoxPassword.Location = new Point(148, 79);
-            textBoxPassword.Margin = new Padding(2, 2, 2, 2);
+            textBoxPassword.Margin = new Padding(2);
             textBoxPassword.Name = "textBoxPassword";
+            textBoxPassword.PasswordChar = '*';
             textBoxPassword.Size = new Size(157, 23);
             textBoxPassword.TabIndex = 3;
+            textBoxPassword.TextChanged += textBoxPassword_TextChanged;
             // 
             // buttonLogin
             // 
             buttonLogin.Location = new Point(226, 109);
-            buttonLogin.Margin = new Padding(2, 2, 2, 2);
+            buttonLogin.Margin = new Padding(2);
             buttonLogin.Name = "buttonLogin";
             buttonLogin.Size = new Size(78, 20);
             buttonLogin.TabIndex = 4;
@@ -92,7 +94,7 @@
             btnForgotPassword.TabIndex = 5;
             btnForgotPassword.Text = "Przypomnij haslo";
             btnForgotPassword.UseVisualStyleBackColor = true;
-            btnForgotPassword.Click += button1_Click; // <--- DODAJ TĘ LINIJKĘ
+            btnForgotPassword.Click += button1_Click;
             // 
             // FormLogin
             // 
@@ -105,7 +107,7 @@
             Controls.Add(textBoxLogin);
             Controls.Add(labelPassword);
             Controls.Add(labelLogin);
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             Name = "FormLogin";
             Text = "Logowanie";
             Load += FormLogin_Load;
