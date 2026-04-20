@@ -1,4 +1,4 @@
-using SystemPrzychodznia.Data;
+﻿using SystemPrzychodznia.Data;
 using SystemPrzychodznia.Services;
 
 namespace SystemPrzychodznia
@@ -36,10 +36,13 @@ namespace SystemPrzychodznia
             var users = _userService.GetUsersByRole(roleId);
             dgvRoleUsers.DataSource = users;
 
-            dgvRoleUsers.Columns["Id"].Visible = false;
+            dgvRoleUsers.Columns["Id"].HeaderText = "ID";
+            dgvRoleUsers.Columns["Id"].Width = 70;
+            dgvRoleUsers.Columns["Id"].DisplayIndex = 0;
+
             dgvRoleUsers.Columns["Login"].HeaderText = "Login";
             dgvRoleUsers.Columns["Login"].Width = 180;
-            dgvRoleUsers.Columns["FirstName"].HeaderText = "Imię";
+            dgvRoleUsers.Columns["FirstName"].HeaderText = "Imie";
             dgvRoleUsers.Columns["FirstName"].Width = 160;
             dgvRoleUsers.Columns["LastName"].HeaderText = "Nazwisko";
             dgvRoleUsers.Columns["LastName"].Width = 160;
@@ -53,7 +56,7 @@ namespace SystemPrzychodznia
             dgvRoleUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvRoleUsers.RowHeadersVisible = false;
 
-            labelUserCount.Text = $"Użytkownicy z rolą: {users.Count}";
+            labelUserCount.Text = "Uzytkownicy z uprawnieniem: " + users.Count;
         }
     }
 }
