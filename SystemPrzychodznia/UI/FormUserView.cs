@@ -103,32 +103,39 @@ namespace SystemPrzychodznia
 
         private void LoadForgottenUsers()
         {
-
             var users = _userService.GetListForgottenUsers();
 
             _bindingSourceForgotten.DataSource = users;
             dgvForgotten.DataSource = _bindingSourceForgotten;
 
-            dgvForgotten.Columns["Id"].Visible = false;
-            dgvForgotten.Columns["ForgottenBy"].Visible = false;
-            dgvForgotten.Columns["PESEL"].Visible = false;
-            dgvForgotten.Columns["BirthDate"].Visible = false;
-            dgvForgotten.Columns["Gender"].Visible = false;
+            // Pokaż tylko trzy kolumny: Data zapomnienia, Zapomniane przez, Zaszyfrowany Login
+            var keep = new[] { "DateForgotten", "ForgottenByLogin", "Login" };
+            foreach (DataGridViewColumn col in dgvForgotten.Columns)
+            {
+                col.Visible = Array.IndexOf(keep, col.Name) >= 0;
+            }
 
-            dgvForgotten.Columns["Login"].HeaderText = "Zaszyfrowany Login";
-            dgvForgotten.Columns["Login"].Width = 200;
+            // Ustaw nagłówki, szerokości i kolejność
+            if (dgvForgotten.Columns.Contains("DateForgotten"))
+            {
+                dgvForgotten.Columns["DateForgotten"].HeaderText = "Data zapomnienia";
+                dgvForgotten.Columns["DateForgotten"].Width = 220;
+                dgvForgotten.Columns["DateForgotten"].DisplayIndex = 0;
+            }
 
-            dgvForgotten.Columns["FirstName"].HeaderText = "Zaszyfrowane Imię";
-            dgvForgotten.Columns["FirstName"].Width = 170;
+            if (dgvForgotten.Columns.Contains("ForgottenByLogin"))
+            {
+                dgvForgotten.Columns["ForgottenByLogin"].HeaderText = "Zapomniane przez";
+                dgvForgotten.Columns["ForgottenByLogin"].Width = 200;
+                dgvForgotten.Columns["ForgottenByLogin"].DisplayIndex = 1;
+            }
 
-            dgvForgotten.Columns["LastName"].HeaderText = "Zaszyfrowane Nazwisko";
-            dgvForgotten.Columns["LastName"].Width = 170;
-
-            dgvForgotten.Columns["DateForgotten"].HeaderText = "Data zapomnienia";
-            dgvForgotten.Columns["DateForgotten"].Width = 200;
-
-            dgvForgotten.Columns["ForgottenByLogin"].HeaderText = "Zapomniane przez";
-            dgvForgotten.Columns["ForgottenByLogin"].Width = 180;
+            if (dgvForgotten.Columns.Contains("Login"))
+            {
+                dgvForgotten.Columns["Login"].HeaderText = "Zaszyfrowany Login";
+                dgvForgotten.Columns["Login"].Width = 300;
+                dgvForgotten.Columns["Login"].DisplayIndex = 2;
+            }
 
             dgvForgotten.RowsDefaultCellStyle.BackColor = Color.White;
             dgvForgotten.AlternatingRowsDefaultCellStyle.BackColor = Color.MistyRose;
