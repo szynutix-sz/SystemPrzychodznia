@@ -34,8 +34,40 @@ namespace SystemPrzychodznia
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
-            _userID.Id = 1;
-            this.Close();
+            string login = textBoxLogin.Text.Trim();
+            string password = textBoxPassword.Text;
+
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("Podaj login i hasło.", "Błąd logowania", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var result = _userService.AttemptLogin(login, password);
+
+            if (result.success)
+            {
+                _userID.Id = result.userId;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show(result.message, "Błąd logowania", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string login = textBoxLogin.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(login))
+            {
+                MessageBox.Show("Wpisz login, aby odzyskać hasło.", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var result = _userService.RecoverPassword(login);
+            MessageBox.Show(result.message, "Odzyskiwanie hasła", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
