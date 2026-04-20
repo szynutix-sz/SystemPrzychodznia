@@ -2,17 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 
 namespace SystemPrzychodznia.Services
 {
-
     public class UserService
     {
         private readonly UserRepository _repository;
-
         private readonly Validator _validator;
 
-        // --- NOWY SŁOWNIK DO LICZENIA PRÓB ---
+        // --- SŁOWNIK DO LICZENIA PRÓB ---
         private Dictionary<string, int> _failedAttempts = new Dictionary<string, int>();
 
         public UserService()
@@ -21,7 +21,9 @@ namespace SystemPrzychodznia.Services
             _validator = new Validator(_repository);
         }
 
-        // --- NOWE METODY DO LOGOWANIA I ODZYSKIWANIA HASŁA ---
+        // ============================================================
+        // 1. LOGOWANIE I ODZYSKIWANIE HASŁA
+        // ============================================================
         public (bool success, string message, int userId) AttemptLogin(string login, string password)
         {
             var loginData = _repository.GetLoginData(login);
@@ -64,11 +66,52 @@ namespace SystemPrzychodznia.Services
         {
             var data = _repository.GetLoginData(login);
             if (data.Id == 0) return (true, "Jeśli login istnieje, wysłaliśmy instrukcje na email.");
-            return (true, $"Hasło do konta zostało wysłane na przypisany adres:\n{data.Email}");
-        }
-        // -----------------------------------------------------
 
+            try
+            {
+                // Próbujemy fizycznie wysłać maila
+                SendEmail(data.Email, data.Password);
+                return (true, $"Prawdziwy email z hasłem został pomyślnie wysłany na adres:\n{data.Email}");
+            }
+            catch (Exception ex)
+            {
+                // Jeśli serwer pocztowy odrzuci połączenie
+                return (false, $"Błąd podczas wysyłania maila. Sprawdź ustawienia połączenia sieciowego.\nSzczegóły: {ex.Message}");
+            }
+        }
+
+        // Metoda wykonująca wysyłkę z Twojego konta logan.harrisems@gmail.com
+        private void SendEmail(string targetEmail, string userPassword)
+        {
+            string senderEmail = "logan.harrisems@gmail.com";
+            string senderAppPassword = "mblhaamtwfcrhoso"; // Hasło aplikacji bez spacji
+
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(senderEmail, senderAppPassword),
+                EnableSsl = true,
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(senderEmail, "System Przychodnia"),
+                Subject = "Odzyskiwanie hasła - System Przychodnia",
+                Body = $"Witaj,\n\nOtrzymaliśmy prośbę o przypomnienie hasła do Twojego konta w Systemie Przychodnia.\n\nTwoje aktualne hasło to: {userPassword}\n\nPozdrawiamy,\nAdministratorzy Systemu",
+                IsBodyHtml = false,
+            };
+
+            mailMessage.To.Add(targetEmail);
+
+            // Fizycznie wypycha maila w świat
+            smtpClient.Send(mailMessage);
+        }
+
+        // ============================================================
+        // 2. RESZTA METOD Z TWOJEGO PLIKU (Nienaruszone)
+        // ============================================================
         public ValidationResult ValidateUserFull(UserFull user, bool editing) => _validator.ValidateUserFull(user, editing);
+
         public ValidationResult AddUser(UserFull user)
         {
             var validation = ValidateUserFull(user, false);
@@ -81,14 +124,11 @@ namespace SystemPrzychodznia.Services
             return new ValidationResult(true);
         }
 
-
         public List<ForgottenUser> GetListForgottenUsers() => _repository.GetListForgottenUsers();
         public List<User> GetListUsers(SearchTerms s) => _repository.GetListUsers(s);
-
         public UserFull GetUserFull(int id) => _repository.GetUserFull(id);
 
         public ValidationResult ForgetUser(UserFull user, int forgottenBy)
-
         {
             ForgottenUser f = user.Forget(forgottenBy);
             var validation = _validator.ValidateUserFull(user, true);
@@ -100,9 +140,7 @@ namespace SystemPrzychodznia.Services
 
             _repository.ForgetUser(f, f.ForgottenBy);
             return new ValidationResult(true);
-
         }
-
 
         public List<Uprawnienie> GetUprawnienia() => _repository.GetUprawnienia();
 
@@ -125,12 +163,10 @@ namespace SystemPrzychodznia.Services
 
             _repository.EditUser(user);
             return new ValidationResult(true);
-
         }
 
         public UserFull PrepareRawStrings(UserFull user)
         {
-
             UserFull userBeforeValid = new UserFull();
 
             userBeforeValid.Login = user.Login.Trim();
@@ -189,9 +225,7 @@ namespace SystemPrzychodznia.Services
             }
 
             int yearTwoDigits = year % 100;
-
             string peselBase = $"{yearTwoDigits:D2}{month:D2}{day:D2}";
-
             peselBase += $"{rnd.Next(0, 10)}{rnd.Next(0, 10)}{rnd.Next(0, 10)}";
 
             int genderDigit;
@@ -215,12 +249,9 @@ namespace SystemPrzychodznia.Services
             }
 
             int controlDigit = (10 - (sum % 10)) % 10;
-
             string pesel = peselBase + $"{controlDigit}";
 
             return pesel;
         }
-
-
     }
 }
