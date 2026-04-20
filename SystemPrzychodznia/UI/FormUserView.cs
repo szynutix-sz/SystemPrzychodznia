@@ -108,8 +108,8 @@ namespace SystemPrzychodznia
             _bindingSourceForgotten.DataSource = users;
             dgvForgotten.DataSource = _bindingSourceForgotten;
 
-            // Pokaż tylko trzy kolumny: Data zapomnienia, Zapomniane przez, Zaszyfrowany Login
-            var keep = new[] { "DateForgotten", "ForgottenByLogin", "Login" };
+            // Pokaż kolumny: Data zapomnienia, Zapomniane przez, Zaszyfrowany Login, Imię, Nazwisko
+            var keep = new[] { "DateForgotten", "ForgottenByLogin", "Login", "FirstName", "LastName" };
             foreach (DataGridViewColumn col in dgvForgotten.Columns)
             {
                 col.Visible = Array.IndexOf(keep, col.Name) >= 0;
@@ -119,22 +119,36 @@ namespace SystemPrzychodznia
             if (dgvForgotten.Columns.Contains("DateForgotten"))
             {
                 dgvForgotten.Columns["DateForgotten"].HeaderText = "Data zapomnienia";
-                dgvForgotten.Columns["DateForgotten"].Width = 220;
+                dgvForgotten.Columns["DateForgotten"].Width = 180;
                 dgvForgotten.Columns["DateForgotten"].DisplayIndex = 0;
             }
 
             if (dgvForgotten.Columns.Contains("ForgottenByLogin"))
             {
                 dgvForgotten.Columns["ForgottenByLogin"].HeaderText = "Zapomniane przez";
-                dgvForgotten.Columns["ForgottenByLogin"].Width = 200;
+                dgvForgotten.Columns["ForgottenByLogin"].Width = 160;
                 dgvForgotten.Columns["ForgottenByLogin"].DisplayIndex = 1;
             }
 
             if (dgvForgotten.Columns.Contains("Login"))
             {
-                dgvForgotten.Columns["Login"].HeaderText = "Zaszyfrowany Login";
-                dgvForgotten.Columns["Login"].Width = 300;
+                dgvForgotten.Columns["Login"].HeaderText = "Login";
+                dgvForgotten.Columns["Login"].Width = 200;
                 dgvForgotten.Columns["Login"].DisplayIndex = 2;
+            }
+
+            if (dgvForgotten.Columns.Contains("FirstName"))
+            {
+                dgvForgotten.Columns["FirstName"].HeaderText = "Imię";
+                dgvForgotten.Columns["FirstName"].Width = 140;
+                dgvForgotten.Columns["FirstName"].DisplayIndex = 3;
+            }
+
+            if (dgvForgotten.Columns.Contains("LastName"))
+            {
+                dgvForgotten.Columns["LastName"].HeaderText = "Nazwisko";
+                dgvForgotten.Columns["LastName"].Width = 140;
+                dgvForgotten.Columns["LastName"].DisplayIndex = 4;
             }
 
             dgvForgotten.RowsDefaultCellStyle.BackColor = Color.White;

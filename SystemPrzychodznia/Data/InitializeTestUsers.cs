@@ -178,7 +178,26 @@ SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'monika.szymczak'
 INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
 SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'monika.szymczak' AND p.Nazwa = 'Admin'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);";
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+
+-- Test 10: Testowe konto (Brak_roli), login: testowaniekonta, email: szynutix@gmail.com
+INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
+SELECT 'Testowo', '99999', 'Testowa', '1', ''
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'szynutix@gmail.com');
+
+INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
+SELECT last_insert_rowid(), 'testowaniekonta', 'Testowy', 'Konto', '00000000000', '1990-01-01', 'M', 'szynutix@gmail.com', '600000000', NULL, 0, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'szynutix@gmail.com');
+
+INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
+SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'testowaniekonta'
+  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'testowaniekonta');
+
+INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
+WHERE u.Login = 'testowaniekonta' AND p.Nazwa = 'Brak_roli'
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+";
             createTableCmd.ExecuteNonQuery();
 
 
