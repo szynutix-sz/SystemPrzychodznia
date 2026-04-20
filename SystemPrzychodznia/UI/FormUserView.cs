@@ -76,7 +76,9 @@ namespace SystemPrzychodznia
                 MessageBox.Show("Nie znaleziono użytkowników spełniających kryteria wyszukiwania.", "Brak wyników");
             }
 
-            dgvUsers.Columns["Id"].Visible = false;
+            dgvUsers.Columns["Id"].HeaderText = "ID";
+            dgvUsers.Columns["Id"].Width = 70;
+            dgvUsers.Columns["Id"].DisplayIndex = 0;
 
             dgvUsers.Columns["Login"].HeaderText = "Login";
             dgvUsers.Columns["Login"].Width = 180;
@@ -101,32 +103,53 @@ namespace SystemPrzychodznia
 
         private void LoadForgottenUsers()
         {
-
             var users = _userService.GetListForgottenUsers();
 
             _bindingSourceForgotten.DataSource = users;
             dgvForgotten.DataSource = _bindingSourceForgotten;
 
-            dgvForgotten.Columns["Id"].Visible = false;
-            dgvForgotten.Columns["ForgottenBy"].Visible = false;
-            dgvForgotten.Columns["PESEL"].Visible = false;
-            dgvForgotten.Columns["BirthDate"].Visible = false;
-            dgvForgotten.Columns["Gender"].Visible = false;
+            // Pokaż kolumny: Data zapomnienia, Zapomniane przez, Zaszyfrowany Login, Imię, Nazwisko
+            var keep = new[] { "DateForgotten", "ForgottenByLogin", "Login", "FirstName", "LastName" };
+            foreach (DataGridViewColumn col in dgvForgotten.Columns)
+            {
+                col.Visible = Array.IndexOf(keep, col.Name) >= 0;
+            }
 
-            dgvForgotten.Columns["Login"].HeaderText = "Zaszyfrowany Login";
-            dgvForgotten.Columns["Login"].Width = 200;
+            // Ustaw nagłówki, szerokości i kolejność
+            if (dgvForgotten.Columns.Contains("DateForgotten"))
+            {
+                dgvForgotten.Columns["DateForgotten"].HeaderText = "Data zapomnienia";
+                dgvForgotten.Columns["DateForgotten"].Width = 180;
+                dgvForgotten.Columns["DateForgotten"].DisplayIndex = 0;
+            }
 
-            dgvForgotten.Columns["FirstName"].HeaderText = "Zaszyfrowane Imię";
-            dgvForgotten.Columns["FirstName"].Width = 170;
+            if (dgvForgotten.Columns.Contains("ForgottenByLogin"))
+            {
+                dgvForgotten.Columns["ForgottenByLogin"].HeaderText = "Zapomniane przez";
+                dgvForgotten.Columns["ForgottenByLogin"].Width = 160;
+                dgvForgotten.Columns["ForgottenByLogin"].DisplayIndex = 1;
+            }
 
-            dgvForgotten.Columns["LastName"].HeaderText = "Zaszyfrowane Nazwisko";
-            dgvForgotten.Columns["LastName"].Width = 170;
+            if (dgvForgotten.Columns.Contains("Login"))
+            {
+                dgvForgotten.Columns["Login"].HeaderText = "Login";
+                dgvForgotten.Columns["Login"].Width = 200;
+                dgvForgotten.Columns["Login"].DisplayIndex = 2;
+            }
 
-            dgvForgotten.Columns["DateForgotten"].HeaderText = "Data zapomnienia";
-            dgvForgotten.Columns["DateForgotten"].Width = 200;
+            if (dgvForgotten.Columns.Contains("FirstName"))
+            {
+                dgvForgotten.Columns["FirstName"].HeaderText = "Imię";
+                dgvForgotten.Columns["FirstName"].Width = 140;
+                dgvForgotten.Columns["FirstName"].DisplayIndex = 3;
+            }
 
-            dgvForgotten.Columns["ForgottenByLogin"].HeaderText = "Zapomniane przez";
-            dgvForgotten.Columns["ForgottenByLogin"].Width = 180;
+            if (dgvForgotten.Columns.Contains("LastName"))
+            {
+                dgvForgotten.Columns["LastName"].HeaderText = "Nazwisko";
+                dgvForgotten.Columns["LastName"].Width = 140;
+                dgvForgotten.Columns["LastName"].DisplayIndex = 4;
+            }
 
             dgvForgotten.RowsDefaultCellStyle.BackColor = Color.White;
             dgvForgotten.AlternatingRowsDefaultCellStyle.BackColor = Color.MistyRose;
@@ -187,10 +210,52 @@ namespace SystemPrzychodznia
 
         private void buttonRoles_Click(object sender, EventArgs e)
         {
+            tabControlUserView.SelectedTab = tabPageRoles;
+        }
+
+        private void buttonUsersPerRole_Click(object sender, EventArgs e)
+        {
             using (Form rolesForm = new FormRoles(_userService))
             {
                 rolesForm.ShowDialog();
             }
+        }
+
+        private void LoadRoles()
+        {
+            var dt = new System.Data.DataTable();
+            dt.Columns.Add("Nazwa roli");
+            dt.Columns.Add("Opis");
+            dt.Columns.Add("Zakres dostępu");
+
+            dt.Rows.Add("SuperAdmin",
+                "Konto systemowe.",
+                "Pełny dostęp do wszystkich modułów systemu. Nie może być modyfikowane ani usunięte.");
+            dt.Rows.Add("Admin",
+                "Administrator systemu.",
+                "Zarządzanie użytkownikami: dodawanie, edycja danych, zapominanie kont (RODO). Przeglądanie list użytkowników i historii.");
+            dt.Rows.Add("Lekarz",
+                "Lekarz prowadzący.",
+                "Dostęp do dokumentacji medycznej pacjentów, prowadzenie wizyt, wystawianie skierowań i recept.");
+            dt.Rows.Add("Recepcja",
+                "Pracownik recepcji.",
+                "Rejestracja pacjentów, umawianie i zarządzanie wizytami, obsługa harmonogramu przyjęć.");
+            dt.Rows.Add("Brak_roli",
+                "Użytkownik bez przypisanej roli.",
+                "Dostęp ograniczony wyłącznie do podglądu własnych danych osobowych.");
+
+            dgvRoles.DataSource = dt;
+
+            dgvRoles.Columns[0].Width = 160;
+            dgvRoles.Columns[1].Width = 220;
+            dgvRoles.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+            dgvRoles.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dgvRoles.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgvRoles.RowsDefaultCellStyle.BackColor = Color.White;
+            dgvRoles.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
+            dgvRoles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvRoles.RowHeadersVisible = false;
         }
 
         private void dgvUsers_CellDoubleClick(object sender, DataGridViewCellEventArgs e)

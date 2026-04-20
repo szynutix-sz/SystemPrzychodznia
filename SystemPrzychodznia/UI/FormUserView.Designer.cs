@@ -33,7 +33,6 @@ namespace SystemPrzychodznia
             UserList = new GroupBox();
             dgvUsers = new DataGridView();
             buttonAddUser = new Button();
-            buttonRoles = new Button();
             buttonSearchUser = new Button();
             tableLayoutPanelUsers = new TableLayoutPanel();
             labelLogin = new Label();
@@ -54,6 +53,8 @@ namespace SystemPrzychodznia
             tabPageAdminViewForgotten = new TabPage();
             groupBoxForgotten = new GroupBox();
             dgvForgotten = new DataGridView();
+            tabPageRoles = new TabPage();
+            dgvRoles = new DataGridView();
             tabPageAbout = new TabPage();
             UserList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
@@ -64,6 +65,8 @@ namespace SystemPrzychodznia
             tabPageAdminViewForgotten.SuspendLayout();
             groupBoxForgotten.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvForgotten).BeginInit();
+            tabPageRoles.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvRoles).BeginInit();
             SuspendLayout();
             // 
             // UserList
@@ -99,16 +102,6 @@ namespace SystemPrzychodznia
             buttonAddUser.Text = "Dodaj Użytkownika";
             buttonAddUser.UseVisualStyleBackColor = true;
             buttonAddUser.Click += buttonAddUser_Click;
-            // 
-            // buttonRoles
-            // 
-            buttonRoles.Location = new Point(6, 55);
-            buttonRoles.Name = "buttonRoles";
-            buttonRoles.Size = new Size(149, 44);
-            buttonRoles.TabIndex = 6;
-            buttonRoles.Text = "Przegląd ról";
-            buttonRoles.UseVisualStyleBackColor = true;
-            buttonRoles.Click += buttonRoles_Click;
             // 
             // buttonSearchUser
             // 
@@ -240,6 +233,7 @@ namespace SystemPrzychodznia
             // 
             tabControlUserView.Controls.Add(tabPageAdminViewUsers);
             tabControlUserView.Controls.Add(tabPageAdminViewForgotten);
+            tabControlUserView.Controls.Add(tabPageRoles);
             tabControlUserView.Controls.Add(tabPageAbout);
             tabControlUserView.Location = new Point(12, 12);
             tabControlUserView.Name = "tabControlUserView";
@@ -251,7 +245,6 @@ namespace SystemPrzychodznia
             // 
             tabPageAdminViewUsers.Controls.Add(groupBoxRoles);
             tabPageAdminViewUsers.Controls.Add(buttonAddUser);
-            tabPageAdminViewUsers.Controls.Add(buttonRoles);
             tabPageAdminViewUsers.Controls.Add(UserList);
             tabPageAdminViewUsers.Controls.Add(buttonClearSearch);
             tabPageAdminViewUsers.Controls.Add(buttonSearchUser);
@@ -313,6 +306,28 @@ namespace SystemPrzychodznia
             dgvForgotten.Size = new Size(1665, 723);
             dgvForgotten.TabIndex = 0;
             // 
+            // tabPageRoles
+            // 
+            tabPageRoles.Controls.Add(dgvRoles);
+            tabPageRoles.Location = new Point(4, 34);
+            tabPageRoles.Name = "tabPageRoles";
+            tabPageRoles.Padding = new Padding(3);
+            tabPageRoles.Size = new Size(1683, 918);
+            tabPageRoles.TabIndex = 3;
+            tabPageRoles.Text = "Uprawnienia";
+            tabPageRoles.UseVisualStyleBackColor = true;
+            // 
+            // dgvRoles
+            // 
+            dgvRoles.AllowUserToAddRows = false;
+            dgvRoles.AllowUserToDeleteRows = false;
+            dgvRoles.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvRoles.Dock = DockStyle.Fill;
+            dgvRoles.Name = "dgvRoles";
+            dgvRoles.ReadOnly = true;
+            dgvRoles.RowHeadersWidth = 62;
+            dgvRoles.TabIndex = 0;
+            // 
             // tabPageAbout
             // 
             tabPageAbout.Location = new Point(4, 34);
@@ -343,6 +358,8 @@ namespace SystemPrzychodznia
             tabPageAdminViewForgotten.ResumeLayout(false);
             groupBoxForgotten.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvForgotten).EndInit();
+            tabPageRoles.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvRoles).EndInit();
             ResumeLayout(false);
         }
 
@@ -351,7 +368,6 @@ namespace SystemPrzychodznia
         private GroupBox UserList;
         private DataGridView dgvUsers;
         private Button buttonAddUser;
-        private Button buttonRoles;
         private Button buttonSearchUser;
         private TableLayoutPanel tableLayoutPanelUsers;
         private Label labelLogin;
@@ -373,5 +389,7 @@ namespace SystemPrzychodznia
         private FlowLayoutPanel flowLayoutPanelUprawnienia;
         private GroupBox groupBoxForgotten;
         private DataGridView dgvForgotten;
+        private TabPage tabPageRoles;
+        private DataGridView dgvRoles;
     }
 }

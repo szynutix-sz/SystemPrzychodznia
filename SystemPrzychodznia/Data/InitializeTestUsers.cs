@@ -106,7 +106,98 @@ SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'katarzyna.kamins
 INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
 SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'katarzyna.kaminska' AND p.Nazwa = 'Brak_roli'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);";
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+
+-- Test 6: Tomasz Zieliński (Recepcja), ur. 1988-02-11, M, PESEL: 88021103456
+INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
+SELECT 'Lublin', '20001', 'Słoneczna', '12', '1'
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'tomasz.zielinski@test.pl');
+
+INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
+SELECT last_insert_rowid(), 'tomasz.zielinski', 'Tomasz', 'Zieliński', '88021103456', '1988-02-11', 'M', 'tomasz.zielinski@test.pl', '600700800', NULL, 0, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'tomasz.zielinski@test.pl');
+
+INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
+SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'tomasz.zielinski'
+  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'tomasz.zielinski');
+
+INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
+WHERE u.Login = 'tomasz.zielinski' AND p.Nazwa = 'Recepcja'
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+
+-- Test 7: Agnieszka Zalewska (Lekarz), ur. 1992-09-09, K, PESEL: 92090912345
+INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
+SELECT 'Szczecin', '70001', 'Jasna', '4', ''
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'agnieszka.zalewska@test.pl');
+
+INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
+SELECT last_insert_rowid(), 'agnieszka.zalewska', 'Agnieszka', 'Zalewska', '92090912345', '1992-09-09', 'K', 'agnieszka.zalewska@test.pl', '502600700', NULL, 0, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'agnieszka.zalewska@test.pl');
+
+INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
+SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'agnieszka.zalewska'
+  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'agnieszka.zalewska');
+
+INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
+WHERE u.Login = 'agnieszka.zalewska' AND p.Nazwa = 'Lekarz'
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+
+-- Test 8: Bartosz Nowicki (Brak_roli), ur. 2001-06-30, M, PESEL: 01063056789
+INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
+SELECT 'Białystok', '15001', 'Leśna', '6', ''
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'bartosz.nowicki@test.pl');
+
+INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
+SELECT last_insert_rowid(), 'bartosz.nowicki', 'Bartosz', 'Nowicki', '01063056789', '2001-06-30', 'M', 'bartosz.nowicki@test.pl', '601800900', NULL, 0, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'bartosz.nowicki@test.pl');
+
+INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
+SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'bartosz.nowicki'
+  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'bartosz.nowicki');
+
+INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
+WHERE u.Login = 'bartosz.nowicki' AND p.Nazwa = 'Brak_roli'
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+
+-- Test 9: Monika Szymczak (Admin), ur. 1980-11-11, K, PESEL: 80111133445
+INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
+SELECT 'Katowice', '40001', 'Główna', '1', ''
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'monika.szymczak@test.pl');
+
+INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
+SELECT last_insert_rowid(), 'monika.szymczak', 'Monika', 'Szymczak', '80111133445', '1980-11-11', 'K', 'monika.szymczak@test.pl', '505900100', NULL, 0, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'monika.szymczak@test.pl');
+
+INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
+SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'monika.szymczak'
+  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'monika.szymczak');
+
+INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
+WHERE u.Login = 'monika.szymczak' AND p.Nazwa = 'Admin'
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+
+-- Test 10: Testowe konto (Brak_roli), login: testowaniekonta, email: szynutix@gmail.com
+INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
+SELECT 'Testowo', '99999', 'Testowa', '1', ''
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'szynutix@gmail.com');
+
+INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
+SELECT last_insert_rowid(), 'testowaniekonta', 'Testowy', 'Konto', '00000000000', '1990-01-01', 'M', 'szynutix@gmail.com', '600000000', NULL, 0, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'szynutix@gmail.com');
+
+INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
+SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'testowaniekonta'
+  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'testowaniekonta');
+
+INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
+SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
+WHERE u.Login = 'testowaniekonta' AND p.Nazwa = 'Brak_roli'
+  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+";
             createTableCmd.ExecuteNonQuery();
 
 

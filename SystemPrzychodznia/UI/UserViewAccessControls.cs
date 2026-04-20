@@ -23,6 +23,11 @@ namespace SystemPrzychodznia
                     tabControlUserView.TabPages.Add(tabPageAdminViewForgotten);
                     LoadForgottenUsers();
                 }
+                if (!tabControlUserView.TabPages.Contains(tabPageRoles))
+                {
+                    tabControlUserView.TabPages.Add(tabPageRoles);
+                    LoadRoles();
+                }
 
             }
 
@@ -39,6 +44,11 @@ namespace SystemPrzychodznia
                 { 
                     tabControlUserView.TabPages.Add(tabPageAdminViewForgotten);
                     LoadForgottenUsers();
+                }
+                if (!tabControlUserView.TabPages.Contains(tabPageRoles))
+                {
+                    tabControlUserView.TabPages.Add(tabPageRoles);
+                    LoadRoles();
                 }
             }
 

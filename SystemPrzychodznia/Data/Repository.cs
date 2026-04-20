@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.VisualBasic.ApplicationServices;
 using Microsoft.VisualBasic.Logging;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
@@ -12,7 +13,49 @@ namespace SystemPrzychodznia.Data
     {
         private readonly string _connectionString = "Data Source=przychodnia.db";
 
-  
+        // --- NOWE METODY DO LOGOWANIA I BLOKAD ---
+        public (int Id, DateTime? BlockedUntil, string Password, string Email) GetLoginData(string login)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT u.ID_Uzytkownika, u.Blokada_konta_do, h.Haslo_Hash, u.Adres_email
+                FROM Uzytkownik u
+                JOIN Historia_Hasel h ON u.ID_Uzytkownika = h.ID_Uzytkownika
+                WHERE u.Login = $login AND u.Czy_zapomniany = 0
+                ORDER BY h.ID_Hasla DESC LIMIT 1;";
+            command.Parameters.AddWithValue("$login", login);
+
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                DateTime? blockedUntil = reader.IsDBNull(1) ? (DateTime?)null : DateTime.Parse(reader.GetString(1));
+                string password = reader.GetString(2);
+                string email = reader.GetString(3);
+                return (id, blockedUntil, password, email);
+            }
+            return (0, null, null, null);
+        }
+
+        public void UpdateBlockedUntil(int userId, DateTime? blockedUntil)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "UPDATE Uzytkownik SET Blokada_konta_do = $date WHERE ID_Uzytkownika = $id;";
+            command.Parameters.AddWithValue("$id", userId);
+
+            if (blockedUntil.HasValue)
+                command.Parameters.AddWithValue("$date", blockedUntil.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            else
+                command.Parameters.AddWithValue("$date", DBNull.Value);
+
+            command.ExecuteNonQuery();
+        }
+        // -----------------------------------------
+
         public int GetUserID(string login)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -50,7 +93,7 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
                 if (i == 1)
                     continue; // pomijamy SuperAdmina, który nie jest normalnym uprawnieniem do przypisywania   
                 Uprawnienie up = uprawnienia.Find(u => u.Id == i);
-                up.Posiadane = true; 
+                up.Posiadane = true;
 
             }
             return uprawnienia;
@@ -271,9 +314,6 @@ WHERE u.Czy_zapomniany = 1;";
         public const int VAL_EMAIL = 1;
         public const int VAL_PESEL = 2;
         public bool CzyIstniejeDanyUżytkowik(string wartoscAtrybutu, int jakiAtrybut, bool exlude = false, int excludeId = -1)
-        // funkcja do sprawdzenia czy istnieje już użytkownik z danym loginem, emailem lub PESELem.
-        // Jeśli exlude=true, to sprawdzamy czy istnieje inny użytkownik z tym atrybutem niż ten o ID=excludeId (przydatne przy edycji danych)
-        // jakiAtrybut: UserRepository.VAL_LOGIN, UserRepository.VAL_EMAIL, UserRepository.VAL_PESEL
         {
             string atrybut = jakiAtrybut switch
             {
@@ -294,9 +334,9 @@ WHERE u.Czy_zapomniany = 1;";
             {
                 command.CommandText = $"SELECT COUNT(*) FROM Uzytkownik WHERE {atrybut} = $wartoscAtrybutu;";
             }
-            
+
             command.Parameters.AddWithValue("$wartoscAtrybutu", wartoscAtrybutu);
-            long count = (long)command.ExecuteScalar(); //bez long jest błąd przy castowaniu
+            long count = (long)command.ExecuteScalar();
             return count > 0;
         }
 

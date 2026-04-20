@@ -12,11 +12,61 @@ namespace SystemPrzychodznia.Services
 
         private readonly Validator _validator;
 
+        // --- NOWY SŁOWNIK DO LICZENIA PRÓB ---
+        private Dictionary<string, int> _failedAttempts = new Dictionary<string, int>();
+
         public UserService()
         {
             _repository = new UserRepository();
             _validator = new Validator(_repository);
         }
+
+        // --- NOWE METODY DO LOGOWANIA I ODZYSKIWANIA HASŁA ---
+        public (bool success, string message, int userId) AttemptLogin(string login, string password)
+        {
+            var loginData = _repository.GetLoginData(login);
+
+            if (loginData.Id == 0) return (false, "Nieprawidłowy login lub hasło.", 0);
+
+            if (loginData.BlockedUntil.HasValue)
+            {
+                if (loginData.BlockedUntil.Value > DateTime.Now)
+                {
+                    var span = loginData.BlockedUntil.Value - DateTime.Now;
+                    return (false, $"Konto zablokowane. Spróbuj ponownie za {(int)span.TotalMinutes} min.", 0);
+                }
+                else
+                {
+                    _repository.UpdateBlockedUntil(loginData.Id, null);
+                    if (_failedAttempts.ContainsKey(login)) _failedAttempts[login] = 0;
+                }
+            }
+
+            if (loginData.Password != password)
+            {
+                if (!_failedAttempts.ContainsKey(login)) _failedAttempts[login] = 0;
+                _failedAttempts[login]++;
+
+                if (_failedAttempts[login] >= 3)
+                {
+                    _repository.UpdateBlockedUntil(loginData.Id, DateTime.Now.AddMinutes(30));
+                    return (false, "Trzy nieudane próby! Konto zablokowane na 30 minut.", 0);
+                }
+
+                return (false, $"Błędne hasło. Pozostało prób: {3 - _failedAttempts[login]}.", 0);
+            }
+
+            _failedAttempts[login] = 0;
+            return (true, "Zalogowano pomyślnie.", loginData.Id);
+        }
+
+        public (bool success, string message) RecoverPassword(string login)
+        {
+            var data = _repository.GetLoginData(login);
+            if (data.Id == 0) return (true, "Jeśli login istnieje, wysłaliśmy instrukcje na email.");
+            return (true, $"Hasło do konta zostało wysłane na przypisany adres:\n{data.Email}");
+        }
+        // -----------------------------------------------------
 
         public ValidationResult ValidateUserFull(UserFull user, bool editing) => _validator.ValidateUserFull(user, editing);
         public ValidationResult AddUser(UserFull user)
@@ -38,7 +88,7 @@ namespace SystemPrzychodznia.Services
         public UserFull GetUserFull(int id) => _repository.GetUserFull(id);
 
         public ValidationResult ForgetUser(UserFull user, int forgottenBy)
-        
+
         {
             ForgottenUser f = user.Forget(forgottenBy);
             var validation = _validator.ValidateUserFull(user, true);
@@ -79,9 +129,6 @@ namespace SystemPrzychodznia.Services
         }
 
         public UserFull PrepareRawStrings(UserFull user)
-        /// Metoda przygotowująca surowe dane do walidacji, np. usuwająca zbędne spacje
-        /// Nie obowiązuje w przypadku daty urodzenia, która jest pobierana z DateTimePicker, więc nie jest surowym stringiem, a już sformatowaną datą
-        /// Nie obowiązuje również w przypadku płci, która jest pobierana z ComboBoxa, więc nie jest surowym stringiem, a już sformatowaną płcią
         {
 
             UserFull userBeforeValid = new UserFull();
@@ -105,13 +152,11 @@ namespace SystemPrzychodznia.Services
         {
             Random rnd = new Random();
 
-            // Walidacja formatu daty
             if (!DateTime.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime birthDate))
             {
                 throw new ArgumentException("Nieprawidłowy format daty. Oczekiwany format: YYYY-MM-DD");
             }
 
-            // Walidacja płci
             string genderLower = gender?.ToLower();
             if (genderLower != "m" && genderLower != "k")
             {
@@ -122,14 +167,13 @@ namespace SystemPrzychodznia.Services
             int month = birthDate.Month;
             int day = birthDate.Day;
 
-            // Modyfikacja miesiąca dla PESEL (dla różnych stuleci)
             if (year >= 1800 && year <= 1899)
             {
                 month += 80;
             }
             else if (year >= 1900 && year <= 1999)
             {
-                // month pozostaje bez zmian (0-12)
+
             }
             else if (year >= 2000 && year <= 2099)
             {
@@ -144,34 +188,24 @@ namespace SystemPrzychodznia.Services
                 month += 60;
             }
 
-            // Pobranie dwóch ostatnich cyfr roku
             int yearTwoDigits = year % 100;
 
-            // Przygotowanie pierwszych 9 cyfr PESEL
             string peselBase = $"{yearTwoDigits:D2}{month:D2}{day:D2}";
 
-            // Dodanie liczby porządkowej (na razie 000) - w uproszczeniu
-            // W rzeczywistości powinna to być unikalna liczba, tutaj używamy 000
-            peselBase += $"{rnd.Next(0,10)}{rnd.Next(0, 10)}{rnd.Next(0, 10)}";
+            peselBase += $"{rnd.Next(0, 10)}{rnd.Next(0, 10)}{rnd.Next(0, 10)}";
 
-            // Określenie cyfry płci (przedostatnia cyfra w PESEL)
-            // Dla kobiety parzysta, dla mężczyzny nieparzysta
             int genderDigit;
             if (genderLower == "m")
             {
-                // Mężczyzna - cyfra nieparzysta (np. 1,3,5,7,9)
-                genderDigit = rnd.Next(1, 6)*2 - 1;
+                genderDigit = rnd.Next(1, 6) * 2 - 1;
             }
             else
             {
-                // Kobieta - cyfra parzysta (np. 0,2,4,6,8)
                 genderDigit = rnd.Next(0, 5) * 2;
             }
 
-            // Dodanie cyfry płci jako przedostatniej cyfry
             peselBase += $"{genderDigit}";
 
-            // Obliczenie sumy kontrolnej
             int[] weights = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
             int sum = 0;
 
@@ -182,7 +216,6 @@ namespace SystemPrzychodznia.Services
 
             int controlDigit = (10 - (sum % 10)) % 10;
 
-            // Zbudowanie pełnego PESEL
             string pesel = peselBase + $"{controlDigit}";
 
             return pesel;
