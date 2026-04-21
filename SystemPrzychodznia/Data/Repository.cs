@@ -8,12 +8,11 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace SystemPrzychodznia.Data
 {
-
     internal partial class UserRepository
     {
         private readonly string _connectionString = "Data Source=przychodnia.db";
 
-        // --- NOWE METODY DO LOGOWANIA I BLOKAD ---
+        // --- METODY DO LOGOWANIA I BLOKAD ---
         public (int Id, DateTime? BlockedUntil, string Password, string Email) GetLoginData(string login)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -54,7 +53,20 @@ namespace SystemPrzychodznia.Data
 
             command.ExecuteNonQuery();
         }
-        // -----------------------------------------
+
+        // --- ZAPIS NOWO WYGENEROWANEGO HASŁA ---
+        public void SaveNewPassword(int userId, string newPassword)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+
+            command.CommandText = "INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash) VALUES ($id, $pass);";
+            command.Parameters.AddWithValue("$id", userId);
+            command.Parameters.AddWithValue("$pass", newPassword);
+
+            command.ExecuteNonQuery();
+        }
 
         public int GetUserID(string login)
         {
@@ -69,7 +81,6 @@ SELECT ID_Uzytkownika FROM Uzytkownik WHERE Login = $login;
 
             reader_id.Read();
             return reader_id.GetInt32(0);
-
         }
 
         public List<Uprawnienie> GetUserUprawnienia(int user_id)
@@ -91,13 +102,13 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
             {
                 int i = reader.GetInt32(0);
                 if (i == 1)
-                    continue; // pomijamy SuperAdmina, który nie jest normalnym uprawnieniem do przypisywania   
+                    continue;
                 Uprawnienie up = uprawnienia.Find(u => u.Id == i);
                 up.Posiadane = true;
-
             }
             return uprawnienia;
         }
+
         public List<Uprawnienie> GetUprawnienia()
         {
             List<Uprawnienie> uprawnienia = new List<Uprawnienie>();
@@ -149,20 +160,16 @@ WHERE
     AND Adres_email LIKE '%' || $email || '%'
     AND PESEL LIKE '%' || $pesel || '%'";
 
-
             foreach (Uprawnienie u in s.Uprawnienia)
             {
                 if (u.Posiadane == true)
                 {
                     command.CommandText += $"\n AND ID_Uzytkownika IN (SELECT ID_Uzytkownika FROM Uzytkownik_Uprawnienie WHERE ID_Uprawnienia = {u.Id})";
-                    // można bez parametrów, bo u.Id jest intem i pochodzi z bazy danych, więc nie ma ryzyka SQL Injection
                 }
                 else if (u.Posiadane == false)
                 {
                     command.CommandText += $"\n AND ID_Uzytkownika NOT IN (SELECT ID_Uzytkownika FROM Uzytkownik_Uprawnienie WHERE ID_Uprawnienia = {u.Id})";
-                    // można bez parametrów, bo u.Id jest intem i pochodzi z bazy danych, więc nie ma ryzyka SQL Injection
                 }
-                // jeśli u.Posiadane == null, to nie filtrujemy po tym uprawnieniu
             }
 
             command.CommandText += ";";
@@ -188,7 +195,6 @@ WHERE
             }
             return users;
         }
-
 
         public UserFull GetUserFull(int id)
         {
@@ -218,11 +224,10 @@ JOIN Adres a ON u.ID_Adresu = a.ID_Adresu
 WHERE 
     u.ID_Uzytkownika = $id
     AND (
-        u.Blokada_konta_do IS NULL               -- konto nie jest zablokowane
-        OR u.Blokada_konta_do <= CURRENT_TIMESTAMP  -- blokada już wygasła
+        u.Blokada_konta_do IS NULL               
+        OR u.Blokada_konta_do <= CURRENT_TIMESTAMP  
     )
-    AND u.Czy_zapomniany = 0;                    -- konto nie jest oznaczone jako zapomniane";
-
+    AND u.Czy_zapomniany = 0;";
 
             command.Parameters.AddWithValue("id", id);
 
@@ -232,31 +237,25 @@ WHERE
                 users.Add(new UserFull
                 {
                     Id = reader.GetInt32(0),
-
                     Login = reader.GetString(1),
                     FirstName = reader.GetString(2),
                     LastName = reader.GetString(3),
-
                     Locality = reader.GetString(4),
                     PostalCode = reader.GetString(5),
                     Street = reader.IsDBNull(6) ? null : reader.GetString(6),
                     PropertyNumber = reader.GetString(7),
                     HouseUnitNumber = reader.IsDBNull(8) ? null : reader.GetString(8),
-
                     PESEL = reader.GetString(9),
-
                     BirthDate = reader.GetString(10),
                     Gender = reader.GetString(11),
                     Email = reader.GetString(12),
                     Phone = reader.GetString(13),
-
                 });
             }
 
-
             users[0].Uprawnienia = GetUserUprawnienia(users[0].Id);
 
-            if (users[0].Id == 1) //jest to superadmin
+            if (users[0].Id == 1)
             {
                 users[0].Uprawnienia.Add(new Uprawnienie
                 {
@@ -268,8 +267,6 @@ WHERE
 
             return users[0];
         }
-
-
 
         public List<ForgottenUser> GetListForgottenUsers()
         {
@@ -308,8 +305,6 @@ WHERE u.Czy_zapomniany = 1;";
             return users;
         }
 
-
-
         public const int VAL_LOGIN = 0;
         public const int VAL_EMAIL = 1;
         public const int VAL_PESEL = 2;
@@ -339,6 +334,5 @@ WHERE u.Czy_zapomniany = 1;";
             long count = (long)command.ExecuteScalar();
             return count > 0;
         }
-
     }
 }

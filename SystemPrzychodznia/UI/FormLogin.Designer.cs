@@ -80,7 +80,7 @@
             buttonLogin.Location = new Point(226, 109);
             buttonLogin.Margin = new Padding(2);
             buttonLogin.Name = "buttonLogin";
-            buttonLogin.Size = new Size(78, 20);
+            buttonLogin.Size = new Size(79, 25);
             buttonLogin.TabIndex = 4;
             buttonLogin.Text = "Zaloguj";
             buttonLogin.UseVisualStyleBackColor = true;
@@ -88,9 +88,9 @@
             // 
             // btnForgotPassword
             // 
-            btnForgotPassword.Location = new Point(140, 111);
+            btnForgotPassword.Location = new Point(140, 109);
             btnForgotPassword.Name = "btnForgotPassword";
-            btnForgotPassword.Size = new Size(75, 23);
+            btnForgotPassword.Size = new Size(81, 23);
             btnForgotPassword.TabIndex = 5;
             btnForgotPassword.Text = "Przypomnij haslo";
             btnForgotPassword.UseVisualStyleBackColor = true;

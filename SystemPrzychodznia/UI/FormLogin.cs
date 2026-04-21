@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using SystemPrzychodznia.Data;
 using SystemPrzychodznia.Services;
+using SystemPrzychodznia.UI;
 
 namespace SystemPrzychodznia
 {
@@ -22,15 +18,9 @@ namespace SystemPrzychodznia
             InitializeComponent();
         }
 
-        private void FormLogin_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void labelLogin_Click(object sender, EventArgs e)
-        {
-
-        }
+        private void FormLogin_Load(object sender, EventArgs e) { }
+        private void labelLogin_Click(object sender, EventArgs e) { }
+        private void textBoxPassword_TextChanged(object sender, EventArgs e) { }
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
@@ -56,23 +46,14 @@ namespace SystemPrzychodznia
             }
         }
 
+        // To jest przycisk "Przypomnij hasło" na ekranie głównym.
+        // Zgodnie z wymaganiem nr 2, otwiera nowe okno.
         private void button1_Click(object sender, EventArgs e)
         {
-            string login = textBoxLogin.Text.Trim();
-
-            if (string.IsNullOrWhiteSpace(login))
+            using (var recoverForm = new FormRecoverPass(_userService))
             {
-                MessageBox.Show("Wpisz login, aby odzyskać hasło.", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                recoverForm.ShowDialog();
             }
-
-            var result = _userService.RecoverPassword(login);
-            MessageBox.Show(result.message, "Odzyskiwanie hasła", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void textBoxPassword_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
