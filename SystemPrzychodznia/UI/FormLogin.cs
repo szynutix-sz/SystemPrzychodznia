@@ -38,7 +38,9 @@ namespace SystemPrzychodznia
             if (result.success)
             {
                 _userID.Id = result.userId;
+                _userID.loggedIn = true;
                 this.Close();
+
             }
             else
             {

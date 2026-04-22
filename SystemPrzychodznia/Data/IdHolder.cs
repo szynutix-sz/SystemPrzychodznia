@@ -7,5 +7,7 @@ namespace SystemPrzychodznia.Data
     public class IdHolder
     {
         public int Id { get; set; }
+
+        public bool loggedIn { get; set; } = false;
     }
 }

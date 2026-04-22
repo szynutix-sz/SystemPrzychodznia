@@ -6,10 +6,13 @@ namespace SystemPrzychodznia.Data
     {
         private const string ConnectionString = "Data Source=przychodnia.db";
 
-        public static void Initialize()
+        public static void Initialize(bool testing)
         {
             InitializeDatabase();
-            InitializeTestData();
+            if (testing)
+            {
+                InitializeTestData();
+            }
 
         }
         public static void InitializeDatabase()

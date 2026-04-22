@@ -10,12 +10,14 @@ namespace SystemPrzychodznia
         private BindingSource _bindingSourceUsers = new BindingSource();
         private BindingSource _bindingSourceForgotten = new BindingSource();
         private UserFull _currentUser;
+        private IdHolder _userIDfromLogin;
 
         public FormUserView(IdHolder userID, UserService userService)
         {
 
             _userService = userService;
             _currentUser = _userService.GetUserFull(userID.Id);
+            _userIDfromLogin = userID;
 
 
             InitializeComponent();
@@ -272,5 +274,10 @@ namespace SystemPrzychodznia
             }
         }
 
+        private void buttonLogOut_Click(object sender, EventArgs e)
+        {
+            _userIDfromLogin.loggedIn = false;
+            this.Close();
+        }
     }
 }

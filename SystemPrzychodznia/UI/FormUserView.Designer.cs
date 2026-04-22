@@ -56,6 +56,7 @@ namespace SystemPrzychodznia
             tabPageRoles = new TabPage();
             dgvRoles = new DataGridView();
             tabPageAbout = new TabPage();
+            buttonLogOut = new Button();
             UserList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
             tableLayoutPanelUsers.SuspendLayout();
@@ -67,6 +68,7 @@ namespace SystemPrzychodznia
             ((System.ComponentModel.ISupportInitialize)dgvForgotten).BeginInit();
             tabPageRoles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRoles).BeginInit();
+            tabPageAbout.SuspendLayout();
             SuspendLayout();
             // 
             // UserList
@@ -288,13 +290,15 @@ namespace SystemPrzychodznia
             // 
             groupBoxForgotten.Controls.Add(dgvForgotten);
             groupBoxForgotten.Dock = DockStyle.Fill;
+            groupBoxForgotten.Location = new Point(0, 0);
             groupBoxForgotten.Name = "groupBoxForgotten";
+            groupBoxForgotten.Size = new Size(1683, 918);
             groupBoxForgotten.TabIndex = 1;
             groupBoxForgotten.TabStop = false;
             groupBoxForgotten.Text = "Zapomnieni Użytkownicy";
             // 
             // dgvForgotten
-            //
+            // 
             dgvForgotten.AllowUserToAddRows = false;
             dgvForgotten.AllowUserToDeleteRows = false;
             dgvForgotten.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -303,7 +307,7 @@ namespace SystemPrzychodznia
             dgvForgotten.Name = "dgvForgotten";
             dgvForgotten.ReadOnly = true;
             dgvForgotten.RowHeadersWidth = 62;
-            dgvForgotten.Size = new Size(1665, 723);
+            dgvForgotten.Size = new Size(1677, 888);
             dgvForgotten.TabIndex = 0;
             // 
             // tabPageRoles
@@ -323,13 +327,16 @@ namespace SystemPrzychodznia
             dgvRoles.AllowUserToDeleteRows = false;
             dgvRoles.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvRoles.Dock = DockStyle.Fill;
+            dgvRoles.Location = new Point(3, 3);
             dgvRoles.Name = "dgvRoles";
             dgvRoles.ReadOnly = true;
             dgvRoles.RowHeadersWidth = 62;
+            dgvRoles.Size = new Size(1677, 912);
             dgvRoles.TabIndex = 0;
             // 
             // tabPageAbout
             // 
+            tabPageAbout.Controls.Add(buttonLogOut);
             tabPageAbout.Location = new Point(4, 34);
             tabPageAbout.Name = "tabPageAbout";
             tabPageAbout.Padding = new Padding(3);
@@ -337,6 +344,16 @@ namespace SystemPrzychodznia
             tabPageAbout.TabIndex = 1;
             tabPageAbout.Text = "O Programie";
             tabPageAbout.UseVisualStyleBackColor = true;
+            // 
+            // buttonLogOut
+            // 
+            buttonLogOut.Location = new Point(18, 21);
+            buttonLogOut.Name = "buttonLogOut";
+            buttonLogOut.Size = new Size(224, 51);
+            buttonLogOut.TabIndex = 0;
+            buttonLogOut.Text = "Wyloguj";
+            buttonLogOut.UseVisualStyleBackColor = true;
+            buttonLogOut.Click += buttonLogOut_Click;
             // 
             // FormUserView
             // 
@@ -360,6 +377,7 @@ namespace SystemPrzychodznia
             ((System.ComponentModel.ISupportInitialize)dgvForgotten).EndInit();
             tabPageRoles.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvRoles).EndInit();
+            tabPageAbout.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -391,5 +409,6 @@ namespace SystemPrzychodznia
         private DataGridView dgvForgotten;
         private TabPage tabPageRoles;
         private DataGridView dgvRoles;
+        private Button buttonLogOut;
     }
 }
