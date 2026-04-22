@@ -1,3 +1,4 @@
+using System.Reflection;
 using SystemPrzychodznia.Data;
 using SystemPrzychodznia.Services;
 
@@ -20,8 +21,12 @@ namespace SystemPrzychodznia
             
 
             ApplicationConfiguration.Initialize();
-            
-            
+
+            var version = Assembly.GetExecutingAssembly()
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    ?.InformationalVersion ?? "Unknown";
+
+
 
             while (true)
             {
@@ -30,7 +35,7 @@ namespace SystemPrzychodznia
 
                 if (_userID.loggedIn)
                 {
-                    Application.Run(new FormUserView(_userID, _userService));
+                    Application.Run(new FormUserView(_userID, _userService, version));
                     if (_userID.loggedIn) break; //użytkownik wyszedł, ale się nie wylogował
                 }
                 else

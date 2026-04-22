@@ -1,3 +1,4 @@
+using SQLitePCL;
 using SystemPrzychodznia.Data;
 using SystemPrzychodznia.Services;
 
@@ -11,14 +12,15 @@ namespace SystemPrzychodznia
         private BindingSource _bindingSourceForgotten = new BindingSource();
         private UserFull _currentUser;
         private IdHolder _userIDfromLogin;
+        private string _version;
 
-        public FormUserView(IdHolder userID, UserService userService)
+        public FormUserView(IdHolder userID, UserService userService, string version)
         {
 
             _userService = userService;
             _currentUser = _userService.GetUserFull(userID.Id);
             _userIDfromLogin = userID;
-
+            _version = version;
 
             InitializeComponent();
 
@@ -28,6 +30,13 @@ namespace SystemPrzychodznia
 
 
             this.Text = $"System Psychodnia - Zalogowano jako: {_currentUser.Login}";
+        }
+
+        private void LoadAbout()
+        {
+            labelVersion.Text = _version;
+
+
         }
 
         private void ClearSearchFields()
@@ -278,6 +287,11 @@ namespace SystemPrzychodznia
         {
             _userIDfromLogin.loggedIn = false;
             this.Close();
+        }
+
+        private void label1_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }

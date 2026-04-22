@@ -57,6 +57,13 @@ namespace SystemPrzychodznia
             dgvRoles = new DataGridView();
             tabPageAbout = new TabPage();
             buttonLogOut = new Button();
+            labelVersion = new Label();
+            labelCLogin = new Label();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            labelCFName = new Label();
+            labelCLName = new Label();
+            labelCEmail = new Label();
+            labelCPhone = new Label();
             UserList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
             tableLayoutPanelUsers.SuspendLayout();
@@ -69,6 +76,7 @@ namespace SystemPrzychodznia
             tabPageRoles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRoles).BeginInit();
             tabPageAbout.SuspendLayout();
+            tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
             // UserList
@@ -337,6 +345,7 @@ namespace SystemPrzychodznia
             // tabPageAbout
             // 
             tabPageAbout.Controls.Add(buttonLogOut);
+            tabPageAbout.Controls.Add(tableLayoutPanel1);
             tabPageAbout.Location = new Point(4, 34);
             tabPageAbout.Name = "tabPageAbout";
             tabPageAbout.Padding = new Padding(3);
@@ -354,6 +363,83 @@ namespace SystemPrzychodznia
             buttonLogOut.Text = "Wyloguj";
             buttonLogOut.UseVisualStyleBackColor = true;
             buttonLogOut.Click += buttonLogOut_Click;
+            // 
+            // labelVersion
+            // 
+            labelVersion.AutoSize = true;
+            labelVersion.Location = new Point(3, 0);
+            labelVersion.Name = "labelVersion";
+            labelVersion.Size = new Size(130, 25);
+            labelVersion.TabIndex = 1;
+            labelVersion.Text = "Version not set";
+            // 
+            // labelCLogin
+            // 
+            labelCLogin.AutoSize = true;
+            labelCLogin.Location = new Point(3, 50);
+            labelCLogin.Name = "labelCLogin";
+            labelCLogin.Size = new Size(148, 25);
+            labelCLogin.TabIndex = 2;
+            labelCLogin.Text = "Login not loaded";
+            labelCLogin.Click += label1_Click_1;
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.ColumnCount = 1;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.Controls.Add(labelCLogin, 0, 1);
+            tableLayoutPanel1.Controls.Add(labelVersion, 0, 0);
+            tableLayoutPanel1.Controls.Add(labelCFName, 0, 2);
+            tableLayoutPanel1.Controls.Add(labelCLName, 0, 3);
+            tableLayoutPanel1.Controls.Add(labelCEmail, 0, 4);
+            tableLayoutPanel1.Controls.Add(labelCPhone, 0, 5);
+            tableLayoutPanel1.Location = new Point(18, 105);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 6;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 16.665781F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6710854F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6657848F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6657848F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6657848F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6657848F));
+            tableLayoutPanel1.Size = new Size(406, 303);
+            tableLayoutPanel1.TabIndex = 3;
+            // 
+            // labelCFName
+            // 
+            labelCFName.AutoSize = true;
+            labelCFName.Location = new Point(3, 100);
+            labelCFName.Name = "labelCFName";
+            labelCFName.Size = new Size(186, 25);
+            labelCFName.TabIndex = 3;
+            labelCFName.Text = "First name not loaded";
+            // 
+            // labelCLName
+            // 
+            labelCLName.AutoSize = true;
+            labelCLName.Location = new Point(3, 150);
+            labelCLName.Name = "labelCLName";
+            labelCLName.Size = new Size(184, 25);
+            labelCLName.TabIndex = 4;
+            labelCLName.Text = "Last name not loaded";
+            // 
+            // labelCEmail
+            // 
+            labelCEmail.AutoSize = true;
+            labelCEmail.Location = new Point(3, 200);
+            labelCEmail.Name = "labelCEmail";
+            labelCEmail.Size = new Size(146, 25);
+            labelCEmail.TabIndex = 5;
+            labelCEmail.Text = "Email not loaded";
+            // 
+            // labelCPhone
+            // 
+            labelCPhone.AutoSize = true;
+            labelCPhone.Location = new Point(3, 250);
+            labelCPhone.Name = "labelCPhone";
+            labelCPhone.Size = new Size(154, 25);
+            labelCPhone.TabIndex = 6;
+            labelCPhone.Text = "Phone not loaded";
             // 
             // FormUserView
             // 
@@ -378,6 +464,8 @@ namespace SystemPrzychodznia
             tabPageRoles.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvRoles).EndInit();
             tabPageAbout.ResumeLayout(false);
+            tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel1.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -410,5 +498,12 @@ namespace SystemPrzychodznia
         private TabPage tabPageRoles;
         private DataGridView dgvRoles;
         private Button buttonLogOut;
+        private TableLayoutPanel tableLayoutPanel1;
+        private Label labelCLogin;
+        private Label labelVersion;
+        private Label labelCFName;
+        private Label labelCLName;
+        private Label labelCEmail;
+        private Label labelCPhone;
     }
 }

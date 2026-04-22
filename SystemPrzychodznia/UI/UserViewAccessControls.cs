@@ -55,6 +55,7 @@ namespace SystemPrzychodznia
 
             // Każdy użytkownik ma dostęp do zakładki "O programie"
             tabControlUserView.TabPages.Add(tabPageAbout);
+            LoadAbout();
         }
     }
 }
