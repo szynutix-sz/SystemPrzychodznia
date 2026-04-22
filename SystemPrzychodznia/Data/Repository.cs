@@ -12,14 +12,26 @@ namespace SystemPrzychodznia.Data
     {
         private readonly string _connectionString = "Data Source=przychodnia.db";
 
-        // --- METODY DO LOGOWANIA I BLOKAD ---
-        public (int Id, DateTime? BlockedUntil, string Password, string Email) GetLoginData(string login)
+        // --- POBIERANIE CZASU BLOKADY Z BAZY ---
+        public int GetLockoutDurationMinutes()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT Czas_blokady_minuty FROM Ustawienia_Systemu LIMIT 1;";
+            using var reader = command.ExecuteReader();
+            if (reader.Read()) return reader.GetInt32(0);
+            return 30; // Domyślnie 30, gdyby tabeli zabrakło
+        }
+
+        // --- ZMODYFIKOWANE POBIERANIE DANYCH DO LOGOWANIA ---
+        public (int Id, DateTime? BlockedUntil, string Password, string Email, bool RequiresPasswordChange) GetLoginData(string login)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
             command.CommandText = @"
-                SELECT u.ID_Uzytkownika, u.Blokada_konta_do, h.Haslo_Hash, u.Adres_email
+                SELECT u.ID_Uzytkownika, u.Blokada_konta_do, h.Haslo_Hash, u.Adres_email, u.Wymaga_zmiany_hasla
                 FROM Uzytkownik u
                 JOIN Historia_Hasel h ON u.ID_Uzytkownika = h.ID_Uzytkownika
                 WHERE u.Login = $login AND u.Czy_zapomniany = 0
@@ -33,9 +45,10 @@ namespace SystemPrzychodznia.Data
                 DateTime? blockedUntil = reader.IsDBNull(1) ? (DateTime?)null : DateTime.Parse(reader.GetString(1));
                 string password = reader.GetString(2);
                 string email = reader.GetString(3);
-                return (id, blockedUntil, password, email);
+                bool requiresChange = reader.GetInt32(4) == 1; // 1 = true
+                return (id, blockedUntil, password, email, requiresChange);
             }
-            return (0, null, null, null);
+            return (0, null, null, null, false);
         }
 
         public void UpdateBlockedUntil(int userId, DateTime? blockedUntil)
@@ -54,17 +67,31 @@ namespace SystemPrzychodznia.Data
             command.ExecuteNonQuery();
         }
 
-        // --- ZAPIS NOWO WYGENEROWANEGO HASŁA ---
+        // --- ZAPIS NOWO WYGENEROWANEGO HASŁA (Z FLAGĄ WYMUSZENIA) ---
         public void SaveNewPassword(int userId, string newPassword)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-
-            command.CommandText = "INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash) VALUES ($id, $pass);";
+            command.CommandText = @"
+                UPDATE Uzytkownik SET Wymaga_zmiany_hasla = 1 WHERE ID_Uzytkownika = $id;
+                INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash) VALUES ($id, $pass);";
             command.Parameters.AddWithValue("$id", userId);
             command.Parameters.AddWithValue("$pass", newPassword);
+            command.ExecuteNonQuery();
+        }
 
+        // --- SAMODZIELNA ZMIANA HASŁA (ZDJĘCIE FLAGI) ---
+        public void ChangeUserPassword(int userId, string newPassword)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE Uzytkownik SET Wymaga_zmiany_hasla = 0 WHERE ID_Uzytkownika = $id;
+                INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash) VALUES ($id, $pass);";
+            command.Parameters.AddWithValue("$id", userId);
+            command.Parameters.AddWithValue("$pass", newPassword);
             command.ExecuteNonQuery();
         }
 
@@ -73,12 +100,9 @@ namespace SystemPrzychodznia.Data
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
-            command.CommandText = @"
-SELECT ID_Uzytkownika FROM Uzytkownik WHERE Login = $login;
-";
+            command.CommandText = "SELECT ID_Uzytkownika FROM Uzytkownik WHERE Login = $login;";
             command.Parameters.AddWithValue("$login", login);
             using var reader_id = command.ExecuteReader();
-
             reader_id.Read();
             return reader_id.GetInt32(0);
         }
@@ -88,23 +112,20 @@ SELECT ID_Uzytkownika FROM Uzytkownik WHERE Login = $login;
             List<Uprawnienie> uprawnienia = GetUprawnienia();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText = @"
 SELECT Uprawnienie.ID_Uprawnienia
 FROM Uzytkownik_Uprawnienie
 JOIN Uprawnienie ON Uzytkownik_Uprawnienie.ID_Uprawnienia = Uprawnienie.ID_Uprawnienia
 WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
-
             command.Parameters.AddWithValue("$id", user_id);
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
                 int i = reader.GetInt32(0);
-                if (i == 1)
-                    continue;
+                if (i == 1) continue;
                 Uprawnienie up = uprawnienia.Find(u => u.Id == i);
-                up.Posiadane = true;
+                if (up != null) up.Posiadane = true;
             }
             return uprawnienia;
         }
@@ -114,7 +135,6 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
             List<Uprawnienie> uprawnienia = new List<Uprawnienie>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText = @"
 SELECT 
@@ -123,7 +143,6 @@ SELECT
 FROM Uprawnienie
 WHERE 
     ID_Uprawnienia  != 1;";
-
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -141,16 +160,10 @@ WHERE
             var users = new List<User>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText = @"
 SELECT 
-    Login, 
-    Imie AS FirstName, 
-    Nazwisko AS LastName, 
-    Adres_email AS Email, 
-    PESEL,
-    Id_Uzytkownika
+    Login, Imie AS FirstName, Nazwisko AS LastName, Adres_email AS Email, PESEL, Id_Uzytkownika
 FROM Uzytkownik
 WHERE 
     Czy_zapomniany = 0
@@ -163,15 +176,10 @@ WHERE
             foreach (Uprawnienie u in s.Uprawnienia)
             {
                 if (u.Posiadane == true)
-                {
                     command.CommandText += $"\n AND ID_Uzytkownika IN (SELECT ID_Uzytkownika FROM Uzytkownik_Uprawnienie WHERE ID_Uprawnienia = {u.Id})";
-                }
                 else if (u.Posiadane == false)
-                {
                     command.CommandText += $"\n AND ID_Uzytkownika NOT IN (SELECT ID_Uzytkownika FROM Uzytkownik_Uprawnienie WHERE ID_Uprawnienia = {u.Id})";
-                }
             }
-
             command.CommandText += ";";
 
             command.Parameters.AddWithValue("$login", s.Login);
@@ -201,36 +209,20 @@ WHERE
             var users = new List<UserFull>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText = @"
                SELECT 
-    u.ID_Uzytkownika AS Id,
-    u.Login,
-    u.Imie AS FirstName,
-    u.Nazwisko AS LastName,
-    a.Miejscowosc AS Locality,
-    a.Kod_pocztowy AS PostalCode,
-    a.Ulica AS Street,
-    a.Numer_posesji_domu AS PropertyNumber,
-    a.Numer_lokalu_mieszkania AS HouseUnitNumber,
-    u.PESEL,
-    u.Data_urodzenia AS BirthDate,
-    u.Plec AS Gender,
-    u.Adres_email AS Email,
-    u.Numer_telefonu AS Phone
+    u.ID_Uzytkownika AS Id, u.Login, u.Imie AS FirstName, u.Nazwisko AS LastName,
+    a.Miejscowosc AS Locality, a.Kod_pocztowy AS PostalCode, a.Ulica AS Street,
+    a.Numer_posesji_domu AS PropertyNumber, a.Numer_lokalu_mieszkania AS HouseUnitNumber,
+    u.PESEL, u.Data_urodzenia AS BirthDate, u.Plec AS Gender, u.Adres_email AS Email, u.Numer_telefonu AS Phone
 FROM Uzytkownik u
 JOIN Adres a ON u.ID_Adresu = a.ID_Adresu
 WHERE 
     u.ID_Uzytkownika = $id
-    AND (
-        u.Blokada_konta_do IS NULL               
-        OR u.Blokada_konta_do <= CURRENT_TIMESTAMP  
-    )
+    AND (u.Blokada_konta_do IS NULL OR u.Blokada_konta_do <= CURRENT_TIMESTAMP)
     AND u.Czy_zapomniany = 0;";
-
             command.Parameters.AddWithValue("id", id);
-
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -253,19 +245,16 @@ WHERE
                 });
             }
 
-            users[0].Uprawnienia = GetUserUprawnienia(users[0].Id);
-
-            if (users[0].Id == 1)
+            if (users.Count > 0)
             {
-                users[0].Uprawnienia.Add(new Uprawnienie
+                users[0].Uprawnienia = GetUserUprawnienia(users[0].Id);
+                if (users[0].Id == 1)
                 {
-                    Id = 1,
-                    Nazwa = "SuperAdmin",
-                    Posiadane = true
-                });
+                    users[0].Uprawnienia.Add(new Uprawnienie { Id = 1, Nazwa = "SuperAdmin", Posiadane = true });
+                }
+                return users[0];
             }
-
-            return users[0];
+            return null;
         }
 
         public List<ForgottenUser> GetListForgottenUsers()
@@ -273,21 +262,14 @@ WHERE
             var users = new List<ForgottenUser>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
-
             var command = connection.CreateCommand();
             command.CommandText = @"
 SELECT 
-    u.Login, 
-    u.Imie AS FirstName, 
-    u.Nazwisko AS LastName, 
-    u.Data_zapomnienia AS DateForgotten, 
-    u.ID_Kto_Zapomnial AS ForgottenBy,
-    u.Id_Uzytkownika,
-    COALESCE(admin.Login, 'Nieznany') AS ForgottenByLogin
+    u.Login, u.Imie AS FirstName, u.Nazwisko AS LastName, u.Data_zapomnienia AS DateForgotten, 
+    u.ID_Kto_Zapomnial AS ForgottenBy, u.Id_Uzytkownika, COALESCE(admin.Login, 'Nieznany') AS ForgottenByLogin
 FROM Uzytkownik u
 LEFT JOIN Uzytkownik admin ON u.ID_Kto_Zapomnial = admin.ID_Uzytkownika
 WHERE u.Czy_zapomniany = 1;";
-
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -297,7 +279,7 @@ WHERE u.Czy_zapomniany = 1;";
                     FirstName = reader.GetString(1),
                     LastName = reader.GetString(2),
                     DateForgotten = reader.GetString(3),
-                    ForgottenBy = reader.GetInt32(4),
+                    ForgottenBy = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
                     Id = reader.GetInt32(5),
                     ForgottenByLogin = reader.GetString(6)
                 });

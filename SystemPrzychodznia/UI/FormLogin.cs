@@ -37,10 +37,25 @@ namespace SystemPrzychodznia
 
             if (result.success)
             {
+                // SPRAWDZENIE: Czy hasło zostało wymuszone do zmiany przez zresetowanie e-mailem?
+                if (result.requiresPasswordChange)
+                {
+                    MessageBox.Show("Logujesz się za pomocą hasła wygenerowanego przez system.\nZe względów bezpieczeństwa musisz ustalić swoje własne hasło.", "Wymiana hasła", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    using (var changePassForm = new FormChangePassword(_userService, result.userId))
+                    {
+                        if (changePassForm.ShowDialog() != DialogResult.OK)
+                        {
+                            // Użytkownik nie zmienił hasła (np. wcisnął krzyżyk) - zablokuj dostęp!
+                            MessageBox.Show("Musisz zmienić hasło, aby się zalogować do systemu!", "Odmowa dostępu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+                }
+
                 _userID.Id = result.userId;
                 _userID.loggedIn = true;
                 this.Close();
-
             }
             else
             {
@@ -48,8 +63,6 @@ namespace SystemPrzychodznia
             }
         }
 
-        // To jest przycisk "Przypomnij hasło" na ekranie głównym.
-        // Zgodnie z wymaganiem nr 2, otwiera nowe okno.
         private void button1_Click(object sender, EventArgs e)
         {
             using (var recoverForm = new FormRecoverPass(_userService))

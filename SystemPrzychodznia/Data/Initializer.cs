@@ -13,8 +13,8 @@ namespace SystemPrzychodznia.Data
             {
                 InitializeTestData();
             }
-
         }
+
         public static void InitializeDatabase()
         {
             using var connection = new SqliteConnection(ConnectionString);
@@ -37,6 +37,16 @@ CREATE TABLE IF NOT EXISTS Adres (
 );
 
 -- ============================================================
+-- Dodane: Tabela Ustawienia_Systemu (Czas blokady)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS Ustawienia_Systemu (
+    Czas_blokady_minuty INTEGER NOT NULL
+);
+
+INSERT INTO Ustawienia_Systemu (Czas_blokady_minuty)
+SELECT 30 WHERE NOT EXISTS (SELECT 1 FROM Ustawienia_Systemu);
+
+-- ============================================================
 -- 2. Tabela Uzytkownik
 -- ============================================================
 CREATE TABLE IF NOT EXISTS Uzytkownik (
@@ -45,13 +55,14 @@ CREATE TABLE IF NOT EXISTS Uzytkownik (
     Login TEXT UNIQUE NOT NULL,
     Imie TEXT NOT NULL,
     Nazwisko TEXT NOT NULL,
-    PESEL TEXT NOT NULL, -- Użytkownik zapomiany może mieć PESEL, ale nie będzie on unikalny
+    PESEL TEXT NOT NULL,
     Data_urodzenia TEXT NOT NULL,
     Plec TEXT NOT NULL CHECK (Plec IN ('K', 'M', 'Inna')),
     Adres_email TEXT UNIQUE NOT NULL,
     Numer_telefonu TEXT NOT NULL,
     Blokada_konta_do TEXT,
     Czy_zapomniany INTEGER NOT NULL DEFAULT 0 CHECK (Czy_zapomniany IN (0,1)),
+    Wymaga_zmiany_hasla INTEGER NOT NULL DEFAULT 0 CHECK (Wymaga_zmiany_hasla IN (0,1)),
     Data_zapomnienia TEXT,
     ID_Kto_Zapomnial INTEGER,
     FOREIGN KEY (ID_Adresu) REFERENCES Adres(ID_Adresu) ON DELETE RESTRICT,
@@ -59,7 +70,7 @@ CREATE TABLE IF NOT EXISTS Uzytkownik (
 );
 
 -- ============================================================
--- 3. Tabela Historia_Hasel (przechowuje hasła)
+-- 3. Tabela Historia_Hasel
 -- ============================================================
 CREATE TABLE IF NOT EXISTS Historia_Hasel (
     ID_Hasla INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -89,53 +100,27 @@ CREATE TABLE IF NOT EXISTS Uzytkownik_Uprawnienie (
 );
 
 -- ============================================================
--- 6. Wstawienie domyślnego adresu (jeśli potrzeba dla SuperAdmina)
+-- 6. Wstawienie domyślnego adresu
 -- ============================================================
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
 SELECT '-', '-', '-', '-', '-'
 WHERE NOT EXISTS (SELECT 1 FROM Adres WHERE ID_Adresu = 1);
 
 -- ============================================================
--- 7. Wstawienie użytkownika SuperAdmin (jeśli nie istnieje)
+-- 7. Wstawienie użytkownika SuperAdmin
 -- ============================================================
 INSERT INTO Uzytkownik (
-    ID_Adresu,
-    Login,
-    Imie,
-    Nazwisko,
-    PESEL,
-    Data_urodzenia,
-    Plec,
-    Adres_email,
-    Numer_telefonu,
-    Blokada_konta_do,
-    Czy_zapomniany,
-    Data_zapomnienia,
-    ID_Kto_Zapomnial
+    ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Wymaga_zmiany_hasla, Data_zapomnienia, ID_Kto_Zapomnial
 )
 SELECT 
-    1,                                    -- ID_Adresu (zakładamy, że pierwszy adres ma ID=1)
-    'SuperAdmin',
-    '-',
-    '-',
-    '-',
-    '2026-03-17',                         -- format YYYY-MM-DD
-    'Inna',                                  -- Plec (wartość dozwolona: K/M/Inna, tu '-' nie jest dozwolone – poprawiam na 'Inna')
-    'customer_service@ict_supplier.com',
-    '000000000',
-    NULL,                                 -- brak blokady
-    0,                                    -- nie zapomniany
-    NULL,
-    NULL
+    1, 'SuperAdmin', '-', '-', '-', '2026-03-17', 'Inna', 'customer_service@ict_supplier.com', '000000000', NULL, 0, 0, NULL, NULL
 WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Login = 'SuperAdmin');
 
 -- ============================================================
--- 8. Wstawienie hasła dla SuperAdmina (jeśli użytkownik został dodany)
---    UWAGA: W rzeczywistej aplikacji hasło powinno być silnie zahaszowane
---    (np. bcrypt, Argon2). Poniższy zapis to tylko przykład.
+-- 8. Wstawienie hasła dla SuperAdmina
 -- ============================================================
 INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
-SELECT ID_Uzytkownika, 'AdminPass'   -- W PRODUKCJI: użyj hasha np. '$2y$10$...' 
+SELECT ID_Uzytkownika, 'AdminPass'
 FROM Uzytkownik
 WHERE Login = 'SuperAdmin'
   AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h 
@@ -143,28 +128,13 @@ WHERE Login = 'SuperAdmin'
                   WHERE u.Login = 'SuperAdmin');
 
 -- ============================================================
--- 9. Dodanie uprawnień' (jeśli nie istnieją)
+-- 9. Dodanie uprawnień
 -- ============================================================
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'SuperAdmin'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');
-
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Admin'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Admin');
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Lekarz'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Lekarz');
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Recepcja'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Recepcja');
-
-INSERT INTO Uprawnienie (Nazwa)
-SELECT 'Brak_roli'
-WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Brak_roli');
+INSERT INTO Uprawnienie (Nazwa) SELECT 'SuperAdmin' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');
+INSERT INTO Uprawnienie (Nazwa) SELECT 'Admin' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Admin');
+INSERT INTO Uprawnienie (Nazwa) SELECT 'Lekarz' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Lekarz');
+INSERT INTO Uprawnienie (Nazwa) SELECT 'Recepcja' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Recepcja');
+INSERT INTO Uprawnienie (Nazwa) SELECT 'Brak_roli' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Brak_roli');
 
 -- ============================================================
 -- 10. Nadanie uprawnienia 'Admin' dla SuperAdmina
@@ -178,8 +148,6 @@ WHERE u.Login = 'SuperAdmin'
                   WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
                     AND up.ID_Uprawnienia = p.ID_Uprawnienia);";
             createTableCmd.ExecuteNonQuery();
-
-
         }
     }
 }

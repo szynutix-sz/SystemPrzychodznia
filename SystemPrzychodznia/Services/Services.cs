@@ -11,7 +11,6 @@ namespace SystemPrzychodznia.Services
     {
         private readonly UserRepository _repository;
         private readonly Validator _validator;
-
         private Dictionary<string, int> _failedAttempts = new Dictionary<string, int>();
 
         public UserService()
@@ -20,18 +19,48 @@ namespace SystemPrzychodznia.Services
             _validator = new Validator(_repository);
         }
 
-        public (bool success, string message, int userId) AttemptLogin(string login, string password)
+        // --- POBIERANIE CZASU Z NTP (OCHRONA PRZED LOKALNĄ ZMIANĄ ZEGARA) ---
+        private DateTime GetRealTime()
+        {
+            try
+            {
+                var addresses = System.Net.Dns.GetHostEntry("time.google.com").AddressList;
+                var ipEndPoint = new System.Net.IPEndPoint(addresses[0], 123);
+                var ntpData = new byte[48]; ntpData[0] = 0x1B;
+
+                using (var socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Dgram, System.Net.Sockets.ProtocolType.Udp))
+                {
+                    socket.Connect(ipEndPoint);
+                    socket.ReceiveTimeout = 2000;
+                    socket.Send(ntpData);
+                    socket.Receive(ntpData);
+                }
+                ulong intPart = (ulong)ntpData[40] << 24 | (ulong)ntpData[41] << 16 | (ulong)ntpData[42] << 8 | (ulong)ntpData[43];
+                ulong fractPart = (ulong)ntpData[44] << 24 | (ulong)ntpData[45] << 16 | (ulong)ntpData[46] << 8 | (ulong)ntpData[47];
+                var milliseconds = (intPart * 1000) + ((fractPart * 1000) / 0x100000000L);
+                return (new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc)).AddMilliseconds((long)milliseconds).ToLocalTime();
+            }
+            catch
+            {
+                return DateTime.Now; // Awaryjny powrót w razie braku internetu
+            }
+        }
+
+        // Zwracamy też requiresPasswordChange w wyniku logowania
+        public (bool success, string message, int userId, bool requiresPasswordChange) AttemptLogin(string login, string password)
         {
             var loginData = _repository.GetLoginData(login);
 
-            if (loginData.Id == 0) return (false, "Nieprawidłowy login lub hasło.", 0);
+            if (loginData.Id == 0) return (false, "Nieprawidłowy login lub hasło.", 0, false);
+
+            DateTime realTimeNow = GetRealTime();
 
             if (loginData.BlockedUntil.HasValue)
             {
-                if (loginData.BlockedUntil.Value > DateTime.Now)
+                if (loginData.BlockedUntil.Value > realTimeNow)
                 {
-                    var span = loginData.BlockedUntil.Value - DateTime.Now;
-                    return (false, $"Konto zablokowane. Spróbuj ponownie za {(int)span.TotalMinutes} min.", 0);
+                    var span = loginData.BlockedUntil.Value - realTimeNow;
+                    return (false, $"Konto zablokowane. Spróbuj ponownie za {(int)span.TotalMinutes + 1} min.", 0, false);
                 }
                 else
                 {
@@ -47,48 +76,49 @@ namespace SystemPrzychodznia.Services
 
                 if (_failedAttempts[login] >= 3)
                 {
-                    _repository.UpdateBlockedUntil(loginData.Id, DateTime.Now.AddMinutes(30));
-                    return (false, "Trzy nieudane próby! Konto zablokowane na 30 minut.", 0);
+                    // Pobranie czasu od admina (z bazy)
+                    int lockoutMinutes = _repository.GetLockoutDurationMinutes();
+                    _repository.UpdateBlockedUntil(loginData.Id, realTimeNow.AddMinutes(lockoutMinutes));
+                    return (false, $"Trzy nieudane próby! Konto zablokowane na {lockoutMinutes} minut.", 0, false);
                 }
 
-                return (false, $"Błędne hasło. Pozostało prób: {3 - _failedAttempts[login]}.", 0);
+                return (false, $"Błędne hasło. Pozostało prób: {3 - _failedAttempts[login]}.", 0, false);
             }
 
             _failedAttempts[login] = 0;
-            return (true, "Zalogowano pomyślnie.", loginData.Id);
+            return (true, "Zalogowano pomyślnie.", loginData.Id, loginData.RequiresPasswordChange);
         }
 
-        // --- ZMODYFIKOWANE ODZYSKIWANIE HASŁA (WG. WYMAGAŃ Z KARTY) ---
+        // --- ZMIANA: ZAWSZE TEN SAM KOMUNIKAT DLA BEZPIECZEŃSTWA (ANTI-ENUMERATION) ---
         public (bool success, string message) RecoverPassword(string login, string email)
         {
             var data = _repository.GetLoginData(login);
+            string genericSuccessMsg = "Jeśli podano prawidłowe dane, nowe hasło zostało wygenerowane i wysłane na powiązany adres e-mail.";
 
-            // Wymagania 3 i 4: Jeśli nie ma usera lub email nie pasuje, ten sam generyczny komunikat
             if (data.Id == 0 || !string.Equals(data.Email, email, StringComparison.OrdinalIgnoreCase))
             {
-                return (false, "Podano błędny identyfikator użytkownika i/lub adres e-mail.");
+                return (true, genericSuccessMsg); // Udajemy sukces!
             }
 
             try
             {
-                // Generowanie losowego hasła (Wymaganie 2)
                 string newPassword = GenerateRandomPassword(10);
-
-                // Zapisz nowe hasło w bazie
                 _repository.SaveNewPassword(data.Id, newPassword);
-
-                // Wyślij e-mail z nowym hasłem
                 SendEmail(data.Email, newPassword);
 
-                return (true, "Nowe hasło zostało wygenerowane przez system i wysłane na podany adres e-mail.");
+                return (true, genericSuccessMsg);
             }
             catch (Exception ex)
             {
-                return (false, $"Błąd podczas wysyłania komunikacji sieciowej: {ex.Message}");
+                return (false, $"Błąd komunikacji: {ex.Message}");
             }
         }
 
-        // Generator bezpiecznych haseł
+        public void ChangeUserPassword(int userId, string newPassword)
+        {
+            _repository.ChangeUserPassword(userId, newPassword);
+        }
+
         private string GenerateRandomPassword(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
@@ -112,7 +142,7 @@ namespace SystemPrzychodznia.Services
             {
                 From = new MailAddress(senderEmail, "System Przychodnia"),
                 Subject = "Nowe hasło - System Przychodnia",
-                Body = $"Witaj,\n\nZgodnie z prośbą, system wygenerował dla Ciebie nowe hasło.\n\nTwoje nowe hasło to: {userPassword}\n\nPozdrawiamy,\nAdministratorzy Systemu",
+                Body = $"Witaj,\n\nZgodnie z prośbą, system wygenerował dla Ciebie nowe hasło.\n\nTwoje nowe tymczasowe hasło to: {userPassword}\n\nPo zalogowaniu system poprosi Cię o ustalenie własnego hasła.\n\nPozdrawiamy,\nAdministratorzy Systemu",
                 IsBodyHtml = false,
             };
 
