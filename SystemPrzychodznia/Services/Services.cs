@@ -1,9 +1,10 @@
-﻿using SystemPrzychodznia.Data;
+﻿using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using SystemPrzychodznia.Data;
 
 namespace SystemPrzychodznia.Services
 {
@@ -114,17 +115,51 @@ namespace SystemPrzychodznia.Services
             }
         }
 
-        public void ChangeUserPassword(int userId, string newPassword)
+        public ValidationResult ChangeUserPassword(int userId, string newPassword)
         {
+
+            ValidationResult validation = new ValidationResult(false);
+
+            validation.Errors = _validator.CzyPoprawneHaslo(userId ,newPassword);
+
+            if (validation.Errors.Count != 0)
+            {
+                validation.IsValid = false;
+                return validation;
+            }
+
+
+
             _repository.ChangeUserPassword(userId, newPassword);
+            return new ValidationResult(true);
+
+
+            
         }
 
         private string GenerateRandomPassword(int length)
         {
+            if (length < 5) throw new ArgumentException("Password length must be at least 5 characters.");
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lower = "abcdefghijklmnopqrstuvwxyz";
+            const string digits = "0123456789";
+            const string special = "!@#$%";
             var random = new Random();
-            return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+            string the_rest = new string(Enumerable.Repeat(chars, length-4).Select(s => s[random.Next(s.Length)]).ToArray());
+            char up = upper[random.Next(upper.Length)];
+            char low = lower[random.Next(lower.Length)];
+            char dig = digits[random.Next(digits.Length)];
+            char spec = special[random.Next(special.Length)];
+            return the_rest + up + low + dig + spec;
         }
+
+        public List<string> GetUserPasswordHistory(int userId)
+        {
+
+            return _repository.GetUserPasswordHistory(userId);
+        }
+
 
         private void SendEmail(string targetEmail, string userPassword)
         {
@@ -162,7 +197,7 @@ namespace SystemPrzychodznia.Services
         }
 
         public List<ForgottenUser> GetListForgottenUsers() => _repository.GetListForgottenUsers();
-        public List<User> GetListUsers(SearchTerms s) => _repository.GetListUsers(s);
+        public List<UserBasic> GetListUsers(SearchTerms s) => _repository.GetListUsers(s);
         public UserFull GetUserFull(int id) => _repository.GetUserFull(id);
 
         public ValidationResult ForgetUser(UserFull user, int forgottenBy)
@@ -178,7 +213,7 @@ namespace SystemPrzychodznia.Services
 
         public List<Uprawnienie> GetUprawnienia() => _repository.GetUprawnienia();
 
-        public List<User> GetUsersByRole(int roleId)
+        public List<UserBasic> GetUsersByRole(int roleId)
         {
             var s = new SearchTerms();
             foreach (var up in _repository.GetUprawnienia())

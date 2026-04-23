@@ -273,7 +273,7 @@ namespace SystemPrzychodznia
         {
             if (e.RowIndex >= 0)
             {
-                var selectedUser = (User)_bindingSourceUsers[e.RowIndex];
+                var selectedUser = (UserBasic)_bindingSourceUsers[e.RowIndex];
                 using (Form EditUser = new FormEditUser(_userService, selectedUser, _currentUser))
                 {
                     EditUser.ShowDialog();

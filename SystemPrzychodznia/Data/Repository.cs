@@ -95,6 +95,22 @@ namespace SystemPrzychodznia.Data
             command.ExecuteNonQuery();
         }
 
+        public List<string> GetUserPasswordHistory(int userId)
+        {
+            List<string> passwordHistory = new List<string>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT Haslo_Hash FROM Historia_Hasel WHERE ID_Uzytkownika = $id ORDER BY Data_ustawienia DESC;";
+            command.Parameters.AddWithValue("$id", userId);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                passwordHistory.Add(reader.GetString(0));
+            }
+            return passwordHistory;
+        }
+
         public int GetUserID(string login)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -155,9 +171,9 @@ WHERE
             return uprawnienia;
         }
 
-        public List<User> GetListUsers(SearchTerms s)
+        public List<UserBasic> GetListUsers(SearchTerms s)
         {
-            var users = new List<User>();
+            var users = new List<UserBasic>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
@@ -191,7 +207,7 @@ WHERE
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                users.Add(new User
+                users.Add(new UserBasic
                 {
                     Login = reader.GetString(0),
                     FirstName = reader.GetString(1),

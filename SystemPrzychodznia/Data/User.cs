@@ -3,7 +3,7 @@ using SystemPrzychodznia.Services;
 
 namespace SystemPrzychodznia.Data
 {
-    public class User
+    public class UserBasic
     {
         public int Id { get; set; } // Unikalny identyfikator użytkownika (autogenerowany)
         public string Login { get; set; } = string.Empty; // Unkialny login użytkownika
@@ -18,7 +18,7 @@ namespace SystemPrzychodznia.Data
        
     }
 
-    public class UserFull : User
+    public class UserFull : UserBasic
     {
         
 

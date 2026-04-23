@@ -80,9 +80,10 @@ namespace SystemPrzychodznia.Services
             else if (!CzySameLiczby(user.Phone))
                 errors.Add("Numer telefonu musi zawierać tylko cyfry");
 
-            // Walidacja Hasła
-            if (string.IsNullOrWhiteSpace(user.Password))
-                errors.Add("Hasło jest wymagane");
+
+            errors.AddRange(CzyPoprawneHaslo(user.Id, user.Password));
+            // sprawdzenie czy hasło jest takie samo jak potwierdzenie hasła odbywa się w kontrolerze, więc nie trzeba tego sprawdzać tutaj
+
 
             // Walidacja unikalności loginu, email, PESEL
             if (!string.IsNullOrWhiteSpace(user.Login) &&
@@ -97,9 +98,7 @@ namespace SystemPrzychodznia.Services
                 _repository.CzyIstniejeDanyUżytkowik(user.PESEL, UserRepository.VAL_PESEL, editing, user.Id))
                 errors.Add("Podany PESEL jest już w systemie");
 
-            // Walidacja formatu hasła - minimum 6 znaków
-            if (!string.IsNullOrWhiteSpace(user.Password) && user.Password.Length < 6)
-    errors.Add("Hasło musi mieć co najmniej 6 znaków");
+
 
 // Walidacja długości pól - max 255 znaków
             if (!string.IsNullOrWhiteSpace(user.Login) && user.Login.Length > 255)
@@ -173,6 +172,63 @@ namespace SystemPrzychodznia.Services
                 return false;
             string plecZPesel = WyciagnijPlecZPesel(pesel);
             return plec == plecZPesel;
+        }
+
+        public List<string> CzyPoprawneHaslo(int userID, string haslo)
+        {
+            List<string> errros = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(haslo))
+            {
+                errros.Add("Hasło nie może być puste");
+            }
+            else
+            {
+                if (haslo.Length < 8)
+                {
+                    errros.Add("Hasło musi mieć co najmniej 8 znaków");
+                }
+                else if (haslo.Length > 15)
+                {
+                    errros.Add("Hasło nie może być dłuższe niż 15 znaków");
+                }
+
+                if (!haslo.Any(char.IsUpper))
+                {
+                    errros.Add("Hasło musi zawierać co najmniej jedną wielką literę");
+                }
+
+                if (!haslo.Any(char.IsLower))
+                {
+                    errros.Add("Hasło musi zawierać co najmniej jedną małą literę");
+                }
+
+                if (!haslo.Any(char.IsDigit))
+                {
+                    errros.Add("Hasło musi zawierać co najmniej jedną cyfrę");
+                }
+
+                if (!haslo.Any(ch => !char.IsLetterOrDigit(ch)))
+                {
+                    errros.Add("Hasło musi zawierać co najmniej jeden ze znaków specjalnych @!#$%");
+                }
+
+                List<string> history = _repository.GetUserPasswordHistory(userID);
+                // histora hasła jest od najnowszego do najstarszego
+
+                for(int i = 0; i < 3 && i < history.Count; i++)
+                {
+                    if (haslo == history[i])
+                    {
+                        errros.Add($"Hasło nie może być takie samo jak jedno z 3 ostatnich haseł");
+                        break;
+                    }
+                }
+
+
+            }
+               
+            return errros;
         }
 
         // Sprawdza czy string zawiera tylko cyfry

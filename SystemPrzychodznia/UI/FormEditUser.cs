@@ -15,10 +15,10 @@ namespace SystemPrzychodznia
     {
 
         private readonly UserService _userService;
-        private User _user;
+        private UserBasic _user;
         private UserFull uF;
         private UserFull _editingUser;
-        public FormEditUser(UserService service, User u, UserFull editingUser)
+        public FormEditUser(UserService service, UserBasic u, UserFull editingUser)
         {
             InitializeComponent();
             _userService = service;
@@ -29,6 +29,11 @@ namespace SystemPrzychodznia
 
         private void buttonEditUser_Click(object sender, EventArgs e)
         {
+            if (textBoxNewPass.Text.Trim() != "")
+            {
+                buttonChangePass_Click(null, null);
+            }
+
             UserFull userBeforeValid = new UserFull();
 
             userBeforeValid.Uprawnienia = _userService.GetUprawnienia();
@@ -38,7 +43,7 @@ namespace SystemPrzychodznia
             userBeforeValid.FirstName = textBoxFirstName.Text.Trim();
             userBeforeValid.LastName = textBoxLastName.Text.Trim();
             userBeforeValid.Locality = textBoxLocality.Text.Trim();
-            userBeforeValid.PostalCode = textBoxPostCode.Text.Trim().Replace("-","");
+            userBeforeValid.PostalCode = textBoxPostCode.Text.Trim().Replace("-", "");
             userBeforeValid.Street = textBoxStreet.Text.Trim();
             userBeforeValid.PropertyNumber = textBoxPropertyNumber.Text.Trim();
             userBeforeValid.HouseUnitNumber = textBoxHouseUnitNumber.Text.Trim();
@@ -47,7 +52,7 @@ namespace SystemPrzychodznia
             userBeforeValid.Gender = comboBoxGender.Text;
             userBeforeValid.Email = textBoxEmail.Text.Trim();
             userBeforeValid.Phone = textBoxPhone.Text.Trim();
-            userBeforeValid.Password = "DummyPassword"; // Nie jest edytowane, ale musi być przekazane do walidacji, więc ustawiamy na wartość tymczasową
+            userBeforeValid.Password = "LqyA9Ti9iz$i9iz"; // Nie jest edytowane, ale musi być przekazane do walidacji, więc ustawiamy na wartość tymczasową
 
             foreach (Uprawnienie u in userBeforeValid.Uprawnienia)
             {
@@ -100,6 +105,9 @@ namespace SystemPrzychodznia
             textBoxPhone.Text = uF.Phone;
             this.Text = $"Podgląd użytkownika: {uF.Login}";
 
+            textBoxNewPass.Text = "";
+            textBoxNewPassRepeat.Text = "";
+
             checkedListBoxUprawnienia.Items.Clear();
             foreach (Uprawnienie uprawnienie in uF.Uprawnienia)
             {
@@ -110,9 +118,10 @@ namespace SystemPrzychodznia
             LockEditing();
 
         }
-        private void LockEditing() { 
+        private void LockEditing()
+        {
 
-           textBoxLogin.Enabled = false;
+            textBoxLogin.Enabled = false;
             textBoxFirstName.Enabled = false;
             textBoxLastName.Enabled = false;
             textBoxLocality.Enabled = false;
@@ -130,6 +139,10 @@ namespace SystemPrzychodznia
             buttonForgetUser.Enabled = false;
 
             checkedListBoxUprawnienia.Enabled = false;
+
+            textBoxNewPass.Enabled = false;
+            textBoxNewPassRepeat.Enabled = false;
+            buttonChangePass.Enabled = false;
 
             buttonUnlockEditing.Text = "Odblokuj edycję";
         }
@@ -174,13 +187,14 @@ namespace SystemPrzychodznia
 
         private void buttonUnlockEditing_Click(object sender, EventArgs e)
         {
-            if ( buttonEditUser.Enabled == true )
+            if (buttonEditUser.Enabled == true)
             {
                 uF = _userService.GetUserFull(_user.Id);
                 FormEditUser_Load(null, null); // przywracamy dane z bazy, by anulować wprowadzone zmiany
                 LockEditing();
-                
-            } else
+
+            }
+            else
             {
                 textBoxLogin.Enabled = true;
                 textBoxFirstName.Enabled = true;
@@ -201,10 +215,33 @@ namespace SystemPrzychodznia
 
                 checkedListBoxUprawnienia.Enabled = true;
 
+                textBoxNewPass.Enabled = true;
+                textBoxNewPassRepeat.Enabled = true;
+                buttonChangePass.Enabled = true;
+
                 buttonUnlockEditing.Text = "Zrezygnuj z edycji";
                 this.Text = $"Edytujesz użytkownika: {uF.Login}";
             }
 
+        }
+
+        private void buttonChangePass_Click(object sender, EventArgs e)
+        {
+            ValidationResult valRe = _userService.ChangeUserPassword(uF.Id, textBoxNewPass.Text.Trim());
+
+            if (valRe.IsValid == true)
+            {
+                MessageBox.Show("Zmieniono hasło użytkownika", "Informacja");
+                FormEditUser_Load(null, null);
+                LockEditing();
+            }
+            else
+            {
+                string errorMessage = string.Join(Environment.NewLine, valRe.Errors);
+                MessageBox.Show(errorMessage, "Błąd walidacji");
+            }
+
+            
         }
     }
 }
