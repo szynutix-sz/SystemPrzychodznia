@@ -19,6 +19,8 @@
 	<PropertyGroup>
 		<MinVerDefaultPreReleasePhase>preview</MinVerDefaultPreReleasePhase>
 		<MinVerVerbosity>minimal</MinVerVerbosity>
+		<!-- Tell MinVer to include branch name -->
+		<MinVerBranchName>true</MinVerBranchName>
 	</PropertyGroup>
 
   <ItemGroup>

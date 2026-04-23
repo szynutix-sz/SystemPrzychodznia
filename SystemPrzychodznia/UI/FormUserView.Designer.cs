@@ -58,8 +58,8 @@ namespace SystemPrzychodznia
             tabPageAbout = new TabPage();
             buttonLogOut = new Button();
             labelVersion = new Label();
-            labelCLogin = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
+            labelCLogin = new Label();
             labelCFName = new Label();
             labelCLName = new Label();
             labelCEmail = new Label();
@@ -345,6 +345,7 @@ namespace SystemPrzychodznia
             // tabPageAbout
             // 
             tabPageAbout.Controls.Add(buttonLogOut);
+            tabPageAbout.Controls.Add(labelVersion);
             tabPageAbout.Controls.Add(tableLayoutPanel1);
             tabPageAbout.Location = new Point(4, 34);
             tabPageAbout.Name = "tabPageAbout";
@@ -367,28 +368,17 @@ namespace SystemPrzychodznia
             // labelVersion
             // 
             labelVersion.AutoSize = true;
-            labelVersion.Location = new Point(3, 0);
+            labelVersion.Location = new Point(262, 34);
             labelVersion.Name = "labelVersion";
-            labelVersion.Size = new Size(130, 25);
+            labelVersion.Size = new Size(162, 25);
             labelVersion.TabIndex = 1;
-            labelVersion.Text = "Version not set";
-            // 
-            // labelCLogin
-            // 
-            labelCLogin.AutoSize = true;
-            labelCLogin.Location = new Point(3, 50);
-            labelCLogin.Name = "labelCLogin";
-            labelCLogin.Size = new Size(148, 25);
-            labelCLogin.TabIndex = 2;
-            labelCLogin.Text = "Login not loaded";
-            labelCLogin.Click += label1_Click_1;
+            labelVersion.Text = "Version not loaded";
             // 
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(labelCLogin, 0, 1);
-            tableLayoutPanel1.Controls.Add(labelVersion, 0, 0);
             tableLayoutPanel1.Controls.Add(labelCFName, 0, 2);
             tableLayoutPanel1.Controls.Add(labelCLName, 0, 3);
             tableLayoutPanel1.Controls.Add(labelCEmail, 0, 4);
@@ -404,6 +394,17 @@ namespace SystemPrzychodznia
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 16.6657848F));
             tableLayoutPanel1.Size = new Size(406, 303);
             tableLayoutPanel1.TabIndex = 3;
+            tableLayoutPanel1.Visible = false;
+            // 
+            // labelCLogin
+            // 
+            labelCLogin.AutoSize = true;
+            labelCLogin.Location = new Point(3, 50);
+            labelCLogin.Name = "labelCLogin";
+            labelCLogin.Size = new Size(148, 25);
+            labelCLogin.TabIndex = 2;
+            labelCLogin.Text = "Login not loaded";
+            labelCLogin.Click += label1_Click_1;
             // 
             // labelCFName
             // 
@@ -464,6 +465,7 @@ namespace SystemPrzychodznia
             tabPageRoles.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvRoles).EndInit();
             tabPageAbout.ResumeLayout(false);
+            tabPageAbout.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             ResumeLayout(false);

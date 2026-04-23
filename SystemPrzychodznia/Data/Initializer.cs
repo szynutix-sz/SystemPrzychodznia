@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Adres (
     ID_Adresu INTEGER PRIMARY KEY AUTOINCREMENT,
     Miejscowosc TEXT NOT NULL,
     Kod_pocztowy TEXT NOT NULL,
-    Ulica TEXT NOT NULL,
+    Ulica TEXT,
     Numer_posesji_domu TEXT NOT NULL,
     Numer_lokalu_mieszkania TEXT
 );
