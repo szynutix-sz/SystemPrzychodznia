@@ -14,7 +14,7 @@ namespace SystemPrzychodznia.Services
             _repository = repository;
         }
 
-        public ValidationResult ValidateUserFull(UserFull user, bool editing)
+        public ValidationResult ValidateUserFull(UserFull user, bool editing, bool validatePassword = true)
         {
             var errors = new List<string>();
 
@@ -81,7 +81,10 @@ namespace SystemPrzychodznia.Services
                 errors.Add("Numer telefonu musi zawierać tylko cyfry");
 
 
-            errors.AddRange(CzyPoprawneHaslo(user.Id, user.Password));
+            if (validatePassword)
+            {
+                errors.AddRange(CzyPoprawneHaslo(user.Id, user.Password));
+            }
             // sprawdzenie czy hasło jest takie samo jak potwierdzenie hasła odbywa się w kontrolerze, więc nie trzeba tego sprawdzać tutaj
 
 

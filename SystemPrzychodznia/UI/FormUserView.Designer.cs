@@ -51,6 +51,21 @@ namespace SystemPrzychodznia
             groupBoxRoles = new GroupBox();
             flowLayoutPanelUprawnienia = new FlowLayoutPanel();
             tabPageAdminViewForgotten = new TabPage();
+            panelForgottenSearch = new Panel();
+            buttonClearForgottenSearch = new Button();
+            buttonSearchForgotten = new Button();
+            textBoxForgottenBy = new TextBox();
+            dateTimePickerForgottenDate = new DateTimePicker();
+            textBoxForgottenLastName = new TextBox();
+            textBoxForgottenFirstName = new TextBox();
+            textBoxForgottenId = new TextBox();
+            textBoxForgottenLogin = new TextBox();
+            labelForgottenBy = new Label();
+            labelForgottenDate = new Label();
+            labelForgottenLastName = new Label();
+            labelForgottenFirstName = new Label();
+            labelForgottenId = new Label();
+            labelForgottenLogin = new Label();
             groupBoxForgotten = new GroupBox();
             dgvForgotten = new DataGridView();
             tabPageRoles = new TabPage();
@@ -71,6 +86,7 @@ namespace SystemPrzychodznia
             tabPageAdminViewUsers.SuspendLayout();
             groupBoxRoles.SuspendLayout();
             tabPageAdminViewForgotten.SuspendLayout();
+            panelForgottenSearch.SuspendLayout();
             groupBoxForgotten.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvForgotten).BeginInit();
             tabPageRoles.SuspendLayout();
@@ -286,6 +302,7 @@ namespace SystemPrzychodznia
             // 
             // tabPageAdminViewForgotten
             // 
+            tabPageAdminViewForgotten.Controls.Add(panelForgottenSearch);
             tabPageAdminViewForgotten.Controls.Add(groupBoxForgotten);
             tabPageAdminViewForgotten.Location = new Point(4, 34);
             tabPageAdminViewForgotten.Name = "tabPageAdminViewForgotten";
@@ -294,13 +311,153 @@ namespace SystemPrzychodznia
             tabPageAdminViewForgotten.Text = "Zapomnieni";
             tabPageAdminViewForgotten.UseVisualStyleBackColor = true;
             // 
+            // panelForgottenSearch
+            // 
+            panelForgottenSearch.Controls.Add(buttonClearForgottenSearch);
+            panelForgottenSearch.Controls.Add(buttonSearchForgotten);
+            panelForgottenSearch.Controls.Add(textBoxForgottenBy);
+            panelForgottenSearch.Controls.Add(dateTimePickerForgottenDate);
+            panelForgottenSearch.Controls.Add(textBoxForgottenLastName);
+            panelForgottenSearch.Controls.Add(textBoxForgottenFirstName);
+            panelForgottenSearch.Controls.Add(textBoxForgottenId);
+            panelForgottenSearch.Controls.Add(textBoxForgottenLogin);
+            panelForgottenSearch.Controls.Add(labelForgottenBy);
+            panelForgottenSearch.Controls.Add(labelForgottenDate);
+            panelForgottenSearch.Controls.Add(labelForgottenLastName);
+            panelForgottenSearch.Controls.Add(labelForgottenFirstName);
+            panelForgottenSearch.Controls.Add(labelForgottenId);
+            panelForgottenSearch.Controls.Add(labelForgottenLogin);
+            panelForgottenSearch.Location = new Point(0, 0);
+            panelForgottenSearch.Name = "panelForgottenSearch";
+            panelForgottenSearch.Size = new Size(1683, 108);
+            panelForgottenSearch.TabIndex = 2;
+            // 
+            // buttonClearForgottenSearch
+            // 
+            buttonClearForgottenSearch.Location = new Point(1510, 12);
+            buttonClearForgottenSearch.Name = "buttonClearForgottenSearch";
+            buttonClearForgottenSearch.Size = new Size(143, 38);
+            buttonClearForgottenSearch.TabIndex = 11;
+            buttonClearForgottenSearch.Text = "Wyczyść";
+            buttonClearForgottenSearch.UseVisualStyleBackColor = true;
+            buttonClearForgottenSearch.Click += buttonClearForgottenSearch_Click;
+            // 
+            // buttonSearchForgotten
+            // 
+            buttonSearchForgotten.Location = new Point(1510, 56);
+            buttonSearchForgotten.Name = "buttonSearchForgotten";
+            buttonSearchForgotten.Size = new Size(143, 38);
+            buttonSearchForgotten.TabIndex = 10;
+            buttonSearchForgotten.Text = "Wyszukaj";
+            buttonSearchForgotten.UseVisualStyleBackColor = true;
+            buttonSearchForgotten.Click += buttonSearchForgotten_Click;
+            // 
+            // textBoxForgottenBy
+            // 
+            textBoxForgottenBy.Location = new Point(1110, 52);
+            textBoxForgottenBy.Name = "textBoxForgottenBy";
+            textBoxForgottenBy.Size = new Size(180, 31);
+            textBoxForgottenBy.TabIndex = 9;
+            // 
+            // dateTimePickerForgottenDate
+            // 
+            dateTimePickerForgottenDate.Checked = false;
+            dateTimePickerForgottenDate.CustomFormat = "yyyy-MM-dd";
+            dateTimePickerForgottenDate.Format = DateTimePickerFormat.Custom;
+            dateTimePickerForgottenDate.Location = new Point(875, 52);
+            dateTimePickerForgottenDate.Name = "dateTimePickerForgottenDate";
+            dateTimePickerForgottenDate.ShowCheckBox = true;
+            dateTimePickerForgottenDate.Size = new Size(190, 31);
+            dateTimePickerForgottenDate.TabIndex = 8;
+            // 
+            // textBoxForgottenLastName
+            // 
+            textBoxForgottenLastName.Location = new Point(650, 52);
+            textBoxForgottenLastName.Name = "textBoxForgottenLastName";
+            textBoxForgottenLastName.Size = new Size(180, 31);
+            textBoxForgottenLastName.TabIndex = 7;
+            // 
+            // textBoxForgottenFirstName
+            // 
+            textBoxForgottenFirstName.Location = new Point(455, 52);
+            textBoxForgottenFirstName.Name = "textBoxForgottenFirstName";
+            textBoxForgottenFirstName.Size = new Size(150, 31);
+            textBoxForgottenFirstName.TabIndex = 12;
+            // 
+            // textBoxForgottenId
+            // 
+            textBoxForgottenId.Location = new Point(330, 52);
+            textBoxForgottenId.Name = "textBoxForgottenId";
+            textBoxForgottenId.Size = new Size(80, 31);
+            textBoxForgottenId.TabIndex = 6;
+            // 
+            // textBoxForgottenLogin
+            // 
+            textBoxForgottenLogin.Location = new Point(45, 52);
+            textBoxForgottenLogin.Name = "textBoxForgottenLogin";
+            textBoxForgottenLogin.Size = new Size(240, 31);
+            textBoxForgottenLogin.TabIndex = 5;
+            // 
+            // labelForgottenBy
+            // 
+            labelForgottenBy.AutoSize = true;
+            labelForgottenBy.Location = new Point(1110, 21);
+            labelForgottenBy.Name = "labelForgottenBy";
+            labelForgottenBy.Size = new Size(154, 25);
+            labelForgottenBy.TabIndex = 4;
+            labelForgottenBy.Text = "ID zapominającego";
+            // 
+            // labelForgottenDate
+            // 
+            labelForgottenDate.AutoSize = true;
+            labelForgottenDate.Location = new Point(875, 21);
+            labelForgottenDate.Name = "labelForgottenDate";
+            labelForgottenDate.Size = new Size(154, 25);
+            labelForgottenDate.TabIndex = 3;
+            labelForgottenDate.Text = "Data zapomnienia";
+            // 
+            // labelForgottenLastName
+            // 
+            labelForgottenLastName.AutoSize = true;
+            labelForgottenLastName.Location = new Point(650, 21);
+            labelForgottenLastName.Name = "labelForgottenLastName";
+            labelForgottenLastName.Size = new Size(87, 25);
+            labelForgottenLastName.TabIndex = 2;
+            labelForgottenLastName.Text = "Nazwisko";
+            // 
+            // labelForgottenFirstName
+            // 
+            labelForgottenFirstName.AutoSize = true;
+            labelForgottenFirstName.Location = new Point(455, 21);
+            labelForgottenFirstName.Name = "labelForgottenFirstName";
+            labelForgottenFirstName.Size = new Size(46, 25);
+            labelForgottenFirstName.TabIndex = 13;
+            labelForgottenFirstName.Text = "Imię";
+            // 
+            // labelForgottenId
+            // 
+            labelForgottenId.AutoSize = true;
+            labelForgottenId.Location = new Point(330, 21);
+            labelForgottenId.Name = "labelForgottenId";
+            labelForgottenId.Size = new Size(28, 25);
+            labelForgottenId.TabIndex = 1;
+            labelForgottenId.Text = "ID";
+            // 
+            // labelForgottenLogin
+            // 
+            labelForgottenLogin.AutoSize = true;
+            labelForgottenLogin.Location = new Point(45, 21);
+            labelForgottenLogin.Name = "labelForgottenLogin";
+            labelForgottenLogin.Size = new Size(56, 25);
+            labelForgottenLogin.TabIndex = 0;
+            labelForgottenLogin.Text = "Login";
+            // 
             // groupBoxForgotten
             // 
             groupBoxForgotten.Controls.Add(dgvForgotten);
-            groupBoxForgotten.Dock = DockStyle.Fill;
-            groupBoxForgotten.Location = new Point(0, 0);
+            groupBoxForgotten.Location = new Point(0, 108);
             groupBoxForgotten.Name = "groupBoxForgotten";
-            groupBoxForgotten.Size = new Size(1683, 918);
+            groupBoxForgotten.Size = new Size(1683, 810);
             groupBoxForgotten.TabIndex = 1;
             groupBoxForgotten.TabStop = false;
             groupBoxForgotten.Text = "Zapomnieni Użytkownicy";
@@ -315,7 +472,7 @@ namespace SystemPrzychodznia
             dgvForgotten.Name = "dgvForgotten";
             dgvForgotten.ReadOnly = true;
             dgvForgotten.RowHeadersWidth = 62;
-            dgvForgotten.Size = new Size(1677, 888);
+            dgvForgotten.Size = new Size(1677, 780);
             dgvForgotten.TabIndex = 0;
             // 
             // tabPageRoles
@@ -460,6 +617,8 @@ namespace SystemPrzychodznia
             tabPageAdminViewUsers.ResumeLayout(false);
             groupBoxRoles.ResumeLayout(false);
             tabPageAdminViewForgotten.ResumeLayout(false);
+            panelForgottenSearch.ResumeLayout(false);
+            panelForgottenSearch.PerformLayout();
             groupBoxForgotten.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvForgotten).EndInit();
             tabPageRoles.ResumeLayout(false);
@@ -493,6 +652,21 @@ namespace SystemPrzychodznia
         private TabPage tabPageAdminViewUsers;
         private TabPage tabPageAbout;
         private TabPage tabPageAdminViewForgotten;
+        private Panel panelForgottenSearch;
+        private Button buttonClearForgottenSearch;
+        private Button buttonSearchForgotten;
+        private TextBox textBoxForgottenBy;
+        private DateTimePicker dateTimePickerForgottenDate;
+        private TextBox textBoxForgottenLastName;
+        private TextBox textBoxForgottenFirstName;
+        private TextBox textBoxForgottenId;
+        private TextBox textBoxForgottenLogin;
+        private Label labelForgottenBy;
+        private Label labelForgottenDate;
+        private Label labelForgottenLastName;
+        private Label labelForgottenFirstName;
+        private Label labelForgottenId;
+        private Label labelForgottenLogin;
         private GroupBox groupBoxRoles;
         private FlowLayoutPanel flowLayoutPanelUprawnienia;
         private GroupBox groupBoxForgotten;

@@ -196,14 +196,15 @@ namespace SystemPrzychodznia.Services
             return new ValidationResult(true);
         }
 
-        public List<ForgottenUser> GetListForgottenUsers() => _repository.GetListForgottenUsers();
+        public List<ForgottenUser> GetListForgottenUsers() => _repository.GetListForgottenUsers(new SearchTermsForgotten());
+        public List<ForgottenUser> GetListForgottenUsers(SearchTermsForgotten searchTerms) => _repository.GetListForgottenUsers(searchTerms);
         public List<UserBasic> GetListUsers(SearchTerms s) => _repository.GetListUsers(s);
         public UserFull GetUserFull(int id) => _repository.GetUserFull(id);
 
         public ValidationResult ForgetUser(UserFull user, int forgottenBy)
         {
             ForgottenUser f = user.Forget(forgottenBy);
-            var validation = _validator.ValidateUserFull(user, true);
+            var validation = _validator.ValidateUserFull(user, true, validatePassword: false);
 
             if (!validation.IsValid) return validation;
 

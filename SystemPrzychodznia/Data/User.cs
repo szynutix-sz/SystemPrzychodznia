@@ -82,6 +82,9 @@ namespace SystemPrzychodznia.Data
             Random rnd = new Random();
 
             f.Id = Id;
+            f.OriginalLogin = Login;
+            f.OriginalFirstName = FirstName;
+            f.OriginalLastName = LastName;
             f.Login = $"F{rnd.Next(1,1_000_000)}";
             Login = f.Login;
             f.FirstName = $"F{rnd.Next(1, 1_000_000)}";
@@ -99,7 +102,7 @@ namespace SystemPrzychodznia.Data
             f.PESEL = UserService.PESELfromData(f.BirthDate, f.Gender);
             PESEL = f.PESEL;
 
-            Password = "DummyPassword";
+            Password = "DummyPass1!";
 
 
             return f;
@@ -114,5 +117,11 @@ namespace SystemPrzychodznia.Data
         public int ForgottenBy { get; set; } = 0;
 
         public string ForgottenByLogin { get; set; } = string.Empty;
+
+        public string OriginalLogin { get; set; } = string.Empty;
+
+        public string OriginalFirstName { get; set; } = string.Empty;
+
+        public string OriginalLastName { get; set; } = string.Empty;
     }
 }

@@ -53,6 +53,19 @@ namespace SystemPrzychodznia
             UserList.Text = "Lista użytkowników";
         }
 
+        private void ClearForgottenSearchFields()
+        {
+            textBoxForgottenLogin.Text = "";
+            textBoxForgottenId.Text = "";
+            textBoxForgottenFirstName.Text = "";
+            textBoxForgottenLastName.Text = "";
+            dateTimePickerForgottenDate.Checked = false;
+            textBoxForgottenBy.Text = "";
+
+            LoadForgottenUsers();
+            groupBoxForgotten.Text = "Zapomnieni Użytkownicy";
+        }
+
         private void LoadUsers()
         {
             SearchTerms s = new SearchTerms();
@@ -114,16 +127,43 @@ namespace SystemPrzychodznia
 
         private void LoadForgottenUsers()
         {
-            var users = _userService.GetListForgottenUsers();
+            SearchTermsForgotten searchTerms = new SearchTermsForgotten
+            {
+                Login = textBoxForgottenLogin.Text.Trim(),
+                FirstName = textBoxForgottenFirstName.Text.Trim(),
+                LastName = textBoxForgottenLastName.Text.Trim(),
+                DateForgotten = dateTimePickerForgottenDate.Checked
+                    ? dateTimePickerForgottenDate.Value.ToString("yyyy-MM-dd")
+                    : ""
+            };
+
+            if (int.TryParse(textBoxForgottenId.Text.Trim(), out int forgottenUserId))
+            {
+                searchTerms.Id = forgottenUserId;
+            }
+
+            if (int.TryParse(textBoxForgottenBy.Text.Trim(), out int forgottenBy))
+            {
+                searchTerms.ForgottenBy = forgottenBy;
+            }
+
+            var users = _userService.GetListForgottenUsers(searchTerms);
 
             _bindingSourceForgotten.DataSource = users;
             dgvForgotten.DataSource = _bindingSourceForgotten;
 
-            // Pokaż kolumny: Data zapomnienia, Zapomniane przez, Zaszyfrowany Login, Imię, Nazwisko
-            var keep = new[] { "DateForgotten", "ForgottenByLogin", "Login", "FirstName", "LastName" };
+            // Pokaż tylko dane wymagane w przypadku użycia UC_1.6.
+            var keep = new[] { "Id", "Login", "FirstName", "LastName", "DateForgotten", "ForgottenBy" };
             foreach (DataGridViewColumn col in dgvForgotten.Columns)
             {
                 col.Visible = Array.IndexOf(keep, col.Name) >= 0;
+            }
+
+            if (dgvForgotten.Columns.Contains("Id"))
+            {
+                dgvForgotten.Columns["Id"].HeaderText = "ID";
+                dgvForgotten.Columns["Id"].Width = 70;
+                dgvForgotten.Columns["Id"].DisplayIndex = 0;
             }
 
             // Ustaw nagłówki, szerokości i kolejność
@@ -131,35 +171,35 @@ namespace SystemPrzychodznia
             {
                 dgvForgotten.Columns["DateForgotten"].HeaderText = "Data zapomnienia";
                 dgvForgotten.Columns["DateForgotten"].Width = 180;
-                dgvForgotten.Columns["DateForgotten"].DisplayIndex = 0;
-            }
-
-            if (dgvForgotten.Columns.Contains("ForgottenByLogin"))
-            {
-                dgvForgotten.Columns["ForgottenByLogin"].HeaderText = "Zapomniane przez";
-                dgvForgotten.Columns["ForgottenByLogin"].Width = 160;
-                dgvForgotten.Columns["ForgottenByLogin"].DisplayIndex = 1;
+                dgvForgotten.Columns["DateForgotten"].DisplayIndex = 4;
             }
 
             if (dgvForgotten.Columns.Contains("Login"))
             {
-                dgvForgotten.Columns["Login"].HeaderText = "Login";
-                dgvForgotten.Columns["Login"].Width = 200;
-                dgvForgotten.Columns["Login"].DisplayIndex = 2;
+                dgvForgotten.Columns["Login"].HeaderText = "Login po zapomnieniu";
+                dgvForgotten.Columns["Login"].Width = 180;
+                dgvForgotten.Columns["Login"].DisplayIndex = 1;
             }
 
             if (dgvForgotten.Columns.Contains("FirstName"))
             {
                 dgvForgotten.Columns["FirstName"].HeaderText = "Imię";
-                dgvForgotten.Columns["FirstName"].Width = 140;
-                dgvForgotten.Columns["FirstName"].DisplayIndex = 3;
+                dgvForgotten.Columns["FirstName"].Width = 160;
+                dgvForgotten.Columns["FirstName"].DisplayIndex = 2;
             }
 
             if (dgvForgotten.Columns.Contains("LastName"))
             {
-                dgvForgotten.Columns["LastName"].HeaderText = "Nazwisko";
-                dgvForgotten.Columns["LastName"].Width = 140;
-                dgvForgotten.Columns["LastName"].DisplayIndex = 4;
+                dgvForgotten.Columns["LastName"].HeaderText = "Nazwisko po zapomnieniu";
+                dgvForgotten.Columns["LastName"].Width = 180;
+                dgvForgotten.Columns["LastName"].DisplayIndex = 3;
+            }
+
+            if (dgvForgotten.Columns.Contains("ForgottenBy"))
+            {
+                dgvForgotten.Columns["ForgottenBy"].HeaderText = "ID zapominającego";
+                dgvForgotten.Columns["ForgottenBy"].Width = 120;
+                dgvForgotten.Columns["ForgottenBy"].DisplayIndex = 5;
             }
 
             dgvForgotten.RowsDefaultCellStyle.BackColor = Color.White;
@@ -217,6 +257,17 @@ namespace SystemPrzychodznia
         {
             ClearSearchFields();
 
+        }
+
+        private void buttonSearchForgotten_Click(object sender, EventArgs e)
+        {
+            LoadForgottenUsers();
+            groupBoxForgotten.Text = "Zapomnieni Użytkownicy (przefiltrowani)";
+        }
+
+        private void buttonClearForgottenSearch_Click(object sender, EventArgs e)
+        {
+            ClearForgottenSearchFields();
         }
 
         private void buttonRoles_Click(object sender, EventArgs e)

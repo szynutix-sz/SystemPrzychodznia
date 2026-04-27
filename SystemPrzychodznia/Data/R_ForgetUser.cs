@@ -24,6 +24,9 @@ SET
     Login = $randLogin,
     Imie = $randFirstName,
     Nazwisko = $randLastName,
+    Zapomniany_Login_Enc = $originalLogin,
+    Zapomniane_Imie_Enc = $originalFirstName,
+    Zapomniane_Nazwisko_Enc = $originalLastName,
     PESEL = $pesel,
     Data_urodzenia = $randDate,
     Plec = $randGender,
@@ -35,6 +38,9 @@ WHERE ID_Uzytkownika = $id;";
                 cmdUser.Parameters.AddWithValue("$randLogin", user.Login);
                 cmdUser.Parameters.AddWithValue("$randFirstName", user.FirstName);
                 cmdUser.Parameters.AddWithValue("$randLastName", user.LastName);
+                cmdUser.Parameters.AddWithValue("$originalLogin", EncryptForgottenSearchValue(user.OriginalLogin));
+                cmdUser.Parameters.AddWithValue("$originalFirstName", EncryptForgottenSearchValue(user.OriginalFirstName));
+                cmdUser.Parameters.AddWithValue("$originalLastName", EncryptForgottenSearchValue(user.OriginalLastName));
                 cmdUser.Parameters.AddWithValue("$pesel", user.PESEL);
                 cmdUser.Parameters.AddWithValue("$randDate", user.BirthDate);
                 cmdUser.Parameters.AddWithValue("$randGender", user.Gender);

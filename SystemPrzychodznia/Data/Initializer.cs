@@ -65,6 +65,9 @@ CREATE TABLE IF NOT EXISTS Uzytkownik (
     Wymaga_zmiany_hasla INTEGER NOT NULL DEFAULT 0 CHECK (Wymaga_zmiany_hasla IN (0,1)),
     Data_zapomnienia TEXT,
     ID_Kto_Zapomnial INTEGER,
+    Zapomniany_Login_Enc TEXT,
+    Zapomniane_Imie_Enc TEXT,
+    Zapomniane_Nazwisko_Enc TEXT,
     FOREIGN KEY (ID_Adresu) REFERENCES Adres(ID_Adresu) ON DELETE RESTRICT,
     FOREIGN KEY (ID_Kto_Zapomnial) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE SET NULL
 );
@@ -145,9 +148,34 @@ FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'SuperAdmin'
   AND p.Nazwa = 'SuperAdmin'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up
-                  WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
+                    WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
                     AND up.ID_Uprawnienia = p.ID_Uprawnienia);";
             createTableCmd.ExecuteNonQuery();
+
+            EnsureColumnExists(connection, "Uzytkownik", "Zapomniany_Login_Enc", "TEXT");
+            EnsureColumnExists(connection, "Uzytkownik", "Zapomniane_Imie_Enc", "TEXT");
+            EnsureColumnExists(connection, "Uzytkownik", "Zapomniane_Nazwisko_Enc", "TEXT");
+        }
+
+        private static void EnsureColumnExists(SqliteConnection connection, string tableName, string columnName, string columnDefinition)
+        {
+            var checkCommand = connection.CreateCommand();
+            checkCommand.CommandText = $"PRAGMA table_info({tableName});";
+
+            using (var reader = checkCommand.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    if (string.Equals(reader.GetString(1), columnName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            var alterCommand = connection.CreateCommand();
+            alterCommand.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition};";
+            alterCommand.ExecuteNonQuery();
         }
     }
 }
