@@ -354,9 +354,9 @@ namespace SystemPrzychodznia
             // 
             // textBoxForgottenBy
             // 
-            textBoxForgottenBy.Location = new Point(1110, 52);
+            textBoxForgottenBy.Location = new Point(1244, 52);
             textBoxForgottenBy.Name = "textBoxForgottenBy";
-            textBoxForgottenBy.Size = new Size(180, 31);
+            textBoxForgottenBy.Size = new Size(230, 31);
             textBoxForgottenBy.TabIndex = 9;
             // 
             // dateTimePickerForgottenDate
@@ -364,44 +364,44 @@ namespace SystemPrzychodznia
             dateTimePickerForgottenDate.Checked = false;
             dateTimePickerForgottenDate.CustomFormat = "yyyy-MM-dd";
             dateTimePickerForgottenDate.Format = DateTimePickerFormat.Custom;
-            dateTimePickerForgottenDate.Location = new Point(875, 52);
+            dateTimePickerForgottenDate.Location = new Point(1000, 52);
             dateTimePickerForgottenDate.Name = "dateTimePickerForgottenDate";
             dateTimePickerForgottenDate.ShowCheckBox = true;
-            dateTimePickerForgottenDate.Size = new Size(190, 31);
+            dateTimePickerForgottenDate.Size = new Size(230, 31);
             dateTimePickerForgottenDate.TabIndex = 8;
             // 
             // textBoxForgottenLastName
             // 
-            textBoxForgottenLastName.Location = new Point(650, 52);
+            textBoxForgottenLastName.Location = new Point(756, 52);
             textBoxForgottenLastName.Name = "textBoxForgottenLastName";
-            textBoxForgottenLastName.Size = new Size(180, 31);
+            textBoxForgottenLastName.Size = new Size(230, 31);
             textBoxForgottenLastName.TabIndex = 7;
             // 
             // textBoxForgottenFirstName
             // 
-            textBoxForgottenFirstName.Location = new Point(455, 52);
+            textBoxForgottenFirstName.Location = new Point(512, 52);
             textBoxForgottenFirstName.Name = "textBoxForgottenFirstName";
-            textBoxForgottenFirstName.Size = new Size(150, 31);
+            textBoxForgottenFirstName.Size = new Size(230, 31);
             textBoxForgottenFirstName.TabIndex = 12;
             // 
             // textBoxForgottenId
             // 
-            textBoxForgottenId.Location = new Point(330, 52);
+            textBoxForgottenId.Location = new Point(268, 52);
             textBoxForgottenId.Name = "textBoxForgottenId";
-            textBoxForgottenId.Size = new Size(80, 31);
+            textBoxForgottenId.Size = new Size(230, 31);
             textBoxForgottenId.TabIndex = 6;
             // 
             // textBoxForgottenLogin
             // 
-            textBoxForgottenLogin.Location = new Point(45, 52);
+            textBoxForgottenLogin.Location = new Point(24, 52);
             textBoxForgottenLogin.Name = "textBoxForgottenLogin";
-            textBoxForgottenLogin.Size = new Size(240, 31);
+            textBoxForgottenLogin.Size = new Size(230, 31);
             textBoxForgottenLogin.TabIndex = 5;
             // 
             // labelForgottenBy
             // 
             labelForgottenBy.AutoSize = true;
-            labelForgottenBy.Location = new Point(1110, 21);
+            labelForgottenBy.Location = new Point(1244, 21);
             labelForgottenBy.Name = "labelForgottenBy";
             labelForgottenBy.Size = new Size(154, 25);
             labelForgottenBy.TabIndex = 4;
@@ -410,7 +410,7 @@ namespace SystemPrzychodznia
             // labelForgottenDate
             // 
             labelForgottenDate.AutoSize = true;
-            labelForgottenDate.Location = new Point(875, 21);
+            labelForgottenDate.Location = new Point(1000, 21);
             labelForgottenDate.Name = "labelForgottenDate";
             labelForgottenDate.Size = new Size(154, 25);
             labelForgottenDate.TabIndex = 3;
@@ -419,7 +419,7 @@ namespace SystemPrzychodznia
             // labelForgottenLastName
             // 
             labelForgottenLastName.AutoSize = true;
-            labelForgottenLastName.Location = new Point(650, 21);
+            labelForgottenLastName.Location = new Point(756, 21);
             labelForgottenLastName.Name = "labelForgottenLastName";
             labelForgottenLastName.Size = new Size(87, 25);
             labelForgottenLastName.TabIndex = 2;
@@ -428,7 +428,7 @@ namespace SystemPrzychodznia
             // labelForgottenFirstName
             // 
             labelForgottenFirstName.AutoSize = true;
-            labelForgottenFirstName.Location = new Point(455, 21);
+            labelForgottenFirstName.Location = new Point(512, 21);
             labelForgottenFirstName.Name = "labelForgottenFirstName";
             labelForgottenFirstName.Size = new Size(46, 25);
             labelForgottenFirstName.TabIndex = 13;
@@ -437,7 +437,7 @@ namespace SystemPrzychodznia
             // labelForgottenId
             // 
             labelForgottenId.AutoSize = true;
-            labelForgottenId.Location = new Point(330, 21);
+            labelForgottenId.Location = new Point(268, 21);
             labelForgottenId.Name = "labelForgottenId";
             labelForgottenId.Size = new Size(28, 25);
             labelForgottenId.TabIndex = 1;
@@ -446,7 +446,7 @@ namespace SystemPrzychodznia
             // labelForgottenLogin
             // 
             labelForgottenLogin.AutoSize = true;
-            labelForgottenLogin.Location = new Point(45, 21);
+            labelForgottenLogin.Location = new Point(24, 21);
             labelForgottenLogin.Name = "labelForgottenLogin";
             labelForgottenLogin.Size = new Size(56, 25);
             labelForgottenLogin.TabIndex = 0;
