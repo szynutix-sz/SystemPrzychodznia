@@ -211,7 +211,7 @@ namespace SystemPrzychodznia.Services
                     errros.Add("Hasło musi zawierać co najmniej jedną cyfrę");
                 }
 
-                if (!haslo.Any(ch => !char.IsLetterOrDigit(ch)))
+                if (!haslo.Any(ch => "!@#$%".Contains(ch)))
                 {
                     errros.Add("Hasło musi zawierać co najmniej jeden ze znaków specjalnych @!#$%");
                 }

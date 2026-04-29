@@ -39,25 +39,23 @@ namespace SystemPrzychodznia.UI // <--- TUTAJ DODALIŚMY .UI
 
         private void BtnSave_Click(object sender, EventArgs e)
         {
-            if (txtNew.Text.Length < 5)
-            {
-                MessageBox.Show("Hasło musi mieć co najmniej 5 znaków.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (txtNew.Text != txtConfirm.Text)
-            {
-                MessageBox.Show("Hasła nie są identyczne!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
             // Zapis nowego hasła i usunięcie flagi wymagań zmiany z bazy
-            _userService.ChangeUserPassword(_userId, txtNew.Text);
+            ValidationResult val = _userService.ChangeUserPassword(_userId, txtNew.Text);
 
-            MessageBox.Show("Hasło zostało pomyślnie zmienione.", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (val.IsValid)
+            {
+                MessageBox.Show("Hasło zostało pomyślnie zmienione.", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            else
+            {
+                string errorMessage = string.Join(Environment.NewLine, val.Errors);
+                MessageBox.Show(errorMessage, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            
         }
     }
 }

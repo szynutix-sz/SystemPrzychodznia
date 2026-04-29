@@ -31,7 +31,8 @@ namespace SystemPrzychodznia
         {
             if (textBoxNewPass.Text.Trim() != "")
             {
-                buttonChangePass_Click(null, null);
+                MessageBox.Show("Niedokończona zmiana hasła. By zmienić hasło w zakładce hasło wpisz nowe oraz nacisnij", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                textBoxNewPass.Text = "";
             }
 
             UserFull userBeforeValid = new UserFull();
@@ -232,8 +233,7 @@ namespace SystemPrzychodznia
             if (valRe.IsValid == true)
             {
                 MessageBox.Show("Zmieniono hasło użytkownika", "Informacja");
-                FormEditUser_Load(null, null);
-                LockEditing();
+                textBoxNewPass.Text = "";
             }
             else
             {
