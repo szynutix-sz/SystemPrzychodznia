@@ -41,6 +41,12 @@ namespace SystemPrzychodznia.UI // <--- TUTAJ DODALIŚMY .UI
         {
 
             // Zapis nowego hasła i usunięcie flagi wymagań zmiany z bazy
+            if (txtNew.Text != txtConfirm.Text)
+            {
+                MessageBox.Show("Hasła nie są identyczne!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             ValidationResult val = _userService.ChangeUserPassword(_userId, txtNew.Text);
 
             if (val.IsValid)
