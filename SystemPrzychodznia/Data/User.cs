@@ -45,6 +45,16 @@ namespace SystemPrzychodznia.Data
 
         public static bool operator ==(UserFull lhs, UserFull rhs)
         {
+            if (ReferenceEquals(lhs, rhs))
+            {
+                return true;
+            }
+
+            if (lhs is null || rhs is null)
+            {
+                return false;
+            }
+
             bool value = lhs.Login == rhs.Login && lhs.FirstName == rhs.FirstName;
 
             value = value && lhs.LastName == rhs.LastName && lhs.Locality == rhs.Locality;

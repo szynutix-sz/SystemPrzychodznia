@@ -139,7 +139,128 @@ namespace SystemPrzychodznia.Services
                 }
             }
 
-            
+             
+            return new ValidationResult(errors.Count == 0) { Errors = errors };
+        }
+
+        public ValidationResult ValidatePatientFull(UserFull patient, bool editing)
+        {
+            var errors = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(patient.Login))
+                errors.Add("Nie udało się przygotować identyfikatora technicznego pacjenta");
+
+            if (string.IsNullOrWhiteSpace(patient.FirstName))
+                errors.Add("Imię jest wymagane");
+
+            if (string.IsNullOrWhiteSpace(patient.LastName))
+                errors.Add("Nazwisko jest wymagane");
+
+            if (string.IsNullOrWhiteSpace(patient.PESEL))
+                errors.Add("PESEL jest wymagany");
+            else if (patient.PESEL.Length != 11)
+                errors.Add("PESEL musi mieć 11 cyfr");
+            else if (!CzySameLiczby(patient.PESEL))
+                errors.Add("PESEL musi zawierać tylko cyfry");
+
+            if (string.IsNullOrWhiteSpace(patient.Locality))
+                errors.Add("Miejscowość jest wymagana");
+
+            if (string.IsNullOrWhiteSpace(patient.PostalCode))
+                errors.Add("Kod pocztowy jest wymagany");
+            else if (patient.PostalCode.Length != 5)
+                errors.Add("Kod pocztowy musi mieć 5 cyfr");
+            else if (!CzySameLiczby(patient.PostalCode))
+                errors.Add("Kod pocztowy musi zawierać tylko cyfry");
+
+            if (string.IsNullOrWhiteSpace(patient.PropertyNumber))
+                errors.Add("Numer nieruchomości jest wymagany");
+
+            if (string.IsNullOrWhiteSpace(patient.BirthDate))
+                errors.Add("Data urodzenia jest wymagana");
+            else if (!CzyPoprawnaDates(patient.BirthDate))
+                errors.Add("Data urodzenia musi być w formacie YYYY-MM-DD");
+
+            if (string.IsNullOrWhiteSpace(patient.Gender))
+                errors.Add("Płeć jest wymagana");
+            else if (patient.Gender != "M" && patient.Gender != "K")
+                errors.Add("Płeć musi być 'M' lub 'K'");
+
+            if (string.IsNullOrWhiteSpace(patient.Phone))
+                errors.Add("Numer telefonu jest wymagany");
+            else if (patient.Phone.Length != 9)
+                errors.Add("Numer telefonu musi mieć 9 cyfr");
+            else if (!CzySameLiczby(patient.Phone))
+                errors.Add("Numer telefonu musi zawierać tylko cyfry");
+
+            if (!string.IsNullOrWhiteSpace(patient.Email))
+            {
+                if (!patient.Email.Contains("@") || !patient.Email.Contains("."))
+                {
+                    errors.Add("Email musi zawierać @ i .");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(patient.Login) &&
+                _repository.CzyIstniejeDanyUżytkowik(patient.Login, UserRepository.VAL_LOGIN, editing, patient.Id))
+            {
+                errors.Add("Podany pacjent już istnieje w systemie");
+            }
+
+            if (!string.IsNullOrWhiteSpace(patient.Email) &&
+                _repository.CzyIstniejeDanyUżytkowik(patient.Email, UserRepository.VAL_EMAIL, editing, patient.Id))
+            {
+                errors.Add("Podany Email jest już zajęty");
+            }
+
+            if (!string.IsNullOrWhiteSpace(patient.PESEL) && patient.PESEL.Length == 11 &&
+                _repository.CzyIstniejeDanyUżytkowik(patient.PESEL, UserRepository.VAL_PESEL, editing, patient.Id))
+            {
+                errors.Add("Podany PESEL jest już w systemie");
+            }
+
+            if (!string.IsNullOrWhiteSpace(patient.FirstName) && patient.FirstName.Length > 255)
+                errors.Add("Imię nie może być dłuższe niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(patient.LastName) && patient.LastName.Length > 255)
+                errors.Add("Nazwisko nie może być dłuższe niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(patient.Email) && patient.Email.Length > 255)
+                errors.Add("Email nie może być dłuższy niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(patient.Locality) && patient.Locality.Length > 255)
+                errors.Add("Miejscowość nie może być dłuższa niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(patient.Street) && patient.Street.Length > 255)
+                errors.Add("Ulica nie może być dłuższa niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(patient.PropertyNumber) && patient.PropertyNumber.Length > 255)
+                errors.Add("Numer nieruchomości nie może być dłuższy niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(patient.HouseUnitNumber) && patient.HouseUnitNumber.Length > 255)
+                errors.Add("Numer lokalu nie może być dłuższy niż 255 znaków");
+
+            if (!string.IsNullOrWhiteSpace(patient.PESEL) && patient.PESEL.Length == 11
+                && CzySameLiczby(patient.PESEL)
+                && !string.IsNullOrWhiteSpace(patient.BirthDate)
+                && CzyPoprawnaDates(patient.BirthDate))
+            {
+                string dataZPesel = WyciagnijDateZPesel(patient.PESEL);
+                if (dataZPesel != patient.BirthDate)
+                    errors.Add("Data urodzenia nie zgadza się z datą zakodowaną w PESEL");
+            }
+
+            if (!string.IsNullOrWhiteSpace(patient.Gender)
+                && (patient.Gender == "M" || patient.Gender == "K")
+                && !string.IsNullOrWhiteSpace(patient.PESEL)
+                && CzySameLiczby(patient.PESEL))
+            {
+                if (!CzyPlecZgadzaSieZPesel(patient.Gender, patient.PESEL))
+                {
+                    errors.Add("Płeć nie zgadza się z płcią zakodowaną w PESEL");
+                }
+            }
+
             return new ValidationResult(errors.Count == 0) { Errors = errors };
         }
 

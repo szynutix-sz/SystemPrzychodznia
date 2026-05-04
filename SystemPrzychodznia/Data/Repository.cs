@@ -233,12 +233,11 @@ WHERE
     a.Numer_posesji_domu AS PropertyNumber, a.Numer_lokalu_mieszkania AS HouseUnitNumber,
     u.PESEL, u.Data_urodzenia AS BirthDate, u.Plec AS Gender, u.Adres_email AS Email, u.Numer_telefonu AS Phone
 FROM Uzytkownik u
-JOIN Adres a ON u.ID_Adresu = a.ID_Adresu
+LEFT JOIN Adres a ON u.ID_Adresu = a.ID_Adresu
 WHERE 
     u.ID_Uzytkownika = $id
-    AND (u.Blokada_konta_do IS NULL OR u.Blokada_konta_do <= CURRENT_TIMESTAMP)
     AND u.Czy_zapomniany = 0;";
-            command.Parameters.AddWithValue("id", id);
+            command.Parameters.AddWithValue("$id", id);
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -248,16 +247,16 @@ WHERE
                     Login = reader.GetString(1),
                     FirstName = reader.GetString(2),
                     LastName = reader.GetString(3),
-                    Locality = reader.GetString(4),
-                    PostalCode = reader.GetString(5),
-                    Street = reader.IsDBNull(6) ? null : reader.GetString(6),
-                    PropertyNumber = reader.GetString(7),
-                    HouseUnitNumber = reader.IsDBNull(8) ? null : reader.GetString(8),
+                    Locality = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                    PostalCode = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                    Street = reader.IsDBNull(6) ? string.Empty : reader.GetString(6),
+                    PropertyNumber = reader.IsDBNull(7) ? string.Empty : reader.GetString(7),
+                    HouseUnitNumber = reader.IsDBNull(8) ? string.Empty : reader.GetString(8),
                     PESEL = reader.GetString(9),
                     BirthDate = reader.GetString(10),
                     Gender = reader.GetString(11),
-                    Email = reader.GetString(12),
-                    Phone = reader.GetString(13),
+                    Email = reader.IsDBNull(12) ? string.Empty : reader.GetString(12),
+                    Phone = reader.IsDBNull(13) ? string.Empty : reader.GetString(13),
                 });
             }
 
