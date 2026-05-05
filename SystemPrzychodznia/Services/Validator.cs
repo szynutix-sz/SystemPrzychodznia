@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.ApplicationServices;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using SystemPrzychodznia.Data;
@@ -116,7 +117,7 @@ namespace SystemPrzychodznia.Services
             if (!string.IsNullOrWhiteSpace(user.Email) && user.Email.Length > 255)
                 errors.Add("Email nie może być dłuższy niż 255 znaków");
 
-            // Walidacja czy data urodzenia zgadza się z datą zakodowaną w PESEL
+            // Walidacja czy data urodzenia zgadza się z datą zakodowaną w PESEL oraz sprawdzenie sumy kontronej
             if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11
                 && CzySameLiczby(user.PESEL)
                 && !string.IsNullOrWhiteSpace(user.BirthDate)
@@ -125,6 +126,9 @@ namespace SystemPrzychodznia.Services
                 string dataZPesel = WyciagnijDateZPesel(user.PESEL);
                 if (dataZPesel != user.BirthDate)
                     errors.Add("Data urodzenia nie zgadza się z datą zakodowaną w PESEL");
+
+                if (!CzyPESELKontrola(user.PESEL))
+                    errors.Add("Niepoprawny PESEL. Niezgodna suma kontrolna");
             }
 
             // Walidacja płeć zgadza się z płcią zakodowaną w PESEL
@@ -138,6 +142,8 @@ namespace SystemPrzychodznia.Services
                     errors.Add("Płeć nie zgadza się z płcią zakodowaną w PESEL");
                 }
             }
+
+
 
              
             return new ValidationResult(errors.Count == 0) { Errors = errors };
@@ -233,6 +239,9 @@ namespace SystemPrzychodznia.Services
                 string dataZPesel = WyciagnijDateZPesel(patient.PESEL);
                 if (dataZPesel != patient.BirthDate)
                     errors.Add("Data urodzenia nie zgadza się z datą zakodowaną w PESEL");
+
+                if (!CzyPESELKontrola(patient.PESEL))
+                    errors.Add("Niepoprawny PESEL. Niezgodna suma kontrolna");
             }
 
             if (!string.IsNullOrWhiteSpace(patient.Gender)
@@ -349,6 +358,18 @@ namespace SystemPrzychodznia.Services
                     return false;
             }
             return true;
+        }
+
+        // Sprawdza sume kontrolną PESEL
+        private bool CzyPESELKontrola(string PESEL)
+        {
+            int[] weights = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
+            int sum = 0;
+            for (int i = 0; i < 10; i++) sum += (int.Parse(PESEL.Substring(i, 1))) * weights[i];
+
+            int controlDigit = (10 - (sum % 10)) % 10;
+
+            return controlDigit == int.Parse(PESEL.Substring(10, 1));
         }
 
         // Sprawdza czy data ma prawidłowy format YYYY-MM-DD

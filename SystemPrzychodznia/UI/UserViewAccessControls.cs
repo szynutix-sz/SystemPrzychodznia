@@ -29,6 +29,8 @@ namespace SystemPrzychodznia
                     LoadRoles();
                 }
 
+                EnsurePatientModuleVisible();
+
             }
 
             // Uprawnienie 2 - Admin
