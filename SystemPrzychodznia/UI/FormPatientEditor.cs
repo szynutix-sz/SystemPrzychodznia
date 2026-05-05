@@ -13,15 +13,15 @@ namespace SystemPrzychodznia
 
         private readonly TextBox _textBoxFirstName = new();
         private readonly TextBox _textBoxLastName = new();
-        private readonly TextBox _textBoxPESEL = new();
+        private readonly MaskedTextBox _textBoxPESEL = new();
         private readonly DateTimePicker _dateTimePickerBirthDate = new();
         private readonly ComboBox _comboBoxGender = new();
         private readonly TextBox _textBoxLocality = new();
-        private readonly TextBox _textBoxPostalCode = new();
+        private readonly MaskedTextBox _textBoxPostalCode = new();
         private readonly TextBox _textBoxStreet = new();
         private readonly TextBox _textBoxPropertyNumber = new();
         private readonly TextBox _textBoxHouseUnitNumber = new();
-        private readonly TextBox _textBoxPhone = new();
+        private readonly MaskedTextBox _textBoxPhone = new();
         private readonly TextBox _textBoxEmail = new();
         private readonly Button _buttonSave = new();
         private readonly Button _buttonToggleEdit = new();
@@ -62,6 +62,10 @@ namespace SystemPrzychodznia
 
             _dateTimePickerBirthDate.Format = DateTimePickerFormat.Custom;
             _dateTimePickerBirthDate.CustomFormat = "yyyy-MM-dd";
+
+            _textBoxPESEL.Mask = "00000000000";
+            _textBoxPostalCode.Mask = "00-000";
+            _textBoxPhone.Mask = "000000000";
 
             _comboBoxGender.DropDownStyle = ComboBoxStyle.DropDownList;
             _comboBoxGender.Items.AddRange(new object[] { "M", "K" });
@@ -179,7 +183,7 @@ namespace SystemPrzychodznia
                 BirthDate = _dateTimePickerBirthDate.Value.ToString("yyyy-MM-dd"),
                 Gender = _comboBoxGender.Text,
                 Locality = _textBoxLocality.Text.Trim(),
-                PostalCode = _textBoxPostalCode.Text.Trim(),
+                PostalCode = _textBoxPostalCode.Text.Trim().Replace("-", ""),
                 Street = _textBoxStreet.Text.Trim(),
                 PropertyNumber = _textBoxPropertyNumber.Text.Trim(),
                 HouseUnitNumber = _textBoxHouseUnitNumber.Text.Trim(),

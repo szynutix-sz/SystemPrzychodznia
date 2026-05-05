@@ -11,9 +11,9 @@ namespace SystemPrzychodznia
         private DataGridView? dgvPatients;
         private TextBox? textBoxPatientFirstName;
         private TextBox? textBoxPatientLastName;
-        private TextBox? textBoxPatientPESEL;
+        private MaskedTextBox? textBoxPatientPESEL;
         private TextBox? textBoxPatientAddress;
-        private TextBox? textBoxPatientPhone;
+        private MaskedTextBox? textBoxPatientPhone;
         private Button? buttonSearchPatients;
         private Button? buttonClearPatients;
         private Button? buttonAddPatient;
@@ -69,9 +69,9 @@ namespace SystemPrzychodznia
 
             textBoxPatientFirstName = CreatePatientTextBox();
             textBoxPatientLastName = CreatePatientTextBox();
-            textBoxPatientPESEL = CreatePatientTextBox();
+            textBoxPatientPESEL = CreatePatientMaskedTextBox("00000000000");
             textBoxPatientAddress = CreatePatientTextBox();
-            textBoxPatientPhone = CreatePatientTextBox();
+            textBoxPatientPhone = CreatePatientMaskedTextBox("000000000");
 
             var searchLayout = new TableLayoutPanel
             {
@@ -152,6 +152,16 @@ namespace SystemPrzychodznia
             {
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 Margin = new Padding(6, 0, 6, 0)
+            };
+        }
+
+        private static MaskedTextBox CreatePatientMaskedTextBox(string mask)
+        {
+            return new MaskedTextBox
+            {
+                Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                Margin = new Padding(6, 0, 6, 0),
+                Mask = mask
             };
         }
 
