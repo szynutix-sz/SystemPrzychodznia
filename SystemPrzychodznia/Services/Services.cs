@@ -186,7 +186,7 @@ namespace SystemPrzychodznia.Services
         }
 
         public ValidationResult ValidateUserFull(UserFull user, bool editing) => _validator.ValidateUserFull(user, editing);
-        public ValidationResult ValidatePatientFull(UserFull patient, bool editing) => _validator.ValidatePatientFull(patient, editing);
+        public ValidationResult ValidatePatientFull(PatientFull patient, bool editing) => _validator.ValidatePatientFull(patient, editing);
 
         public ValidationResult AddUser(UserFull user)
         {
@@ -200,6 +200,7 @@ namespace SystemPrzychodznia.Services
         public List<ForgottenUser> GetListForgottenUsers() => _repository.GetListForgottenUsers(new SearchTermsForgotten());
         public List<ForgottenUser> GetListForgottenUsers(SearchTermsForgotten searchTerms) => _repository.GetListForgottenUsers(searchTerms);
         public List<PatientListItem> GetListPatients(SearchTermsPatient searchTerms) => _repository.GetListPatients(searchTerms);
+        public PatientFull? GetPatientFull(int id) => _repository.GetPatientFull(id);
         public List<UserBasic> GetListUsers(SearchTerms s) => _repository.GetListUsers(s);
         public UserFull GetUserFull(int id) => _repository.GetUserFull(id);
 
@@ -233,24 +234,24 @@ namespace SystemPrzychodznia.Services
             return new ValidationResult(true);
         }
 
-        public ValidationResult RegisterPatient(UserFull patient)
+        public ValidationResult RegisterPatient(PatientFull patient)
         {
-            var preparedPatient = PreparePatientForSave(patient, editing: false);
+            var preparedPatient = PreparePatientForSave(patient);
             var validation = _validator.ValidatePatientFull(preparedPatient, false);
             if (!validation.IsValid) return validation;
 
-            _repository.Add(preparedPatient);
+            _repository.AddPatient(preparedPatient);
             patient.Id = preparedPatient.Id;
             return new ValidationResult(true);
         }
 
-        public ValidationResult EditPatient(UserFull patient)
+        public ValidationResult EditPatient(PatientFull patient)
         {
-            var preparedPatient = PreparePatientForSave(patient, editing: true);
+            var preparedPatient = PreparePatientForSave(patient);
             var validation = _validator.ValidatePatientFull(preparedPatient, true);
             if (!validation.IsValid) return validation;
 
-            _repository.EditUser(preparedPatient);
+            _repository.EditPatient(preparedPatient);
             return new ValidationResult(true);
         }
 
@@ -300,52 +301,24 @@ namespace SystemPrzychodznia.Services
             return peselBase + $"{controlDigit}";
         }
 
-        private UserFull PreparePatientForSave(UserFull patient, bool editing)
+        private PatientFull PreparePatientForSave(PatientFull patient)
         {
-            var preparedPatient = new UserFull
+            return new PatientFull
             {
                 Id = patient.Id,
-                Login = editing ? patient.Login.Trim() : GeneratePatientLogin(patient.PESEL),
                 FirstName = patient.FirstName.Trim(),
                 LastName = patient.LastName.Trim(),
                 Locality = patient.Locality.Trim(),
                 PostalCode = patient.PostalCode.Trim().Replace("-", ""),
-                Street = string.IsNullOrWhiteSpace(patient.Street) ? null : patient.Street.Trim(),
+                Street = string.IsNullOrWhiteSpace(patient.Street) ? string.Empty : patient.Street.Trim(),
                 PropertyNumber = patient.PropertyNumber.Trim(),
-                HouseUnitNumber = string.IsNullOrWhiteSpace(patient.HouseUnitNumber) ? null : patient.HouseUnitNumber.Trim(),
+                HouseUnitNumber = string.IsNullOrWhiteSpace(patient.HouseUnitNumber) ? string.Empty : patient.HouseUnitNumber.Trim(),
                 PESEL = patient.PESEL.Trim(),
                 BirthDate = patient.BirthDate.Trim(),
                 Gender = patient.Gender.Trim(),
-                Email = patient.Email.Trim(),
-                Phone = patient.Phone.Trim(),
-                Password = editing ? "Pacjent1!" : GeneratePatientPassword(patient.PESEL),
-                Uprawnienia = BuildPatientPermissions()
+                Email = string.IsNullOrWhiteSpace(patient.Email) ? string.Empty : patient.Email.Trim(),
+                Phone = patient.Phone.Trim()
             };
-
-            return preparedPatient;
-        }
-
-        private List<Uprawnienie> BuildPatientPermissions()
-        {
-            var permissions = _repository.GetUprawnienia();
-            foreach (var permission in permissions)
-            {
-                permission.Posiadane = permission.Id == 5;
-            }
-
-            return permissions;
-        }
-
-        private static string GeneratePatientLogin(string pesel)
-        {
-            return $"pacjent.{pesel.Trim()}";
-        }
-
-        private static string GeneratePatientPassword(string pesel)
-        {
-            var lastDigits = (pesel ?? string.Empty).Trim();
-            lastDigits = lastDigits.Length >= 4 ? lastDigits.Substring(lastDigits.Length - 4) : lastDigits.PadLeft(4, '0');
-            return $"Pacj!{lastDigits}Aa";
         }
     }
 }

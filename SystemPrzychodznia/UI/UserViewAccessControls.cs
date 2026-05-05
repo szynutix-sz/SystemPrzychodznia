@@ -12,7 +12,6 @@ namespace SystemPrzychodznia
             // Uprawnienie 1 - SuperAdmin
             if (_currentUser.Uprawnienia.Exists(u => u.Id == 1 && u.Posiadane == true))
             {
-                EnsurePatientModuleVisible();
                 if (!tabControlUserView.TabPages.Contains(tabPageAdminViewUsers))
                 {
                     tabControlUserView.TabPages.Add(tabPageAdminViewUsers);
@@ -35,7 +34,6 @@ namespace SystemPrzychodznia
             // Uprawnienie 2 - Admin
             if (_currentUser.Uprawnienia.Exists(u => u.Id == 2 && u.Posiadane == true))
             {
-                EnsurePatientModuleVisible();
                 if (!tabControlUserView.TabPages.Contains(tabPageAdminViewUsers))
                 { 
                     tabControlUserView.TabPages.Add(tabPageAdminViewUsers);

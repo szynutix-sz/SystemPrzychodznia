@@ -103,14 +103,30 @@ CREATE TABLE IF NOT EXISTS Uzytkownik_Uprawnienie (
 );
 
 -- ============================================================
--- 6. Wstawienie domyślnego adresu
+-- 6. Tabela Pacjent
+-- ============================================================
+CREATE TABLE IF NOT EXISTS Pacjent (
+    ID_Pacjenta INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID_Adresu INTEGER NOT NULL,
+    Imie TEXT NOT NULL,
+    Nazwisko TEXT NOT NULL,
+    PESEL TEXT NOT NULL UNIQUE,
+    Adres_email TEXT,
+    Numer_telefonu TEXT NOT NULL,
+    Data_urodzenia TEXT NOT NULL,
+    Plec TEXT NOT NULL CHECK (Plec IN ('K', 'M')),
+    FOREIGN KEY (ID_Adresu) REFERENCES Adres(ID_Adresu) ON DELETE RESTRICT
+);
+
+-- ============================================================
+-- 7. Wstawienie domyślnego adresu
 -- ============================================================
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
 SELECT '-', '-', '-', '-', '-'
 WHERE NOT EXISTS (SELECT 1 FROM Adres WHERE ID_Adresu = 1);
 
 -- ============================================================
--- 7. Wstawienie użytkownika SuperAdmin
+-- 8. Wstawienie użytkownika SuperAdmin
 -- ============================================================
 INSERT INTO Uzytkownik (
     ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Wymaga_zmiany_hasla, Data_zapomnienia, ID_Kto_Zapomnial
@@ -120,7 +136,7 @@ SELECT
 WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Login = 'SuperAdmin');
 
 -- ============================================================
--- 8. Wstawienie hasła dla SuperAdmina
+-- 9. Wstawienie hasła dla SuperAdmina
 -- ============================================================
 INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
 SELECT ID_Uzytkownika, 'AdminPass'
@@ -131,7 +147,7 @@ WHERE Login = 'SuperAdmin'
                   WHERE u.Login = 'SuperAdmin');
 
 -- ============================================================
--- 9. Dodanie uprawnień
+-- 10. Dodanie uprawnień
 -- ============================================================
 INSERT INTO Uprawnienie (Nazwa) SELECT 'SuperAdmin' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');
 INSERT INTO Uprawnienie (Nazwa) SELECT 'Admin' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Admin');
@@ -140,7 +156,7 @@ INSERT INTO Uprawnienie (Nazwa) SELECT 'Recepcja' WHERE NOT EXISTS (SELECT 1 FRO
 INSERT INTO Uprawnienie (Nazwa) SELECT 'Brak_roli' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Brak_roli');
 
 -- ============================================================
--- 10. Nadanie uprawnienia 'Admin' dla SuperAdmina
+-- 11. Nadanie uprawnienia 'Admin' dla SuperAdmina
 -- ============================================================
 INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
 SELECT u.ID_Uzytkownika, p.ID_Uprawnienia
@@ -155,6 +171,7 @@ WHERE u.Login = 'SuperAdmin'
             EnsureColumnExists(connection, "Uzytkownik", "Zapomniany_Login_Enc", "TEXT");
             EnsureColumnExists(connection, "Uzytkownik", "Zapomniane_Imie_Enc", "TEXT");
             EnsureColumnExists(connection, "Uzytkownik", "Zapomniane_Nazwisko_Enc", "TEXT");
+            MigrateLegacyPatients(connection);
         }
 
         private static void EnsureColumnExists(SqliteConnection connection, string tableName, string columnName, string columnDefinition)
@@ -176,6 +193,63 @@ WHERE u.Login = 'SuperAdmin'
             var alterCommand = connection.CreateCommand();
             alterCommand.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {columnName} {columnDefinition};";
             alterCommand.ExecuteNonQuery();
+        }
+
+        private static void MigrateLegacyPatients(SqliteConnection connection)
+        {
+            var migrationCommand = connection.CreateCommand();
+            migrationCommand.CommandText = @"
+BEGIN TRANSACTION;
+
+INSERT INTO Pacjent (
+    ID_Adresu,
+    Imie,
+    Nazwisko,
+    PESEL,
+    Adres_email,
+    Numer_telefonu,
+    Data_urodzenia,
+    Plec
+)
+SELECT
+    u.ID_Adresu,
+    u.Imie,
+    u.Nazwisko,
+    u.PESEL,
+    u.Adres_email,
+    u.Numer_telefonu,
+    u.Data_urodzenia,
+    CASE
+        WHEN u.Plec IN ('K', 'M') THEN u.Plec
+        ELSE 'K'
+    END
+FROM Uzytkownik u
+WHERE u.Czy_zapomniany = 0
+  AND EXISTS (
+      SELECT 1
+      FROM Uzytkownik_Uprawnienie uu
+      JOIN Uprawnienie up ON up.ID_Uprawnienia = uu.ID_Uprawnienia
+      WHERE uu.ID_Uzytkownika = u.ID_Uzytkownika
+        AND up.Nazwa = 'Brak_roli'
+  )
+  AND NOT EXISTS (
+      SELECT 1
+      FROM Pacjent p
+      WHERE p.PESEL = u.PESEL
+  );
+
+DELETE FROM Uzytkownik
+WHERE Czy_zapomniany = 0
+  AND EXISTS (
+      SELECT 1
+      FROM Uzytkownik_Uprawnienie uu
+      JOIN Uprawnienie up ON up.ID_Uprawnienia = uu.ID_Uprawnienia
+      WHERE uu.ID_Uzytkownika = Uzytkownik.ID_Uzytkownika
+        AND up.Nazwa = 'Brak_roli'
+  );
+
+COMMIT;";
+            migrationCommand.ExecuteNonQuery();
         }
     }
 }

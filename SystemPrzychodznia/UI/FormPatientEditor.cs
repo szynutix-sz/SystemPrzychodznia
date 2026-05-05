@@ -9,7 +9,7 @@ namespace SystemPrzychodznia
         private readonly UserService _userService;
         private readonly int? _patientId;
 
-        private UserFull? _loadedPatient;
+        private PatientFull? _loadedPatient;
 
         private readonly TextBox _textBoxFirstName = new();
         private readonly TextBox _textBoxLastName = new();
@@ -66,12 +66,12 @@ namespace SystemPrzychodznia
             _comboBoxGender.DropDownStyle = ComboBoxStyle.DropDownList;
             _comboBoxGender.Items.AddRange(new object[] { "M", "K" });
 
-            AddField(tableLayout, 0, "Imię", _textBoxFirstName);
+            AddField(tableLayout, 0, "Imie", _textBoxFirstName);
             AddField(tableLayout, 1, "Nazwisko", _textBoxLastName);
             AddField(tableLayout, 2, "PESEL", _textBoxPESEL);
             AddField(tableLayout, 3, "Data urodzenia", _dateTimePickerBirthDate);
-            AddField(tableLayout, 4, "Płeć", _comboBoxGender);
-            AddField(tableLayout, 5, "Miejscowość", _textBoxLocality);
+            AddField(tableLayout, 4, "Plec", _comboBoxGender);
+            AddField(tableLayout, 5, "Miejscowosc", _textBoxLocality);
             AddField(tableLayout, 6, "Kod pocztowy", _textBoxPostalCode);
             AddField(tableLayout, 7, "Ulica", _textBoxStreet);
             AddField(tableLayout, 8, "Numer posesji", _textBoxPropertyNumber);
@@ -94,7 +94,7 @@ namespace SystemPrzychodznia
             _buttonSave.AutoSize = true;
             _buttonSave.Click += ButtonSave_Click;
 
-            _buttonToggleEdit.Text = "Odblokuj edycję";
+            _buttonToggleEdit.Text = "Odblokuj edycje";
             _buttonToggleEdit.AutoSize = true;
             _buttonToggleEdit.Click += ButtonToggleEdit_Click;
 
@@ -127,16 +127,16 @@ namespace SystemPrzychodznia
         {
             if (_patientId.HasValue)
             {
-                _loadedPatient = _userService.GetUserFull(_patientId.Value);
+                _loadedPatient = _userService.GetPatientFull(_patientId.Value);
                 if (_loadedPatient is null)
                 {
-                    MessageBox.Show("Nie udało się wczytać danych pacjenta.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Nie udalo sie wczytac danych pacjenta.", "Blad", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
                     return;
                 }
 
                 ApplyPatientToForm(_loadedPatient);
-                Text = $"Podgląd pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
+                Text = $"Podglad pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
                 SetEditingState(false);
             }
             else
@@ -144,20 +144,20 @@ namespace SystemPrzychodznia
                 Text = "Rejestracja pacjenta";
                 _buttonToggleEdit.Visible = false;
                 _buttonSave.Text = "Zarejestruj pacjenta";
-                _comboBoxGender.SelectedIndex = 0;
+                _comboBoxGender.SelectedItem = "K";
             }
         }
 
-        private void ApplyPatientToForm(UserFull patient)
+        private void ApplyPatientToForm(PatientFull patient)
         {
             _textBoxFirstName.Text = patient.FirstName;
             _textBoxLastName.Text = patient.LastName;
             _textBoxPESEL.Text = patient.PESEL;
             _textBoxLocality.Text = patient.Locality;
             _textBoxPostalCode.Text = patient.PostalCode;
-            _textBoxStreet.Text = patient.Street ?? string.Empty;
+            _textBoxStreet.Text = patient.Street;
             _textBoxPropertyNumber.Text = patient.PropertyNumber;
-            _textBoxHouseUnitNumber.Text = patient.HouseUnitNumber ?? string.Empty;
+            _textBoxHouseUnitNumber.Text = patient.HouseUnitNumber;
             _textBoxPhone.Text = patient.Phone;
             _textBoxEmail.Text = patient.Email;
             _comboBoxGender.Text = patient.Gender;
@@ -168,12 +168,11 @@ namespace SystemPrzychodznia
             }
         }
 
-        private UserFull CollectPatientFromForm()
+        private PatientFull CollectPatientFromForm()
         {
-            return new UserFull
+            return new PatientFull
             {
                 Id = _loadedPatient?.Id ?? 0,
-                Login = _loadedPatient?.Login ?? string.Empty,
                 FirstName = _textBoxFirstName.Text.Trim(),
                 LastName = _textBoxLastName.Text.Trim(),
                 PESEL = _textBoxPESEL.Text.Trim(),
@@ -204,7 +203,7 @@ namespace SystemPrzychodznia
             _textBoxPhone.Enabled = enabled;
             _textBoxEmail.Enabled = enabled;
             _buttonSave.Enabled = enabled || !_patientId.HasValue;
-            _buttonToggleEdit.Text = enabled ? "Anuluj edycję" : "Odblokuj edycję";
+            _buttonToggleEdit.Text = enabled ? "Anuluj edycje" : "Odblokuj edycje";
         }
 
         private void ButtonToggleEdit_Click(object? sender, EventArgs e)
@@ -223,7 +222,7 @@ namespace SystemPrzychodznia
             }
             else if (_loadedPatient != null)
             {
-                Text = $"Podgląd pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
+                Text = $"Podglad pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
             }
         }
 
@@ -239,19 +238,19 @@ namespace SystemPrzychodznia
                 if (result.IsValid)
                 {
                     MessageBox.Show(
-                        _patientId.HasValue ? "Dane pacjenta zostały zapisane." : "Pacjent został zarejestrowany.",
+                        _patientId.HasValue ? "Dane pacjenta zostaly zapisane." : "Pacjent zostal zarejestrowany.",
                         "Informacja",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
 
                     if (_patientId.HasValue)
                     {
-                        _loadedPatient = _userService.GetUserFull(patient.Id);
+                        _loadedPatient = _userService.GetPatientFull(patient.Id);
                         if (_loadedPatient is not null)
                         {
                             ApplyPatientToForm(_loadedPatient);
                             SetEditingState(false);
-                            Text = $"Podgląd pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
+                            Text = $"Podglad pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
                         }
                     }
                     else
@@ -261,12 +260,12 @@ namespace SystemPrzychodznia
                 }
                 else
                 {
-                    MessageBox.Show(string.Join(Environment.NewLine, result.Errors), "Błąd walidacji", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(string.Join(Environment.NewLine, result.Errors), "Blad walidacji", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Wystąpił błąd podczas zapisu pacjenta:{Environment.NewLine}{ex.Message}", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Wystapil blad podczas zapisu pacjenta:{Environment.NewLine}{ex.Message}", "Blad", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

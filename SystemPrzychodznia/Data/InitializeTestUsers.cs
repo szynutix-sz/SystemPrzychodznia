@@ -54,23 +54,14 @@ SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'jan.kowalski' AND p.Nazwa = 'Lekarz'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
 
--- Test 3: Maria Wiśniewska (Brak_roli), ur. 2000-03-15, K, PESEL: 00231502340
+-- Test 3: Maria Wiśniewska (Pacjent), ur. 2000-03-15, K, PESEL: 00231502340
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
 SELECT 'Gdańsk', '80001', 'Morska', '3', '7'
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'maria.wisniewska@test.pl');
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '00231502340');
 
-INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
-SELECT last_insert_rowid(), 'maria.wisniewska', 'Maria', 'Wiśniewska', '00231502340', '2000-03-15', 'K', 'maria.wisniewska@test.pl', '700300400', NULL, 0, NULL, NULL
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'maria.wisniewska@test.pl');
-
-INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
-SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'maria.wisniewska'
-  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'maria.wisniewska');
-
-INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
-WHERE u.Login = 'maria.wisniewska' AND p.Nazwa = 'Brak_roli'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+INSERT INTO Pacjent (ID_Adresu, Imie, Nazwisko, PESEL, Adres_email, Numer_telefonu, Data_urodzenia, Plec)
+SELECT last_insert_rowid(), 'Maria', 'Wiśniewska', '00231502340', 'maria.wisniewska@test.pl', '700300400', '2000-03-15', 'K'
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '00231502340');
 
 -- Test 4: Piotr Wójcik (Admin), ur. 1975-07-22, M, PESEL: 75072205637
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
@@ -90,23 +81,14 @@ SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'piotr.wojcik' AND p.Nazwa = 'Admin'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
 
--- Test 5: Katarzyna Kamińska (Brak_roli), ur. 1995-12-03, K, PESEL: 95120308901
+-- Test 5: Katarzyna Kamińska (Pacjent), ur. 1995-12-03, K, PESEL: 95120308901
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
 SELECT 'Wrocław', '50001', 'Wrocławska', '8', '4'
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'katarzyna.kaminska@test.pl');
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '95120308901');
 
-INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
-SELECT last_insert_rowid(), 'katarzyna.kaminska', 'Katarzyna', 'Kamińska', '95120308901', '1995-12-03', 'K', 'katarzyna.kaminska@test.pl', '900500600', NULL, 0, NULL, NULL
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'katarzyna.kaminska@test.pl');
-
-INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
-SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'katarzyna.kaminska'
-  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'katarzyna.kaminska');
-
-INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
-WHERE u.Login = 'katarzyna.kaminska' AND p.Nazwa = 'Brak_roli'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+INSERT INTO Pacjent (ID_Adresu, Imie, Nazwisko, PESEL, Adres_email, Numer_telefonu, Data_urodzenia, Plec)
+SELECT last_insert_rowid(), 'Katarzyna', 'Kamińska', '95120308901', 'katarzyna.kaminska@test.pl', '900500600', '1995-12-03', 'K'
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '95120308901');
 
 -- Test 6: Tomasz Zieliński (Recepcja), ur. 1988-02-11, M, PESEL: 88021103456
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
@@ -144,23 +126,14 @@ SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'agnieszka.zalewska' AND p.Nazwa = 'Lekarz'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
 
--- Test 8: Bartosz Nowicki (Brak_roli), ur. 2001-06-30, M, PESEL: 01063056789
+-- Test 8: Bartosz Nowicki (Pacjent), ur. 2001-06-30, M, PESEL: 01063056789
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
 SELECT 'Białystok', '15001', 'Leśna', '6', ''
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'bartosz.nowicki@test.pl');
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '01063056789');
 
-INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
-SELECT last_insert_rowid(), 'bartosz.nowicki', 'Bartosz', 'Nowicki', '01063056789', '2001-06-30', 'M', 'bartosz.nowicki@test.pl', '601800900', NULL, 0, NULL, NULL
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'bartosz.nowicki@test.pl');
-
-INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
-SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'bartosz.nowicki'
-  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'bartosz.nowicki');
-
-INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
-WHERE u.Login = 'bartosz.nowicki' AND p.Nazwa = 'Brak_roli'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+INSERT INTO Pacjent (ID_Adresu, Imie, Nazwisko, PESEL, Adres_email, Numer_telefonu, Data_urodzenia, Plec)
+SELECT last_insert_rowid(), 'Bartosz', 'Nowicki', '01063056789', 'bartosz.nowicki@test.pl', '601800900', '2001-06-30', 'M'
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '01063056789');
 
 -- Test 9: Monika Szymczak (Admin), ur. 1980-11-11, K, PESEL: 80111133445
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
@@ -180,23 +153,14 @@ SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'monika.szymczak' AND p.Nazwa = 'Admin'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
 
--- Test 10: Testowe konto (Brak_roli), login: testowaniekonta, email: szynutix@gmail.com
+-- Test 10: Testowe konto (Pacjent), email: szynutix@gmail.com
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
 SELECT 'Testowo', '99999', 'Testowa', '1', ''
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'szynutix@gmail.com');
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '00000000000');
 
-INSERT INTO Uzytkownik (ID_Adresu, Login, Imie, Nazwisko, PESEL, Data_urodzenia, Plec, Adres_email, Numer_telefonu, Blokada_konta_do, Czy_zapomniany, Data_zapomnienia, ID_Kto_Zapomnial)
-SELECT last_insert_rowid(), 'testowaniekonta', 'Testowy', 'Konto', '00000000000', '1990-01-01', 'M', 'szynutix@gmail.com', '600000000', NULL, 0, NULL, NULL
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Adres_email = 'szynutix@gmail.com');
-
-INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
-SELECT ID_Uzytkownika, 'Pass123' FROM Uzytkownik WHERE Login = 'testowaniekonta'
-  AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika WHERE u.Login = 'testowaniekonta');
-
-INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
-WHERE u.Login = 'testowaniekonta' AND p.Nazwa = 'Brak_roli'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+INSERT INTO Pacjent (ID_Adresu, Imie, Nazwisko, PESEL, Adres_email, Numer_telefonu, Data_urodzenia, Plec)
+SELECT last_insert_rowid(), 'Testowy', 'Konto', '00000000000', 'szynutix@gmail.com', '600000000', '1990-01-01', 'M'
+WHERE NOT EXISTS (SELECT 1 FROM Pacjent WHERE PESEL = '00000000000');
 ";
             createTableCmd.ExecuteNonQuery();
 

@@ -143,12 +143,9 @@ namespace SystemPrzychodznia.Services
             return new ValidationResult(errors.Count == 0) { Errors = errors };
         }
 
-        public ValidationResult ValidatePatientFull(UserFull patient, bool editing)
+        public ValidationResult ValidatePatientFull(PatientFull patient, bool editing)
         {
             var errors = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(patient.Login))
-                errors.Add("Nie udało się przygotować identyfikatora technicznego pacjenta");
 
             if (string.IsNullOrWhiteSpace(patient.FirstName))
                 errors.Add("Imię jest wymagane");
@@ -201,22 +198,10 @@ namespace SystemPrzychodznia.Services
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(patient.Login) &&
-                _repository.CzyIstniejeDanyUżytkowik(patient.Login, UserRepository.VAL_LOGIN, editing, patient.Id))
-            {
-                errors.Add("Podany pacjent już istnieje w systemie");
-            }
-
-            if (!string.IsNullOrWhiteSpace(patient.Email) &&
-                _repository.CzyIstniejeDanyUżytkowik(patient.Email, UserRepository.VAL_EMAIL, editing, patient.Id))
-            {
-                errors.Add("Podany Email jest już zajęty");
-            }
-
             if (!string.IsNullOrWhiteSpace(patient.PESEL) && patient.PESEL.Length == 11 &&
-                _repository.CzyIstniejeDanyUżytkowik(patient.PESEL, UserRepository.VAL_PESEL, editing, patient.Id))
+                _repository.PatientPeselExists(patient.PESEL, editing, patient.Id))
             {
-                errors.Add("Podany PESEL jest już w systemie");
+                errors.Add("Podany PESEL pacjenta jest już w systemie");
             }
 
             if (!string.IsNullOrWhiteSpace(patient.FirstName) && patient.FirstName.Length > 255)
