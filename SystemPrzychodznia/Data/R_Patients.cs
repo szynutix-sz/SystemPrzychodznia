@@ -272,6 +272,27 @@ WHERE ID_Pacjenta = $id;";
             return count > 0;
         }
 
+        public bool PatientEmailExists(string email, bool exclude = false, int excludeId = -1)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            if (exclude)
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Pacjent WHERE Adres_email = $email AND ID_Pacjenta != $excludeId;";
+                command.Parameters.AddWithValue("$excludeId", excludeId);
+            }
+            else
+            {
+                command.CommandText = "SELECT COUNT(*) FROM Pacjent WHERE Adres_email = $email;";
+            }
+
+            command.Parameters.AddWithValue("$email", email);
+            long count = (long)command.ExecuteScalar()!;
+            return count > 0;
+        }
+
         private static string ReadNullablePatientString(SqliteDataReader reader, int ordinal)
         {
             return reader.IsDBNull(ordinal) ? string.Empty : reader.GetString(ordinal);

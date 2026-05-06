@@ -98,7 +98,7 @@ namespace SystemPrzychodznia
             _buttonSave.AutoSize = true;
             _buttonSave.Click += ButtonSave_Click;
 
-            _buttonToggleEdit.Text = "Odblokuj edycje";
+            _buttonToggleEdit.Text = "Odblokuj edycję";
             _buttonToggleEdit.AutoSize = true;
             _buttonToggleEdit.Click += ButtonToggleEdit_Click;
 
@@ -134,20 +134,20 @@ namespace SystemPrzychodznia
                 _loadedPatient = _userService.GetPatientFull(_patientId.Value);
                 if (_loadedPatient is null)
                 {
-                    MessageBox.Show("Nie udalo sie wczytac danych pacjenta.", "Blad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Nie udało się wczytać danych pacjenta.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
                     return;
                 }
 
                 ApplyPatientToForm(_loadedPatient);
-                Text = $"Podglad pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
+                Text = $"Podgląd pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
                 SetEditingState(false);
             }
             else
             {
                 Text = "Rejestracja pacjenta";
                 _buttonToggleEdit.Visible = false;
-                _buttonSave.Text = "Zarejestruj pacjenta";
+                _buttonSave.Text = "Potwierdź rejestracje";
                 _comboBoxGender.SelectedItem = "K";
             }
         }
@@ -207,7 +207,8 @@ namespace SystemPrzychodznia
             _textBoxPhone.Enabled = enabled;
             _textBoxEmail.Enabled = enabled;
             _buttonSave.Enabled = enabled || !_patientId.HasValue;
-            _buttonToggleEdit.Text = enabled ? "Anuluj edycje" : "Odblokuj edycje";
+            _buttonSave.Text = _patientId.HasValue ? "Potwierdź Dane" : "Potwierdź rejestracje";
+            _buttonToggleEdit.Text = enabled ? "Zrezygnuj z edycji" : "Odblokuj edycję";
         }
 
         private void ButtonToggleEdit_Click(object? sender, EventArgs e)
@@ -226,7 +227,7 @@ namespace SystemPrzychodznia
             }
             else if (_loadedPatient != null)
             {
-                Text = $"Podglad pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
+                Text = $"Podgląd pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
             }
         }
 
@@ -235,6 +236,13 @@ namespace SystemPrzychodznia
             try
             {
                 var patient = CollectPatientFromForm();
+
+                if (_patientId.HasValue && _loadedPatient is not null && ArePatientsEqual(patient, _loadedPatient))
+                {
+                    MessageBox.Show("Nie wprowadzono żadnych zmian", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 ValidationResult result = _patientId.HasValue
                     ? _userService.EditPatient(patient)
                     : _userService.RegisterPatient(patient);
@@ -242,7 +250,7 @@ namespace SystemPrzychodznia
                 if (result.IsValid)
                 {
                     MessageBox.Show(
-                        _patientId.HasValue ? "Dane pacjenta zostaly zapisane." : "Pacjent zostal zarejestrowany.",
+                        _patientId.HasValue ? "Zmieniono dane pacjenta" : "Pacjent został zarejestrowany",
                         "Informacja",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
@@ -254,7 +262,7 @@ namespace SystemPrzychodznia
                         {
                             ApplyPatientToForm(_loadedPatient);
                             SetEditingState(false);
-                            Text = $"Podglad pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
+                            Text = $"Podgląd pacjenta: {_loadedPatient.FirstName} {_loadedPatient.LastName}";
                         }
                     }
                     else
@@ -264,13 +272,29 @@ namespace SystemPrzychodznia
                 }
                 else
                 {
-                    MessageBox.Show(string.Join(Environment.NewLine, result.Errors), "Blad walidacji", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(string.Join(Environment.NewLine, result.Errors), "Błąd walidacji", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Wystapil blad podczas zapisu pacjenta:{Environment.NewLine}{ex.Message}", "Blad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Wystąpił błąd podczas zapisu pacjenta:{Environment.NewLine}{ex.Message}", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private static bool ArePatientsEqual(PatientFull left, PatientFull right)
+        {
+            return left.FirstName == right.FirstName
+                && left.LastName == right.LastName
+                && left.PESEL == right.PESEL
+                && left.BirthDate == right.BirthDate
+                && left.Gender == right.Gender
+                && left.Locality == right.Locality
+                && left.PostalCode.Replace("-", "") == right.PostalCode.Replace("-", "")
+                && left.Street == right.Street
+                && left.PropertyNumber == right.PropertyNumber
+                && left.HouseUnitNumber == right.HouseUnitNumber
+                && left.Phone == right.Phone
+                && left.Email == right.Email;
         }
     }
 }

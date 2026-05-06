@@ -33,17 +33,15 @@ namespace SystemPrzychodznia.Services
 
             // Walidacja Email
             if (string.IsNullOrWhiteSpace(user.Email))
-                errors.Add("Email jest wymagany");
-            else if (!user.Email.Contains("@") || !user.Email.Contains("."))
-                errors.Add("Email musi zawierać @ i .");
+                errors.Add(RequiredFieldMessage("Adres e-mail"));
+            else
+                errors.AddRange(ValidateEmail(user.Email));
 
             // Walidacja PESEL - musi mieć 11 znaków i być liczbą
             if (string.IsNullOrWhiteSpace(user.PESEL))
-                errors.Add("PESEL jest wymagany");
-            else if (user.PESEL.Length != 11)
-                errors.Add("PESEL musi mieć 11 cyfr");
-            else if (!CzySameLiczby(user.PESEL))
-                errors.Add("PESEL musi zawierać tylko cyfry");
+                errors.Add(RequiredFieldMessage("PESEL"));
+            else if (user.PESEL.Length != 11 || !CzySameLiczby(user.PESEL))
+                errors.Add("Nieprawidłowy PESEL. Ilość znaków jest nieprawidłowa. Prawidłowy numer PESEL powinien zawierać 11 znaków");
 
             // Walidacja Miejscowości
             if (string.IsNullOrWhiteSpace(user.Locality))
@@ -75,11 +73,9 @@ namespace SystemPrzychodznia.Services
 
             // Walidacja Numeru Telefonu - musi mieć 9 znaków i być liczbą
             if (string.IsNullOrWhiteSpace(user.Phone))
-                errors.Add("Numer telefonu jest wymagany");
-            else if (user.Phone.Length != 9)
-                errors.Add("Numer telefonu musi mieć 9 cyfr");
-            else if (!CzySameLiczby(user.Phone))
-                errors.Add("Numer telefonu musi zawierać tylko cyfry");
+                errors.Add(RequiredFieldMessage("Numer telefonu"));
+            else if (user.Phone.Length != 9 || !CzySameLiczby(user.Phone))
+                errors.Add("Nieprawidłowy numer telefonu. Ilość cyfr telefonu nie jest zgodna. Prawidłowa ilość to 9 cyfr");
 
 
             if (validatePassword)
@@ -92,15 +88,16 @@ namespace SystemPrzychodznia.Services
             // Walidacja unikalności loginu, email, PESEL
             if (!string.IsNullOrWhiteSpace(user.Login) &&
                 _repository.CzyIstniejeDanyUżytkowik(user.Login,UserRepository.VAL_LOGIN, editing, user.Id))
-                errors.Add("Podany Login jest już zajęty");
+                errors.Add("Login jest zajęty");
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && 
+            if (!string.IsNullOrWhiteSpace(user.Email) &&
+                ValidateEmail(user.Email).Count == 0 &&
                 _repository.CzyIstniejeDanyUżytkowik(user.Email, UserRepository.VAL_EMAIL, editing, user.Id))
-                errors.Add("Podany Email jest już zajęty");
+                errors.Add("Nieprawidłowy adres e-mail. E-mail jest już zarejestrowany w systemie");
 
             if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11 &&
                 _repository.CzyIstniejeDanyUżytkowik(user.PESEL, UserRepository.VAL_PESEL, editing, user.Id))
-                errors.Add("Podany PESEL jest już w systemie");
+                errors.Add("Nieprawidłowy PESEL. Podany numer PESEL już widnieje w systemie");
 
 
 
@@ -114,9 +111,6 @@ namespace SystemPrzychodznia.Services
             if (!string.IsNullOrWhiteSpace(user.LastName) && user.LastName.Length > 255)
                 errors.Add("Nazwisko nie może być dłuższe niż 255 znaków");
 
-            if (!string.IsNullOrWhiteSpace(user.Email) && user.Email.Length > 255)
-                errors.Add("Email nie może być dłuższy niż 255 znaków");
-
             // Walidacja czy data urodzenia zgadza się z datą zakodowaną w PESEL oraz sprawdzenie sumy kontronej
             if (!string.IsNullOrWhiteSpace(user.PESEL) && user.PESEL.Length == 11
                 && CzySameLiczby(user.PESEL)
@@ -125,21 +119,22 @@ namespace SystemPrzychodznia.Services
             {
                 string dataZPesel = WyciagnijDateZPesel(user.PESEL);
                 if (dataZPesel != user.BirthDate)
-                    errors.Add("Data urodzenia nie zgadza się z datą zakodowaną w PESEL");
+                    errors.Add("Nieprawidłowy PESEL. Data urodzenia nie jest zgodna z zasadami RRMMDD");
 
                 if (!CzyPESELKontrola(user.PESEL))
-                    errors.Add("Niepoprawny PESEL. Niezgodna suma kontrolna");
+                    errors.Add("Nieprawidłowy PESEL. Cyfra kontrolna nie zgadza się z zasadami https://www.gov.pl/web/gov/czym-jest-numer-pesel");
             }
 
             // Walidacja płeć zgadza się z płcią zakodowaną w PESEL
             if (!string.IsNullOrWhiteSpace(user.Gender)
                 && (user.Gender == "M" || user.Gender == "K")
                 && !string.IsNullOrWhiteSpace(user.PESEL)
+                && user.PESEL.Length == 11
                 && CzySameLiczby(user.PESEL))
             {
                 if (!CzyPlecZgadzaSieZPesel(user.Gender, user.PESEL))
                 {
-                    errors.Add("Płeć nie zgadza się z płcią zakodowaną w PESEL");
+                    errors.Add("Nieprawidłowy PESEL. Płeć nie jest zgodna z zasadami przedostatniej cyfry");
                 }
             }
 
@@ -154,60 +149,60 @@ namespace SystemPrzychodznia.Services
             var errors = new List<string>();
 
             if (string.IsNullOrWhiteSpace(patient.FirstName))
-                errors.Add("Imię jest wymagane");
+                errors.Add(RequiredFieldMessage("Imię"));
 
             if (string.IsNullOrWhiteSpace(patient.LastName))
-                errors.Add("Nazwisko jest wymagane");
+                errors.Add(RequiredFieldMessage("Nazwisko"));
 
             if (string.IsNullOrWhiteSpace(patient.PESEL))
-                errors.Add("PESEL jest wymagany");
-            else if (patient.PESEL.Length != 11)
-                errors.Add("PESEL musi mieć 11 cyfr");
-            else if (!CzySameLiczby(patient.PESEL))
-                errors.Add("PESEL musi zawierać tylko cyfry");
+                errors.Add(RequiredFieldMessage("PESEL"));
+            else if (patient.PESEL.Length != 11 || !CzySameLiczby(patient.PESEL))
+                errors.Add("Nieprawidłowy PESEL. Ilość znaków jest nieprawidłowa. Prawidłowy numer PESEL powinien zawierać 11 znaków");
 
             if (string.IsNullOrWhiteSpace(patient.Locality))
-                errors.Add("Miejscowość jest wymagana");
+                errors.Add(RequiredFieldMessage("Miejscowość"));
 
             if (string.IsNullOrWhiteSpace(patient.PostalCode))
-                errors.Add("Kod pocztowy jest wymagany");
+                errors.Add(RequiredFieldMessage("Kod pocztowy"));
             else if (patient.PostalCode.Length != 5)
                 errors.Add("Kod pocztowy musi mieć 5 cyfr");
             else if (!CzySameLiczby(patient.PostalCode))
                 errors.Add("Kod pocztowy musi zawierać tylko cyfry");
 
             if (string.IsNullOrWhiteSpace(patient.PropertyNumber))
-                errors.Add("Numer nieruchomości jest wymagany");
+                errors.Add(RequiredFieldMessage("Numer domu"));
 
             if (string.IsNullOrWhiteSpace(patient.BirthDate))
-                errors.Add("Data urodzenia jest wymagana");
+                errors.Add(RequiredFieldMessage("Data urodzenia"));
             else if (!CzyPoprawnaDates(patient.BirthDate))
                 errors.Add("Data urodzenia musi być w formacie YYYY-MM-DD");
 
             if (string.IsNullOrWhiteSpace(patient.Gender))
-                errors.Add("Płeć jest wymagana");
+                errors.Add(RequiredFieldMessage("Płeć"));
             else if (patient.Gender != "M" && patient.Gender != "K")
                 errors.Add("Płeć musi być 'M' lub 'K'");
 
             if (string.IsNullOrWhiteSpace(patient.Phone))
-                errors.Add("Numer telefonu jest wymagany");
-            else if (patient.Phone.Length != 9)
-                errors.Add("Numer telefonu musi mieć 9 cyfr");
-            else if (!CzySameLiczby(patient.Phone))
-                errors.Add("Numer telefonu musi zawierać tylko cyfry");
+                errors.Add(RequiredFieldMessage("Numer telefonu"));
+            else if (patient.Phone.Length != 9 || !CzySameLiczby(patient.Phone))
+                errors.Add("Nieprawidłowy numer telefonu. Ilość cyfr telefonu nie jest zgodna. Prawidłowa ilość to 9 cyfr.");
 
             if (!string.IsNullOrWhiteSpace(patient.Email))
             {
-                if (!patient.Email.Contains("@") || !patient.Email.Contains("."))
-                {
-                    errors.Add("Email musi zawierać @ i .");
-                }
+                errors.AddRange(ValidateEmail(patient.Email));
             }
 
             if (!string.IsNullOrWhiteSpace(patient.PESEL) && patient.PESEL.Length == 11 &&
                 _repository.PatientPeselExists(patient.PESEL, editing, patient.Id))
             {
-                errors.Add("Podany PESEL pacjenta jest już w systemie");
+                errors.Add("Nieprawidłowy PESEL. Podany numer PESEL już widnieje w systemie");
+            }
+
+            if (!string.IsNullOrWhiteSpace(patient.Email) &&
+                ValidateEmail(patient.Email).Count == 0 &&
+                _repository.PatientEmailExists(patient.Email, editing, patient.Id))
+            {
+                errors.Add("Nieprawidłowy adres e-mail. E-mail jest już zarejestrowany w systemie");
             }
 
             if (!string.IsNullOrWhiteSpace(patient.FirstName) && patient.FirstName.Length > 255)
@@ -215,9 +210,6 @@ namespace SystemPrzychodznia.Services
 
             if (!string.IsNullOrWhiteSpace(patient.LastName) && patient.LastName.Length > 255)
                 errors.Add("Nazwisko nie może być dłuższe niż 255 znaków");
-
-            if (!string.IsNullOrWhiteSpace(patient.Email) && patient.Email.Length > 255)
-                errors.Add("Email nie może być dłuższy niż 255 znaków");
 
             if (!string.IsNullOrWhiteSpace(patient.Locality) && patient.Locality.Length > 255)
                 errors.Add("Miejscowość nie może być dłuższa niż 255 znaków");
@@ -238,24 +230,69 @@ namespace SystemPrzychodznia.Services
             {
                 string dataZPesel = WyciagnijDateZPesel(patient.PESEL);
                 if (dataZPesel != patient.BirthDate)
-                    errors.Add("Data urodzenia nie zgadza się z datą zakodowaną w PESEL");
+                    errors.Add("Nieprawidłowy PESEL. Data urodzenia nie jest zgodna z zasadami RRMMDD");
 
                 if (!CzyPESELKontrola(patient.PESEL))
-                    errors.Add("Niepoprawny PESEL. Niezgodna suma kontrolna");
+                    errors.Add("Nieprawidłowy PESEL. Cyfra kontrolna nie zgadza się z zasadami https://www.gov.pl/web/gov/czym-jest-numer-pesel");
             }
 
             if (!string.IsNullOrWhiteSpace(patient.Gender)
                 && (patient.Gender == "M" || patient.Gender == "K")
                 && !string.IsNullOrWhiteSpace(patient.PESEL)
+                && patient.PESEL.Length == 11
                 && CzySameLiczby(patient.PESEL))
             {
                 if (!CzyPlecZgadzaSieZPesel(patient.Gender, patient.PESEL))
                 {
-                    errors.Add("Płeć nie zgadza się z płcią zakodowaną w PESEL");
+                    errors.Add("Nieprawidłowy PESEL. Płeć nie jest zgodna z zasadami przedostatniej cyfry");
                 }
             }
 
             return new ValidationResult(errors.Count == 0) { Errors = errors };
+        }
+
+        private static string RequiredFieldMessage(string fieldName)
+        {
+            return $"Brak wypełnionego pola ({fieldName})";
+        }
+
+        private static List<string> ValidateEmail(string email)
+        {
+            var errors = new List<string>();
+
+            if (email.Length > 255)
+            {
+                errors.Add("Nieprawidłowy adres e-mail. Liczba znaków w mailu przekracza próg 255 znaków");
+            }
+
+            int atCount = email.Count(c => c == '@');
+            if (atCount == 0)
+            {
+                errors.Add("Nieprawidłowy adres e-mail. E-mail nie zawiera znaku: @");
+                return errors;
+            }
+
+            if (atCount > 1)
+            {
+                errors.Add("Nieprawidłowy adres e-mail. Email zawiera więcej niż jeden znak: @");
+                return errors;
+            }
+
+            int atIndex = email.IndexOf('@');
+            if (atIndex == 0 || atIndex == email.Length - 1)
+            {
+                errors.Add("Nieprawidłowy adres e-mail. Email nie jest zgodny z ustaloną składnią nazwa_użytkownika@nazwa_domeny_serwera_poczty");
+                return errors;
+            }
+
+            string domain = email[(atIndex + 1)..];
+            int lastDotAfterAt = domain.LastIndexOf('.');
+            if (lastDotAfterAt <= 0 || lastDotAfterAt == domain.Length - 1)
+            {
+                errors.Add("Nieprawidłowy adres e-mail. E-mail nie posiada domeny");
+            }
+
+            return errors;
         }
 
         // Wyciąga datę urodzenia z PESEL i zwraca w formacie YYYY-MM-DD
