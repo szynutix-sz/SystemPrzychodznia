@@ -262,7 +262,7 @@ namespace SystemPrzychodznia
 
             if (showNoResults && patients.Count == 0)
             {
-                MessageBox.Show("Nie znaleziono pacjentow spelniajacych kryteria wyszukiwania.", "Brak wynikow", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Nie znaleziono pacjentów spełniających kryteria wyszukiwania.", "Brak wyników", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
