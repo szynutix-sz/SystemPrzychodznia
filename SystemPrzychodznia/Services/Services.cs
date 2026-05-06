@@ -139,10 +139,11 @@ namespace SystemPrzychodznia.Services
 
         private string GenerateRandomPassword()
         {
-            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const string lower = "abcdefghijklmnopqrstuvwxyz";
-            const string digits = "0123456789";
+            const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // bez dużej litery I , O
+            const string lower = "abcdefghijkmnopqrstuvwxyz"; // bez malej litery l      
+            const string digits = "123456789"; // bez 0
             const string special = "-_!*#$&";
+            // w zależnosci od czcnioki I i l oraz O i 0 mogą być nie do odróżnienia, więc je pomijamy w generowaniu hasła
             var random = new Random();
             char up1 = upper[random.Next(upper.Length)];
             char up2 = upper[random.Next(upper.Length)];
