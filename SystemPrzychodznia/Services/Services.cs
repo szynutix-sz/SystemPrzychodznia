@@ -103,7 +103,7 @@ namespace SystemPrzychodznia.Services
 
             try
             {
-                string newPassword = GenerateRandomPassword(10);
+                string newPassword = GenerateRandomPassword();
                 _repository.SaveNewPassword(data.Id, newPassword);
                 SendEmail(data.Email, newPassword);
 
@@ -137,21 +137,30 @@ namespace SystemPrzychodznia.Services
             
         }
 
-        private string GenerateRandomPassword(int length)
+        private string GenerateRandomPassword()
         {
-            if (length < 5) throw new ArgumentException("Password length must be at least 5 characters.");
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
-            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const string lower = "abcdefghijklmnopqrstuvwxyz";
-            const string digits = "0123456789";
-            const string special = "!@#$%";
+            const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // bez dużej litery I , O
+            const string lower = "abcdefghijkmnopqrstuvwxyz"; // bez malej litery l      
+            const string digits = "123456789"; // bez 0
+            const string special = "-_!*#$&";
+            // w zależnosci od czcnioki I i l oraz O i 0 mogą być nie do odróżnienia, więc je pomijamy w generowaniu hasła
             var random = new Random();
-            string the_rest = new string(Enumerable.Repeat(chars, length-4).Select(s => s[random.Next(s.Length)]).ToArray());
-            char up = upper[random.Next(upper.Length)];
-            char low = lower[random.Next(lower.Length)];
-            char dig = digits[random.Next(digits.Length)];
-            char spec = special[random.Next(special.Length)];
-            return the_rest + up + low + dig + spec;
+            char up1 = upper[random.Next(upper.Length)];
+            char up2 = upper[random.Next(upper.Length)];
+            char up3 = upper[random.Next(upper.Length)];
+            char low1 = lower[random.Next(lower.Length)];
+            char low2 = lower[random.Next(lower.Length)];
+            char low3 = lower[random.Next(lower.Length)];
+            char dig1 = digits[random.Next(digits.Length)];
+            char dig2 = digits[random.Next(digits.Length)];
+            char spec1 = special[random.Next(special.Length)];
+            char spec2 = special[random.Next(special.Length)];
+
+            char[] array = new char[] { up1, up2, up3, low1, low2, low3, dig1, dig2, spec1, spec2 };
+            random.Shuffle(array);
+
+
+            return new string(array);
         }
 
         public List<string> GetUserPasswordHistory(int userId)
