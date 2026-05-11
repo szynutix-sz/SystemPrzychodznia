@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using System;
 
 namespace SystemPrzychodznia.Data
 {
@@ -119,6 +120,47 @@ CREATE TABLE IF NOT EXISTS Pacjent (
 );
 
 -- ============================================================
+-- Dodane: Specjalizacja, Lekarze, Gabinety, Wizyty
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS Specjalizacja (
+    ID_Specjalizacji INTEGER PRIMARY KEY AUTOINCREMENT,
+    Nazwa TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Lekarz (
+    ID_Uzytkownika INTEGER PRIMARY KEY,
+    FOREIGN KEY (ID_Uzytkownika) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Lekarz_Specjalizacja (
+    ID_Uzytkownika INTEGER NOT NULL,
+    ID_Specjalizacji INTEGER NOT NULL,
+    PRIMARY KEY (ID_Uzytkownika, ID_Specjalizacji),
+    FOREIGN KEY (ID_Uzytkownika) REFERENCES Lekarz(ID_Uzytkownika) ON DELETE CASCADE,
+    FOREIGN KEY (ID_Specjalizacji) REFERENCES Specjalizacja(ID_Specjalizacji) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Gabinet (
+    ID_Gabinetu INTEGER PRIMARY KEY AUTOINCREMENT,
+    Nazwa_Numer TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Wizyta (
+    ID_Wizyty INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID_Pacjenta INTEGER NOT NULL,
+    ID_Lekarza INTEGER NOT NULL,
+    ID_Gabinetu INTEGER NOT NULL,
+    Data_i_godzina_rozpoczecia TEXT NOT NULL,
+    Status TEXT NOT NULL,
+    Schorzenia_i_dolegliwosci TEXT,
+    Zalecenia_i_lekarstwa TEXT,
+    FOREIGN KEY (ID_Pacjenta) REFERENCES Pacjent(ID_Pacjenta) ON DELETE CASCADE,
+    FOREIGN KEY (ID_Lekarza) REFERENCES Lekarz(ID_Uzytkownika) ON DELETE RESTRICT,
+    FOREIGN KEY (ID_Gabinetu) REFERENCES Gabinet(ID_Gabinetu) ON DELETE RESTRICT
+);
+
+-- ============================================================
 -- 7. Wstawienie domyślnego adresu
 -- ============================================================
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
@@ -165,7 +207,20 @@ WHERE u.Login = 'SuperAdmin'
   AND p.Nazwa = 'SuperAdmin'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up
                     WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
-                    AND up.ID_Uprawnienia = p.ID_Uprawnienia);";
+                    AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+                    
+-- ============================================================
+-- 12. Domyślne dane słownikowe (Gabinety, Specjalizacje)
+-- ============================================================
+INSERT INTO Specjalizacja (Nazwa) SELECT 'Kardiolog' WHERE NOT EXISTS (SELECT 1 FROM Specjalizacja WHERE Nazwa = 'Kardiolog');
+INSERT INTO Specjalizacja (Nazwa) SELECT 'Pediatra' WHERE NOT EXISTS (SELECT 1 FROM Specjalizacja WHERE Nazwa = 'Pediatra');
+INSERT INTO Specjalizacja (Nazwa) SELECT 'Lekarz rodzinny' WHERE NOT EXISTS (SELECT 1 FROM Specjalizacja WHERE Nazwa = 'Lekarz rodzinny');
+INSERT INTO Specjalizacja (Nazwa) SELECT 'Neurolog' WHERE NOT EXISTS (SELECT 1 FROM Specjalizacja WHERE Nazwa = 'Neurolog');
+
+INSERT INTO Gabinet (Nazwa_Numer) SELECT 'Gabinet 101' WHERE NOT EXISTS (SELECT 1 FROM Gabinet WHERE Nazwa_Numer = 'Gabinet 101');
+INSERT INTO Gabinet (Nazwa_Numer) SELECT 'Gabinet 102' WHERE NOT EXISTS (SELECT 1 FROM Gabinet WHERE Nazwa_Numer = 'Gabinet 102');
+INSERT INTO Gabinet (Nazwa_Numer) SELECT 'Gabinet Zabiegowy' WHERE NOT EXISTS (SELECT 1 FROM Gabinet WHERE Nazwa_Numer = 'Gabinet Zabiegowy');
+";
             createTableCmd.ExecuteNonQuery();
 
             EnsureColumnExists(connection, "Uzytkownik", "Zapomniany_Login_Enc", "TEXT");
