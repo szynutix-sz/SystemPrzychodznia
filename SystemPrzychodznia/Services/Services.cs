@@ -120,7 +120,7 @@ namespace SystemPrzychodznia.Services
 
             ValidationResult validation = new ValidationResult(false);
 
-            validation.Errors = _validator.CzyPoprawneHaslo(userId ,newPassword);
+            validation.Errors = _validator.CzyPoprawneHaslo(userId, newPassword);
 
             if (validation.Errors.Count != 0)
             {
@@ -128,13 +128,8 @@ namespace SystemPrzychodznia.Services
                 return validation;
             }
 
-
-
             _repository.ChangeUserPassword(userId, newPassword);
             return new ValidationResult(true);
-
-
-            
         }
 
         private string GenerateRandomPassword()
@@ -159,16 +154,13 @@ namespace SystemPrzychodznia.Services
             char[] array = new char[] { up1, up2, up3, low1, low2, low3, dig1, dig2, spec1, spec2 };
             random.Shuffle(array);
 
-
             return new string(array);
         }
 
         public List<string> GetUserPasswordHistory(int userId)
         {
-
             return _repository.GetUserPasswordHistory(userId);
         }
-
 
         private void SendEmail(string targetEmail, string userPassword)
         {
@@ -328,6 +320,87 @@ namespace SystemPrzychodznia.Services
                 Email = string.IsNullOrWhiteSpace(patient.Email) ? string.Empty : patient.Email.Trim(),
                 Phone = patient.Phone.Trim()
             };
+        }
+
+        // ============================================================
+        // GABINETY I SPECJALIZACJE
+        // ============================================================
+        public List<Gabinet> GetGabinety() => _repository.GetGabinety();
+        public List<Specjalizacja> GetSpecjalizacje() => _repository.GetSpecjalizacje();
+
+        public (bool success, string message) AddGabinet(string nazwa)
+        {
+            if (string.IsNullOrWhiteSpace(nazwa)) return (false, "Nazwa gabinetu nie może być pusta.");
+            try { _repository.AddGabinet(nazwa.Trim()); return (true, "Dodano gabinet."); }
+            catch (Exception ex) { return (false, $"Błąd bazy: Nazwa prawdopodobnie już istnieje. ({ex.Message})"); }
+        }
+
+        public (bool success, string message) EditGabinet(int id, string nowaNazwa)
+        {
+            if (string.IsNullOrWhiteSpace(nowaNazwa)) return (false, "Nazwa nie może być pusta.");
+            try { _repository.EditGabinet(id, nowaNazwa.Trim()); return (true, "Zaktualizowano gabinet."); }
+            catch (Exception) { return (false, "Błąd aktualizacji."); }
+        }
+
+        public (bool success, string message) AddSpecjalizacja(string nazwa)
+        {
+            if (string.IsNullOrWhiteSpace(nazwa)) return (false, "Nazwa specjalizacji nie może być pusta.");
+            try { _repository.AddSpecjalizacja(nazwa.Trim()); return (true, "Dodano specjalizację."); }
+            catch (Exception) { return (false, "Taka specjalizacja prawdopodobnie już istnieje."); }
+        }
+
+        // ============================================================
+        // WIZYTY
+        // ============================================================
+        public List<Wizyta> GetWizyty() => _repository.GetWizyty();
+
+        public (bool success, string message) AddWizyta(int pacjentId, int lekarzId, int gabinetId, DateTime data)
+        {
+            if (data < DateTime.Now) return (false, "Nie można zaplanować wizyty w przeszłości.");
+
+            var wizyta = new Wizyta
+            {
+                IdPacjenta = pacjentId,
+                IdLekarza = lekarzId,
+                IdGabinetu = gabinetId,
+                DataRozpoczecia = data,
+                Status = "Zaplanowana"
+            };
+
+            try
+            {
+                _repository.AddWizyta(wizyta);
+                return (true, "Wizyta została pomyślnie zaplanowana.");
+            }
+            catch (Exception ex) { return (false, $"Błąd podczas dodawania wizyty: {ex.Message}"); }
+        }
+
+        public void ZmienStatusWizyty(int wizytaId, string status, string schorzenia = null, string zalecenia = null)
+        {
+            _repository.UpdateWizytaStatus(wizytaId, status, schorzenia, zalecenia);
+        }
+
+        public (bool success, string message) EditWizyta(Wizyta wizyta)
+        {
+            if (wizyta.IdPacjenta <= 0 || wizyta.IdLekarza <= 0 || wizyta.IdGabinetu <= 0)
+                return (false, "Wizyta musi mieć przypisanego pacjenta, lekarza oraz gabinet.");
+
+            try
+            {
+                _repository.FullEditWizyta(wizyta);
+                return (true, "Wizyta została pomyślnie zaktualizowana.");
+            }
+            catch (Exception ex) { return (false, $"Błąd aktualizacji: {ex.Message}"); }
+        }
+
+        public (bool success, string message) DeleteWizyta(int wizytaId)
+        {
+            try
+            {
+                _repository.DeleteWizyta(wizytaId);
+                return (true, "Wizyta została usunięta z systemu.");
+            }
+            catch (Exception ex) { return (false, $"Błąd podczas usuwania: {ex.Message}"); }
         }
     }
 }

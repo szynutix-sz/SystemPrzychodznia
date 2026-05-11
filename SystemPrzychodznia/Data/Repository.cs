@@ -331,5 +331,232 @@ WHERE u.Czy_zapomniany = 1;";
             long count = (long)command.ExecuteScalar();
             return count > 0;
         }
+
+        // ==========================================
+        // GABINETY
+        // ==========================================
+        public List<Gabinet> GetGabinety()
+        {
+            var gabinety = new List<Gabinet>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT ID_Gabinetu, Nazwa_Numer FROM Gabinet ORDER BY Nazwa_Numer;";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                gabinety.Add(new Gabinet { Id = reader.GetInt32(0), Nazwa = reader.GetString(1) });
+            }
+            return gabinety;
+        }
+
+        public void AddGabinet(string nazwa)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "INSERT INTO Gabinet (Nazwa_Numer) VALUES ($nazwa);";
+            command.Parameters.AddWithValue("$nazwa", nazwa);
+            command.ExecuteNonQuery();
+        }
+
+        public void EditGabinet(int id, string nowaNazwa)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "UPDATE Gabinet SET Nazwa_Numer = $nazwa WHERE ID_Gabinetu = $id;";
+            command.Parameters.AddWithValue("$nazwa", nowaNazwa);
+            command.Parameters.AddWithValue("$id", id);
+            command.ExecuteNonQuery();
+        }
+
+        // ==========================================
+        // SPECJALIZACJE
+        // ==========================================
+        public List<Specjalizacja> GetSpecjalizacje()
+        {
+            var specjalizacje = new List<Specjalizacja>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT ID_Specjalizacji, Nazwa FROM Specjalizacja ORDER BY Nazwa;";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                specjalizacje.Add(new Specjalizacja { Id = reader.GetInt32(0), Nazwa = reader.GetString(1) });
+            }
+            return specjalizacje;
+        }
+
+        public void AddSpecjalizacja(string nazwa)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "INSERT INTO Specjalizacja (Nazwa) VALUES ($nazwa);";
+            command.Parameters.AddWithValue("$nazwa", nazwa);
+            command.ExecuteNonQuery();
+        }
+
+        public void EditSpecjalizacja(int id, string nowaNazwa)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "UPDATE Specjalizacja SET Nazwa = $nazwa WHERE ID_Specjalizacji = $id;";
+            command.Parameters.AddWithValue("$nazwa", nowaNazwa);
+            command.Parameters.AddWithValue("$id", id);
+            command.ExecuteNonQuery();
+        }
+
+        // ==========================================
+        // WIZYTY
+        // ==========================================
+        public void AddWizyta(Wizyta wizyta)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                INSERT INTO Wizyta (ID_Pacjenta, ID_Lekarza, ID_Gabinetu, Data_i_godzina_rozpoczecia, Status, Schorzenia_i_dolegliwosci, Zalecenia_i_lekarstwa) 
+                VALUES ($pacjent, $lekarz, $gabinet, $data, $status, $schorzenia, $zalecenia);";
+
+            command.Parameters.AddWithValue("$pacjent", wizyta.IdPacjenta);
+            command.Parameters.AddWithValue("$lekarz", wizyta.IdLekarza);
+            command.Parameters.AddWithValue("$gabinet", wizyta.IdGabinetu);
+            command.Parameters.AddWithValue("$data", wizyta.DataRozpoczecia.ToString("yyyy-MM-dd HH:mm"));
+            command.Parameters.AddWithValue("$status", wizyta.Status ?? "Zaplanowana");
+            command.Parameters.AddWithValue("$schorzenia", (object)wizyta.Schorzenia ?? DBNull.Value);
+            command.Parameters.AddWithValue("$zalecenia", (object)wizyta.Zalecenia ?? DBNull.Value);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void UpdateWizytaStatus(int wizytaId, string nowyStatus, string schorzenia = null, string zalecenia = null)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE Wizyta 
+                SET Status = $status, 
+                    Schorzenia_i_dolegliwosci = COALESCE($schorzenia, Schorzenia_i_dolegliwosci),
+                    Zalecenia_i_lekarstwa = COALESCE($zalecenia, Zalecenia_i_lekarstwa)
+                WHERE ID_Wizyty = $id;";
+
+            command.Parameters.AddWithValue("$status", nowyStatus);
+            command.Parameters.AddWithValue("$schorzenia", (object)schorzenia ?? DBNull.Value);
+            command.Parameters.AddWithValue("$zalecenia", (object)zalecenia ?? DBNull.Value);
+            command.Parameters.AddWithValue("$id", wizytaId);
+            command.ExecuteNonQuery();
+        }
+
+        public void FullEditWizyta(Wizyta wizyta)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE Wizyta 
+                SET ID_Pacjenta = $pacjent,
+                    ID_Lekarza = $lekarz,
+                    ID_Gabinetu = $gabinet,
+                    Data_i_godzina_rozpoczecia = $data,
+                    Status = $status,
+                    Schorzenia_i_dolegliwosci = $schorzenia,
+                    Zalecenia_i_lekarstwa = $zalecenia
+                WHERE ID_Wizyty = $id;";
+
+            command.Parameters.AddWithValue("$pacjent", wizyta.IdPacjenta);
+            command.Parameters.AddWithValue("$lekarz", wizyta.IdLekarza);
+            command.Parameters.AddWithValue("$gabinet", wizyta.IdGabinetu);
+            command.Parameters.AddWithValue("$data", wizyta.DataRozpoczecia.ToString("yyyy-MM-dd HH:mm"));
+            command.Parameters.AddWithValue("$status", wizyta.Status ?? "Zaplanowana");
+            command.Parameters.AddWithValue("$schorzenia", (object)wizyta.Schorzenia ?? DBNull.Value);
+            command.Parameters.AddWithValue("$zalecenia", (object)wizyta.Zalecenia ?? DBNull.Value);
+            command.Parameters.AddWithValue("$id", wizyta.Id);
+            command.ExecuteNonQuery();
+        }
+
+        public void DeleteWizyta(int wizytaId)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = "DELETE FROM Wizyta WHERE ID_Wizyty = $id;";
+            command.Parameters.AddWithValue("$id", wizytaId);
+            command.ExecuteNonQuery();
+        }
+
+        public List<Wizyta> GetWizyty()
+        {
+            var wizyty = new List<Wizyta>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT 
+                    w.ID_Wizyty, w.ID_Pacjenta, w.ID_Lekarza, w.ID_Gabinetu, w.Data_i_godzina_rozpoczecia, w.Status, w.Schorzenia_i_dolegliwosci, w.Zalecenia_i_lekarstwa,
+                    p.Imie || ' ' || p.Nazwisko AS PacjentNazwa,
+                    l.Imie || ' ' || l.Nazwisko AS LekarzNazwa,
+                    g.Nazwa_Numer AS GabinetNazwa
+                FROM Wizyta w
+                JOIN Pacjent p ON w.ID_Pacjenta = p.ID_Pacjenta
+                JOIN Uzytkownik l ON w.ID_Lekarza = l.ID_Uzytkownika
+                JOIN Gabinet g ON w.ID_Gabinetu = g.ID_Gabinetu
+                ORDER BY w.Data_i_godzina_rozpoczecia DESC;";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                wizyty.Add(new Wizyta
+                {
+                    Id = reader.GetInt32(0),
+                    IdPacjenta = reader.GetInt32(1),
+                    IdLekarza = reader.GetInt32(2),
+                    IdGabinetu = reader.GetInt32(3),
+                    DataRozpoczecia = DateTime.Parse(reader.GetString(4)),
+                    Status = reader.GetString(5),
+                    Schorzenia = reader.IsDBNull(6) ? "" : reader.GetString(6),
+                    Zalecenia = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                    NazwaPacjenta = reader.GetString(8),
+                    NazwaLekarza = reader.GetString(9),
+                    NazwaGabinetu = reader.GetString(10)
+                });
+            }
+            return wizyty;
+        }
+    }
+
+    // ==========================================
+    // NOWE MODELE DANYCH
+    // ==========================================
+    public class Gabinet
+    {
+        public int Id { get; set; }
+        public string Nazwa { get; set; }
+    }
+
+    public class Specjalizacja
+    {
+        public int Id { get; set; }
+        public string Nazwa { get; set; }
+    }
+
+    public class Wizyta
+    {
+        public int Id { get; set; }
+        public int IdPacjenta { get; set; }
+        public int IdLekarza { get; set; }
+        public int IdGabinetu { get; set; }
+        public DateTime DataRozpoczecia { get; set; }
+        public string Status { get; set; }
+        public string Schorzenia { get; set; }
+        public string Zalecenia { get; set; }
+
+        public string NazwaPacjenta { get; set; }
+        public string NazwaLekarza { get; set; }
+        public string NazwaGabinetu { get; set; }
     }
 }
