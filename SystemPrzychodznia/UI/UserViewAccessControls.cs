@@ -30,6 +30,7 @@ namespace SystemPrzychodznia
                 }
 
                 EnsurePatientModuleVisible();
+                EnsureVisitModuleVisible();
 
             }
 
@@ -58,6 +59,7 @@ namespace SystemPrzychodznia
             if (_currentUser.Uprawnienia.Exists(u => u.Id == 4 && u.Posiadane == true))
             {
                 EnsurePatientModuleVisible();
+                EnsureVisitModuleVisible();
             }
 
 
