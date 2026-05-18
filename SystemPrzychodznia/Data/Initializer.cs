@@ -181,7 +181,7 @@ FROM Uzytkownik
 WHERE ID_Uzytkownika = 1
   AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h 
                   JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika 
-                  WHERE u.Login = 'SuperAdmin');
+                  WHERE u.ID_Uzytkownika = 1);
 
 -- ============================================================
 -- 10. Dodanie uprawnień
