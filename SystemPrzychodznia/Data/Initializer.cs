@@ -178,7 +178,7 @@ WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE ID_Uzytkownika = 1);
 INSERT INTO Historia_Hasel (ID_Uzytkownika, Haslo_Hash)
 SELECT ID_Uzytkownika, 'AdminPass'
 FROM Uzytkownik
-WHERE Login = 'SuperAdmin'
+WHERE ID_Uzytkownika = 1
   AND NOT EXISTS (SELECT 1 FROM Historia_Hasel h 
                   JOIN Uzytkownik u ON h.ID_Uzytkownika = u.ID_Uzytkownika 
                   WHERE u.Login = 'SuperAdmin');
