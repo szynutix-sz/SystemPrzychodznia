@@ -149,7 +149,7 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
 
         public List<Specjalizacja> GetUserSpec(int user_id)
         {
-            
+
             List<Uprawnienie> uprawnienia = GetUserUprawnienia(user_id);
             List<Specjalizacja> specjalizacje = GetSpecjalizacje();
             if (uprawnienia.Exists(u => u.Id == 3 && u.Posiadane == true)) // jest lekarzem
@@ -171,8 +171,6 @@ WHERE Lekarz_Specjalizacja.ID_Uzytkownika = $id;";
                     if (sp != null) sp.Posiadane = true;
                 }
             }
-
-            
             return specjalizacje;
         }
 
@@ -403,7 +401,7 @@ WHERE u.Czy_zapomniany = 1;";
         }
 
         // ==========================================
-        // SPECJALIZACJE
+        // SPECJALIZACJE I LEKARZE
         // ==========================================
         public List<Specjalizacja> GetSpecjalizacje()
         {
@@ -441,9 +439,68 @@ WHERE u.Czy_zapomniany = 1;";
             command.ExecuteNonQuery();
         }
 
+        // Wyszukiwanie lekarzy o określonej specjalizacji
+        public List<UserBasic> GetLekarzeBySpecjalizacja(int idSpecjalizacji)
+        {
+            var users = new List<UserBasic>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT u.Login, u.Imie, u.Nazwisko, u.Adres_email, u.PESEL, u.ID_Uzytkownika
+                FROM Uzytkownik u
+                JOIN Lekarz_Specjalizacja ls ON u.ID_Uzytkownika = ls.ID_Uzytkownika
+                WHERE ls.ID_Specjalizacji = $id AND u.Czy_zapomniany = 0
+                ORDER BY u.Nazwisko, u.Imie;";
+
+            command.Parameters.AddWithValue("$id", idSpecjalizacji);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                users.Add(new UserBasic
+                {
+                    Login = reader.GetString(0),
+                    FirstName = reader.GetString(1),
+                    LastName = reader.GetString(2),
+                    Email = reader.GetString(3),
+                    PESEL = reader.GetString(4),
+                    Id = reader.GetInt32(5)
+                });
+            }
+            return users;
+        }
+
         // ==========================================
-        // WIZYTY
+        // WIZYTY I KOLIZJE
         // ==========================================
+        public bool CheckWizytaCollision(int lekarzId, int gabinetId, DateTime data, int? ignoreWizytaId = null)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            var command = connection.CreateCommand();
+
+            // Kolizja: jeśli status to nie Odwołana i nie Zakończona
+            // Oraz jeśli czas wizyty mieści się w promieniu +/- 29 minut (zakładamy, że wizyta trwa 30 minut).
+            command.CommandText = @"
+                SELECT COUNT(*) FROM Wizyta 
+                WHERE Status NOT IN ('Odwołana', 'Zakończona')
+                  AND (ID_Lekarza = $lekarz OR ID_Gabinetu = $gabinet)
+                  AND ABS(ROUND((JULIANDAY(Data_i_godzina_rozpoczecia) - JULIANDAY($data)) * 1440)) < 30";
+
+            if (ignoreWizytaId.HasValue)
+            {
+                command.CommandText += " AND ID_Wizyty != $ignoreId";
+                command.Parameters.AddWithValue("$ignoreId", ignoreWizytaId.Value);
+            }
+
+            command.Parameters.AddWithValue("$lekarz", lekarzId);
+            command.Parameters.AddWithValue("$gabinet", gabinetId);
+            command.Parameters.AddWithValue("$data", data.ToString("yyyy-MM-dd HH:mm"));
+
+            long count = (long)command.ExecuteScalar();
+            return count > 0;
+        }
+
         public void AddWizyta(Wizyta wizyta)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -520,7 +577,8 @@ WHERE u.Czy_zapomniany = 1;";
             command.ExecuteNonQuery();
         }
 
-        public List<Wizyta> GetWizyty()
+        // Filtrowanie Wizyt za pomocą modelu SearchTermsWizyta
+        public List<Wizyta> GetWizyty(SearchTermsWizyta s = null)
         {
             var wizyty = new List<Wizyta>();
             using var connection = new SqliteConnection(_connectionString);
@@ -536,7 +594,38 @@ WHERE u.Czy_zapomniany = 1;";
                 JOIN Pacjent p ON w.ID_Pacjenta = p.ID_Pacjenta
                 JOIN Uzytkownik l ON w.ID_Lekarza = l.ID_Uzytkownika
                 JOIN Gabinet g ON w.ID_Gabinetu = g.ID_Gabinetu
-                ORDER BY w.Data_i_godzina_rozpoczecia DESC;";
+                WHERE 1=1 ";
+
+            if (s != null)
+            {
+                if (s.DataOd.HasValue)
+                {
+                    command.CommandText += " AND w.Data_i_godzina_rozpoczecia >= $dataOd";
+                    command.Parameters.AddWithValue("$dataOd", s.DataOd.Value.ToString("yyyy-MM-dd 00:00"));
+                }
+                if (s.DataDo.HasValue)
+                {
+                    command.CommandText += " AND w.Data_i_godzina_rozpoczecia <= $dataDo";
+                    command.Parameters.AddWithValue("$dataDo", s.DataDo.Value.ToString("yyyy-MM-dd 23:59"));
+                }
+                if (s.IdLekarza.HasValue && s.IdLekarza.Value > 0)
+                {
+                    command.CommandText += " AND w.ID_Lekarza = $lekarz";
+                    command.Parameters.AddWithValue("$lekarz", s.IdLekarza.Value);
+                }
+                if (s.IdPacjenta.HasValue && s.IdPacjenta.Value > 0)
+                {
+                    command.CommandText += " AND w.ID_Pacjenta = $pacjent";
+                    command.Parameters.AddWithValue("$pacjent", s.IdPacjenta.Value);
+                }
+                if (!string.IsNullOrWhiteSpace(s.Status))
+                {
+                    command.CommandText += " AND w.Status = $status";
+                    command.Parameters.AddWithValue("$status", s.Status);
+                }
+            }
+
+            command.CommandText += " ORDER BY w.Data_i_godzina_rozpoczecia DESC;";
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -591,5 +680,14 @@ WHERE u.Czy_zapomniany = 1;";
         public string NazwaPacjenta { get; set; }
         public string NazwaLekarza { get; set; }
         public string NazwaGabinetu { get; set; }
+    }
+
+    public class SearchTermsWizyta
+    {
+        public DateTime? DataOd { get; set; }
+        public DateTime? DataDo { get; set; }
+        public int? IdLekarza { get; set; }
+        public int? IdPacjenta { get; set; }
+        public string Status { get; set; }
     }
 }

@@ -323,10 +323,13 @@ namespace SystemPrzychodznia.Services
         }
 
         // ============================================================
-        // GABINETY I SPECJALIZACJE
+        // GABINETY I SPECJALIZACJE ORAZ LEKARZE Z DANEJ SPECJALIZACJI
         // ============================================================
         public List<Gabinet> GetGabinety() => _repository.GetGabinety();
         public List<Specjalizacja> GetSpecjalizacje() => _repository.GetSpecjalizacje();
+
+        // Funkcja pozwalająca znaleźć użytkowników (lekarzy) po konkretnej specjalizacji
+        public List<UserBasic> GetLekarzeBySpecjalizacja(int idSpecjalizacji) => _repository.GetLekarzeBySpecjalizacja(idSpecjalizacji);
 
         public (bool success, string message) AddGabinet(string nazwa)
         {
@@ -350,13 +353,21 @@ namespace SystemPrzychodznia.Services
         }
 
         // ============================================================
-        // WIZYTY
+        // WIZYTY Z KOLIZJAMI I FILTROWANIEM
         // ============================================================
-        public List<Wizyta> GetWizyty() => _repository.GetWizyty();
+
+        // Zmodyfikowana metoda pozwalająca wyszukiwać wizyty na podstawie modelu SearchTermsWizyta
+        public List<Wizyta> GetWizyty(SearchTermsWizyta s = null) => _repository.GetWizyty(s);
 
         public (bool success, string message) AddWizyta(int pacjentId, int lekarzId, int gabinetId, DateTime data)
         {
             if (data < DateTime.Now) return (false, "Nie można zaplanować wizyty w przeszłości.");
+
+            // Blokada zabezpieczająca przed kolizjami
+            if (_repository.CheckWizytaCollision(lekarzId, gabinetId, data))
+            {
+                return (false, "Kolizja terminu! Wybrany lekarz lub gabinet jest już zajęty w tym czasie (okienko 30 minut).");
+            }
 
             var wizyta = new Wizyta
             {
@@ -384,6 +395,12 @@ namespace SystemPrzychodznia.Services
         {
             if (wizyta.IdPacjenta <= 0 || wizyta.IdLekarza <= 0 || wizyta.IdGabinetu <= 0)
                 return (false, "Wizyta musi mieć przypisanego pacjenta, lekarza oraz gabinet.");
+
+            // Blokada zabezpieczająca przed kolizjami przy edycji, ignorująca swój własny stary czas
+            if (_repository.CheckWizytaCollision(wizyta.IdLekarza, wizyta.IdGabinetu, wizyta.DataRozpoczecia, wizyta.Id))
+            {
+                return (false, "Kolizja terminu! Wybrany lekarz lub gabinet jest już zajęty w tym czasie (okienko 30 minut).");
+            }
 
             try
             {
