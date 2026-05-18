@@ -33,7 +33,8 @@ SET
     Czy_zapomniany = 1,
     Data_zapomnienia = CURRENT_TIMESTAMP,
     ID_Kto_Zapomnial = $adminId
-WHERE ID_Uzytkownika = $id;";
+WHERE ID_Uzytkownika = $id
+AND ID_Uzytkownika != 1;"; // Nie pozwalamy zapomnieć SuperAdmina
 
                 cmdUser.Parameters.AddWithValue("$randLogin", user.Login);
                 cmdUser.Parameters.AddWithValue("$randFirstName", user.FirstName);
@@ -48,14 +49,16 @@ WHERE ID_Uzytkownika = $id;";
                 cmdUser.Parameters.AddWithValue("$id", user.Id);
                 cmdUser.ExecuteNonQuery();
 
-                //Usunięcie uprawnień
+                //Usunięcie uprawnień i specjalizacji
                 var deleteCommand = connection.CreateCommand();
                 deleteCommand.Transaction = transaction;
                 deleteCommand.CommandText = @"
 DELETE FROM Uzytkownik_Uprawnienie 
 WHERE ID_Uzytkownika = $userId
-    AND ID_Uprawnienia != 
-        (SELECT ID_Uprawnienia FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');";
+AND ID_Uprawnienia != 1;
+
+DELETE FROM Lekarz_Specjalizacja
+WHERE ID_Uzytkownika = $userId;";
                 deleteCommand.Parameters.AddWithValue("$userId", user.Id);
                 deleteCommand.ExecuteNonQuery();
 

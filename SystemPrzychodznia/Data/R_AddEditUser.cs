@@ -102,6 +102,8 @@ COMMIT;
 
                 ZmieńUprawnienia(user.Id, user.Uprawnienia);
 
+                ZmieńSpecjalizacje(user.Id, user.Specjalizacje);
+
             }
             catch (SqliteException ex)
             {
@@ -175,6 +177,8 @@ COMMIT;";
                 command.ExecuteNonQuery();
 
                 ZmieńUprawnienia(user.Id, user.Uprawnienia);
+
+                ZmieńSpecjalizacje(user.Id, user.Specjalizacje);
 
             }
             catch (SqliteException ex)

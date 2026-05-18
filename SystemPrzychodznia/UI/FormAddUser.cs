@@ -41,12 +41,15 @@ namespace SystemPrzychodznia
                 userBeforeValid.Phone = textBoxPhone.Text.Trim();
                 userBeforeValid.Password = textBoxPass.Text;
 
+                userBeforeValid.Uprawnienia = _userService.GetUprawnienia();
+                userBeforeValid.Specjalizacje = _userService.GetSpecjalizacje();
 
                 foreach (var item in checkedListBoxUprawnienia.CheckedItems)
                 {
                     Uprawnienie up = userBeforeValid.Uprawnienia.Find(u => u.Nazwa == item.ToString());
                     up.Posiadane = true;
                 }
+
 
                 try
                 {
@@ -88,9 +91,16 @@ namespace SystemPrzychodznia
 
             List<Uprawnienie> uprawnienia = _userService.GetUprawnienia();
 
+            List<Specjalizacja> specjalizacje = _userService.GetSpecjalizacje();
+
             foreach (Uprawnienie item in uprawnienia)
             {
                 checkedListBoxUprawnienia.Items.Add(item.Nazwa);
+            }
+
+            foreach (Specjalizacja item in specjalizacje)
+            {
+                checkedListBoxSpec.Items.Add(item.Nazwa);
             }
         }
 

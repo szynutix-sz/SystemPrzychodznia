@@ -64,10 +64,13 @@
             textBoxPostCode = new MaskedTextBox();
             tabPageUprawnienia = new TabPage();
             checkedListBoxUprawnienia = new CheckedListBox();
+            tabPageSpec = new TabPage();
+            checkedListBoxSpec = new CheckedListBox();
             tabControlAddUser.SuspendLayout();
             tabPageUserData.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tabPageUprawnienia.SuspendLayout();
+            tabPageSpec.SuspendLayout();
             SuspendLayout();
             // 
             // buttonSendUser
@@ -84,6 +87,7 @@
             // 
             tabControlAddUser.Controls.Add(tabPageUserData);
             tabControlAddUser.Controls.Add(tabPageUprawnienia);
+            tabControlAddUser.Controls.Add(tabPageSpec);
             tabControlAddUser.Location = new Point(12, 12);
             tabControlAddUser.Name = "tabControlAddUser";
             tabControlAddUser.SelectedIndex = 0;
@@ -424,6 +428,25 @@
             checkedListBoxUprawnienia.Size = new Size(740, 676);
             checkedListBoxUprawnienia.TabIndex = 0;
             // 
+            // tabPageSpec
+            // 
+            tabPageSpec.Controls.Add(checkedListBoxSpec);
+            tabPageSpec.Location = new Point(4, 34);
+            tabPageSpec.Name = "tabPageSpec";
+            tabPageSpec.Padding = new Padding(3);
+            tabPageSpec.Size = new Size(752, 683);
+            tabPageSpec.TabIndex = 2;
+            tabPageSpec.Text = "Specjalizacje";
+            tabPageSpec.UseVisualStyleBackColor = true;
+            // 
+            // checkedListBoxSpec
+            // 
+            checkedListBoxSpec.FormattingEnabled = true;
+            checkedListBoxSpec.Location = new Point(2, 8);
+            checkedListBoxSpec.Name = "checkedListBoxSpec";
+            checkedListBoxSpec.Size = new Size(747, 676);
+            checkedListBoxSpec.TabIndex = 0;
+            // 
             // FormAddUser
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -439,6 +462,7 @@
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             tabPageUprawnienia.ResumeLayout(false);
+            tabPageSpec.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -479,5 +503,7 @@
         private MaskedTextBox textBoxPESEL;
         private MaskedTextBox textBoxPostCode;
         private CheckedListBox checkedListBoxUprawnienia;
+        private TabPage tabPageSpec;
+        private CheckedListBox checkedListBoxSpec;
     }
 }

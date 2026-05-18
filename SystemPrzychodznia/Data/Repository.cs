@@ -146,6 +146,36 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
             return uprawnienia;
         }
 
+
+        public List<Specjalizacja> GetUserSpec(int user_id)
+        {
+            
+            List<Uprawnienie> uprawnienia = GetUserUprawnienia(user_id);
+            List<Specjalizacja> specjalizacje = GetSpecjalizacje();
+            if (uprawnienia.Exists(u => u.Id == 3 && u.Posiadane == true)) // jest lekarzem
+            {
+                using var connection = new SqliteConnection(_connectionString);
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+SELECT Specjalizacja.ID_Specjalizacji
+FROM Lekarz_Specjalizacja
+JOIN Specjalizacja ON Lekarz_Specjalizacja.ID_Specjalizacji = Specjalizacja.ID_Specjalizacji
+WHERE Lekarz_Specjalizacja.ID_Uzytkownika = $id;";
+                command.Parameters.AddWithValue("$id", user_id);
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    int i = reader.GetInt32(0);
+                    Specjalizacja sp = specjalizacje.Find(s => s.Id == i);
+                    if (sp != null) sp.Posiadane = true;
+                }
+            }
+
+            
+            return specjalizacje;
+        }
+
         public List<Uprawnienie> GetUprawnienia()
         {
             List<Uprawnienie> uprawnienia = new List<Uprawnienie>();
@@ -263,6 +293,7 @@ WHERE
             if (users.Count > 0)
             {
                 users[0].Uprawnienia = GetUserUprawnienia(users[0].Id);
+                users[0].Specjalizacje = GetUserSpec(users[0].Id);
                 if (users[0].Id == 1)
                 {
                     users[0].Uprawnienia.Add(new Uprawnienie { Id = 1, Nazwa = "SuperAdmin", Posiadane = true });
@@ -542,6 +573,8 @@ WHERE u.Czy_zapomniany = 1;";
     {
         public int Id { get; set; }
         public string Nazwa { get; set; }
+
+        public bool? Posiadane { get; set; } = false;
     }
 
     public class Wizyta

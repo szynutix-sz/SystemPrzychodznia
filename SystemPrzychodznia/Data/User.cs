@@ -23,6 +23,8 @@ namespace SystemPrzychodznia.Data
         
 
         public List<Uprawnienie> Uprawnienia { get; set; } = new List<Uprawnienie>(); // Lista uprawnień użytkownika, np. "Admin", "User", "Doctor"
+        
+        public List<Specjalizacja> Specjalizacje { get; set; } = new List<Specjalizacja>(); // Lista specjalizacji użytkownika, np. "Kardiolog", "Pediatra" (dotyczy tylko lekarzy)
         public string Locality { get; set; } = string.Empty;
 
         public string PostalCode { get; set; } = string.Empty; // składnia 5 cyfr
@@ -76,6 +78,17 @@ namespace SystemPrzychodznia.Data
                 value = value && (ulhs.Posiadane == urhs.Posiadane);
             }
 
+            foreach (Specjalizacja slhs in lhs.Specjalizacje)
+            {
+                Specjalizacja srhs = rhs.Specjalizacje.Find(s => s.Id == slhs.Id);
+                if (srhs == null)
+                {
+                    value = false;
+                    break;
+                }
+                value = value && (slhs.Posiadane == srhs.Posiadane);
+            }
+
             return value;
 
         }
@@ -112,7 +125,7 @@ namespace SystemPrzychodznia.Data
             f.PESEL = UserService.PESELfromData(f.BirthDate, f.Gender);
             PESEL = f.PESEL;
 
-            Password = "DummyPass1!";
+            Password = "LqyA9Ti9iz$i9iz";
 
 
             return f;

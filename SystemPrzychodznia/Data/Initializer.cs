@@ -128,16 +128,11 @@ CREATE TABLE IF NOT EXISTS Specjalizacja (
     Nazwa TEXT UNIQUE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Lekarz (
-    ID_Uzytkownika INTEGER PRIMARY KEY,
-    FOREIGN KEY (ID_Uzytkownika) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS Lekarz_Specjalizacja (
     ID_Uzytkownika INTEGER NOT NULL,
     ID_Specjalizacji INTEGER NOT NULL,
     PRIMARY KEY (ID_Uzytkownika, ID_Specjalizacji),
-    FOREIGN KEY (ID_Uzytkownika) REFERENCES Lekarz(ID_Uzytkownika) ON DELETE CASCADE,
+    FOREIGN KEY (ID_Uzytkownika) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE CASCADE,
     FOREIGN KEY (ID_Specjalizacji) REFERENCES Specjalizacja(ID_Specjalizacji) ON DELETE CASCADE
 );
 

@@ -69,12 +69,15 @@
             textBoxNewPass = new TextBox();
             textBoxNewPassRepeat = new TextBox();
             buttonChangePass = new Button();
+            tabPageSpecjalizacja = new TabPage();
+            checkedListBoxSpecs = new CheckedListBox();
             tableLayoutPanel1.SuspendLayout();
             tabControlEditUser.SuspendLayout();
             tabPageUserData.SuspendLayout();
             tabPageUserUpra.SuspendLayout();
             tabPagePass.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
+            tabPageSpecjalizacja.SuspendLayout();
             SuspendLayout();
             // 
             // buttonEditUser
@@ -377,6 +380,7 @@
             tabControlEditUser.Controls.Add(tabPageUserData);
             tabControlEditUser.Controls.Add(tabPageUserUpra);
             tabControlEditUser.Controls.Add(tabPagePass);
+            tabControlEditUser.Controls.Add(tabPageSpecjalizacja);
             tabControlEditUser.Location = new Point(11, 12);
             tabControlEditUser.Name = "tabControlEditUser";
             tabControlEditUser.SelectedIndex = 0;
@@ -486,6 +490,25 @@
             buttonChangePass.UseVisualStyleBackColor = true;
             buttonChangePass.Click += buttonChangePass_Click;
             // 
+            // tabPageSpecjalizacja
+            // 
+            tabPageSpecjalizacja.Controls.Add(checkedListBoxSpecs);
+            tabPageSpecjalizacja.Location = new Point(4, 34);
+            tabPageSpecjalizacja.Name = "tabPageSpecjalizacja";
+            tabPageSpecjalizacja.Padding = new Padding(3);
+            tabPageSpecjalizacja.Size = new Size(778, 469);
+            tabPageSpecjalizacja.TabIndex = 3;
+            tabPageSpecjalizacja.Text = "Specjalizacja";
+            tabPageSpecjalizacja.UseVisualStyleBackColor = true;
+            // 
+            // checkedListBoxSpecs
+            // 
+            checkedListBoxSpecs.FormattingEnabled = true;
+            checkedListBoxSpecs.Location = new Point(1, 0);
+            checkedListBoxSpecs.Name = "checkedListBoxSpecs";
+            checkedListBoxSpecs.Size = new Size(774, 452);
+            checkedListBoxSpecs.TabIndex = 0;
+            // 
             // FormEditUser
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -506,6 +529,7 @@
             tabPagePass.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
             tableLayoutPanel2.PerformLayout();
+            tabPageSpecjalizacja.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -551,5 +575,7 @@
         private Label labelNewPassRepeat;
         private TextBox textBoxNewPass;
         private TextBox textBoxNewPassRepeat;
+        private TabPage tabPageSpecjalizacja;
+        private CheckedListBox checkedListBoxSpecs;
     }
 }

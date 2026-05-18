@@ -38,6 +38,7 @@ namespace SystemPrzychodznia
             UserFull userBeforeValid = new UserFull();
 
             userBeforeValid.Uprawnienia = _userService.GetUprawnienia();
+            userBeforeValid.Specjalizacje = _userService.GetSpecjalizacje();
 
             userBeforeValid.Id = uF.Id;
             userBeforeValid.Login = textBoxLogin.Text.Trim();
@@ -60,10 +61,16 @@ namespace SystemPrzychodznia
                 u.Posiadane = checkedListBoxUprawnienia.CheckedItems.Contains(u.Nazwa);
             }
 
+            foreach (Specjalizacja s in userBeforeValid.Specjalizacje)
+            {
+                s.Posiadane = checkedListBoxSpecs.CheckedItems.Contains(s.Nazwa);
+            }
+
             bool somethingChanged = !(userBeforeValid == uF);
 
             if (somethingChanged == true)
             {
+
                 ValidationResult valRe = _userService.EditUser(userBeforeValid);
 
                 if (valRe.IsValid == true)
@@ -115,6 +122,12 @@ namespace SystemPrzychodznia
                 checkedListBoxUprawnienia.Items.Add(uprawnienie.Nazwa, uprawnienie.Posiadane == true);
             }
 
+            checkedListBoxSpecs.Items.Clear();
+            foreach (Specjalizacja spec in uF.Specjalizacje)
+            {
+                checkedListBoxSpecs.Items.Add(spec.Nazwa, spec.Posiadane == true);
+            }
+
 
             LockEditing();
 
@@ -140,6 +153,7 @@ namespace SystemPrzychodznia
             buttonForgetUser.Enabled = false;
 
             checkedListBoxUprawnienia.Enabled = false;
+            checkedListBoxSpecs.Enabled = false;
 
             textBoxNewPass.Enabled = false;
             textBoxNewPassRepeat.Enabled = false;
@@ -215,6 +229,7 @@ namespace SystemPrzychodznia
                 buttonForgetUser.Enabled = true;
 
                 checkedListBoxUprawnienia.Enabled = true;
+                checkedListBoxSpecs.Enabled = true;
 
                 textBoxNewPass.Enabled = true;
                 textBoxNewPassRepeat.Enabled = true;

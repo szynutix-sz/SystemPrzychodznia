@@ -138,9 +138,31 @@ namespace SystemPrzychodznia.Services
                 }
             }
 
+            if (user.Uprawnienia.Exists(u => u.Id == 3 && u.Posiadane == true))
+            {
+                // Jeśli jest lekarzem, to musi mieć przypisaną przynajmniej jedną specjalizację
+                if (user.Specjalizacje.Exists(s => s.Posiadane == true) == false)
+                {
+                    errors.Add("Użytkownik z uprawnieniem lekarza musi mieć przypisaną przynajmniej jedną specjalizację");
+                }
+            }
+            else
+            {
+                //Jeśłi nie jest lekarzem, to nie może mieć przypisanych specjalizacji
+                if (user.Specjalizacje.Exists(s => s.Posiadane == true) == true)
+                {
+                    errors.Add("Użytkownik bez uprawnienia lekarza nie może mieć przypisanych specjalizacji");
+                }
+            }
+
+            if (user.Uprawnienia.Find(u => u.Posiadane == true) == null)
+            {
+                errors.Add("Użytkownik musi mieć przypisane przynajmniej jedno uprawnienie");
+            }
 
 
-             
+
+
             return new ValidationResult(errors.Count == 0) { Errors = errors };
         }
 
