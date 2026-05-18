@@ -170,7 +170,7 @@ INSERT INTO Uzytkownik (
 )
 SELECT 
     1, 'SuperAdmin', '-', '-', '-', '2026-03-17', 'Inna', 'customer_service@ict_supplier.com', '000000000', NULL, 0, 0, NULL, NULL
-WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE Login = 'SuperAdmin');
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik WHERE ID_Uzytkownika = 1);
 
 -- ============================================================
 -- 9. Wstawienie hasła dla SuperAdmina
@@ -193,16 +193,11 @@ INSERT INTO Uprawnienie (Nazwa) SELECT 'Recepcja' WHERE NOT EXISTS (SELECT 1 FRO
 INSERT INTO Uprawnienie (Nazwa) SELECT 'Brak_roli' WHERE NOT EXISTS (SELECT 1 FROM Uprawnienie WHERE Nazwa = 'Brak_roli');
 
 -- ============================================================
--- 11. Nadanie uprawnienia 'Admin' dla SuperAdmina
+-- 11. Nadanie uprawnienia 'SuperAdmin' dla SuperAdmina
 -- ============================================================
 INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-SELECT u.ID_Uzytkownika, p.ID_Uprawnienia
-FROM Uzytkownik u, Uprawnienie p
-WHERE u.Login = 'SuperAdmin'
-  AND p.Nazwa = 'SuperAdmin'
-  AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up
-                    WHERE up.ID_Uzytkownika = u.ID_Uzytkownika
-                    AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+SELECT 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie WHERE ID_Uzytkownika = 1 AND ID_Uprawnienia = 1);
                     
 -- ============================================================
 -- 12. Domyślne dane słownikowe (Gabinety, Specjalizacje)

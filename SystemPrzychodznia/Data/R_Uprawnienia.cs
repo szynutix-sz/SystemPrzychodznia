@@ -18,8 +18,7 @@ namespace SystemPrzychodznia.Data
             deleteCommand.CommandText = @"
 DELETE FROM Uzytkownik_Uprawnienie 
 WHERE ID_Uzytkownika = $userId
-    AND ID_Uprawnienia != 
-        (SELECT ID_Uprawnienia FROM Uprawnienie WHERE Nazwa = 'SuperAdmin');";
+    AND ID_Uprawnienia != 1;"; // nie można usunąć uprawnienia "SuperAdmin" (ID_Uprawnienia = 1)
             deleteCommand.Parameters.AddWithValue("$userId", userId);
             deleteCommand.ExecuteNonQuery();
 
@@ -34,8 +33,8 @@ WHERE ID_Uzytkownika = $userId
             if (noweUprawnienia.Exists(u => u.Posiadane == true))
                 foreach (Uprawnienie uprawnienie in noweUprawnienia)
                 {
-                    if (uprawnienie.Posiadane == false)
-                        continue; // pomijamy uprawnienia, które nie są zaznaczone jako posiadane lub jest to uprawnienie Brak_roli)
+                    if (uprawnienie.Posiadane == false || uprawnienie.Id == 1)
+                        continue; // pomijamy uprawnienia, które nie są zaznaczone jako posiadane lub jest to uprawnienie "SuperAdmin" (ID_Uprawnienia = 1), które nie może być usunięte
                     var insertCommand = connection.CreateCommand();
                     insertCommand.CommandText = @"
     INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
