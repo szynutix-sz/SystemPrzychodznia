@@ -22,6 +22,7 @@ namespace SystemPrzychodznia
         private List<PatientChoice> _visitPatients = new();
         private List<DoctorChoice> _visitDoctors = new();
         private List<OfficeChoice> _visitOffices = new();
+        private List<SpecializationChoice> _visitSpecializations = new();
 
         private void EnsureVisitModuleVisible()
         {
@@ -76,6 +77,7 @@ namespace SystemPrzychodznia
             textBoxVisitPatient = CreateVisitTextBox();
             textBoxVisitPESEL = CreateVisitMaskedTextBox("00000000000");
             comboBoxVisitSpecialization = CreateVisitComboBox();
+            comboBoxVisitSpecialization.SelectedIndexChanged += (_, _) => PopulateVisitDoctorCombo();
             comboBoxVisitDoctor = CreateVisitComboBox();
 
             dateTimePickerVisitFrom = new DateTimePicker
@@ -184,13 +186,30 @@ namespace SystemPrzychodznia
                 .OrderBy(p => p.FullName)
                 .ToList();
 
-            var doctors = _userService.GetUsersByRole(3);
-            _visitDoctors = doctors
-                .Select(doctor => new DoctorChoice
+            _visitSpecializations = _userService.GetSpecjalizacje()
+                .Select(s => new SpecializationChoice
                 {
-                    Id = doctor.Id,
-                    FullName = $"{doctor.FirstName} {doctor.LastName}".Trim(),
-                    Login = doctor.Login
+                    Id = s.Id,
+                    Name = s.Nazwa
+                })
+                .OrderBy(s => s.Name)
+                .ToList();
+
+            var doctors = _userService.GetUsersByRole(PermissionRoles.Lekarz);
+            _visitDoctors = doctors
+                .Select(doctor =>
+                {
+                    var doctorFull = _userService.GetUserFull(doctor.Id);
+                    return new DoctorChoice
+                    {
+                        Id = doctor.Id,
+                        FullName = $"{doctor.FirstName} {doctor.LastName}".Trim(),
+                        Login = doctor.Login,
+                        SpecializationIds = doctorFull.Specjalizacje
+                            .Where(s => s.Posiadane == true)
+                            .Select(s => s.Id)
+                            .ToList()
+                    };
                 })
                 .OrderBy(d => d.FullName)
                 .ToList();
@@ -217,6 +236,10 @@ namespace SystemPrzychodznia
 
             comboBoxVisitSpecialization.Items.Clear();
             comboBoxVisitSpecialization.Items.Add(string.Empty);
+            comboBoxVisitSpecialization.Items.AddRange(_visitSpecializations
+                .Select(s => s.DisplayName)
+                .Cast<object>()
+                .ToArray());
             comboBoxVisitSpecialization.SelectedIndex = 0;
         }
 
@@ -230,7 +253,13 @@ namespace SystemPrzychodznia
             string previousSelection = comboBoxVisitDoctor.Text;
             comboBoxVisitDoctor.Items.Clear();
             comboBoxVisitDoctor.Items.Add(string.Empty);
-            comboBoxVisitDoctor.Items.AddRange(_visitDoctors
+
+            int? selectedSpecializationId = GetSelectedVisitSpecializationId();
+            var doctors = selectedSpecializationId.HasValue
+                ? _visitDoctors.Where(d => d.SpecializationIds.Contains(selectedSpecializationId.Value))
+                : _visitDoctors;
+
+            comboBoxVisitDoctor.Items.AddRange(doctors
                 .Select(d => d.DisplayName)
                 .Cast<object>()
                 .ToArray());
@@ -245,6 +274,16 @@ namespace SystemPrzychodznia
             }
         }
 
+        private int? GetSelectedVisitSpecializationId()
+        {
+            if (comboBoxVisitSpecialization == null || string.IsNullOrWhiteSpace(comboBoxVisitSpecialization.Text))
+            {
+                return null;
+            }
+
+            return _visitSpecializations.FirstOrDefault(s => s.DisplayName == comboBoxVisitSpecialization.Text)?.Id;
+        }
+
         private void LoadVisits(bool showNoResults = false)
         {
             if (textBoxVisitPatient == null || textBoxVisitPESEL == null || comboBoxVisitSpecialization == null ||
@@ -257,6 +296,7 @@ namespace SystemPrzychodznia
             var visitRows = _userService.GetWizyty()
                 .Select(v => new VisitListItem
                 {
+                    DoctorId = v.IdLekarza,
                     PatientName = v.NazwaPacjenta,
                     PatientPESEL = _visitPatients.FirstOrDefault(p => p.Id == v.IdPacjenta)?.PESEL ?? string.Empty,
                     DoctorName = v.NazwaLekarza,
@@ -283,6 +323,13 @@ namespace SystemPrzychodznia
             if (!string.IsNullOrWhiteSpace(comboBoxVisitDoctor.Text))
             {
                 filtered = filtered.Where(v => v.DoctorName == comboBoxVisitDoctor.Text);
+            }
+
+            int? specializationId = GetSelectedVisitSpecializationId();
+            if (specializationId.HasValue)
+            {
+                filtered = filtered.Where(v =>
+                    _visitDoctors.Any(d => d.Id == v.DoctorId && d.SpecializationIds.Contains(specializationId.Value)));
             }
 
             if (dateTimePickerVisitFrom.Checked)
@@ -397,7 +444,7 @@ namespace SystemPrzychodznia
 
         private void ButtonAddVisit_Click(object? sender, EventArgs e)
         {
-            using var form = new FormVisitEditor(_visitPatients, _visitDoctors, _visitOffices);
+            using var form = new FormVisitEditor(_visitPatients, _visitDoctors, _visitOffices, _visitSpecializations);
             if (form.ShowDialog(this) == DialogResult.OK && form.CreatedVisit != null)
             {
                 var createdVisit = form.CreatedVisit.Value;
@@ -500,6 +547,7 @@ namespace SystemPrzychodznia
 
         internal sealed class VisitListItem
         {
+            public int DoctorId { get; set; }
             public string PatientName { get; set; } = string.Empty;
             public string PatientPESEL { get; set; } = string.Empty;
             public string DoctorName { get; set; } = string.Empty;
@@ -521,10 +569,18 @@ namespace SystemPrzychodznia
             public int Id { get; set; }
             public string FullName { get; set; } = string.Empty;
             public string Login { get; set; } = string.Empty;
+            public List<int> SpecializationIds { get; set; } = new();
             public string DisplayName => FullName;
         }
 
         internal sealed class OfficeChoice
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public string DisplayName => Name;
+        }
+
+        internal sealed class SpecializationChoice
         {
             public int Id { get; set; }
             public string Name { get; set; } = string.Empty;

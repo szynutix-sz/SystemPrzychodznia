@@ -22,10 +22,17 @@ WHERE ID_Uzytkownika = $userId
             deleteCommand.Parameters.AddWithValue("$userId", userId);
             deleteCommand.ExecuteNonQuery();
 
-            if (noweUprawnienia.Exists(u =>u.Posiadane == true && u.Id != 5))
+            var brakRoli = noweUprawnienia.Find(u => string.Equals(u.Nazwa, PermissionRoles.BrakRoli, StringComparison.OrdinalIgnoreCase));
+
+            if (noweUprawnienia.Exists(u =>
+                    u.Posiadane == true &&
+                    !string.Equals(u.Nazwa, PermissionRoles.BrakRoli, StringComparison.OrdinalIgnoreCase)))
             {
                 // Jeśli użytkownik ma uprawnienie inne niż "Brak roli" usuwamy "Brak roli" na poziome aplikacja
-                noweUprawnienia.Find(u => u.Id == 5).Posiadane = false;
+                if (brakRoli != null)
+                {
+                    brakRoli.Posiadane = false;
+                }
             }
 
 
@@ -33,7 +40,7 @@ WHERE ID_Uzytkownika = $userId
             if (noweUprawnienia.Exists(u => u.Posiadane == true))
                 foreach (Uprawnienie uprawnienie in noweUprawnienia)
                 {
-                    if (uprawnienie.Posiadane == false || uprawnienie.Id == 1)
+                    if (uprawnienie.Posiadane == false || string.Equals(uprawnienie.Nazwa, PermissionRoles.SuperAdmin, StringComparison.OrdinalIgnoreCase))
                         continue; // pomijamy uprawnienia, które nie są zaznaczone jako posiadane lub jest to uprawnienie "SuperAdmin" (ID_Uprawnienia = 1), które nie może być usunięte
                     var insertCommand = connection.CreateCommand();
                     insertCommand.CommandText = @"
@@ -44,14 +51,15 @@ WHERE ID_Uzytkownika = $userId
                     insertCommand.Parameters.AddWithValue("$uprawnienieId", uprawnienie.Id);
                     insertCommand.ExecuteNonQuery();
                 }
-            else // Jeśli użytkownik nie ma żadnych uprawnień, dodajemy uprawnienie "Brak roli"
+            else if (brakRoli != null) // Jeśli użytkownik nie ma żadnych uprawnień, dodajemy uprawnienie "Brak roli"
             {
                 var insertCommand = connection.CreateCommand();
                 insertCommand.CommandText = @"
     INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
-    VALUES ( $userId , 5);
+    VALUES ( $userId , $uprawnienieId);
     ";
                 insertCommand.Parameters.AddWithValue("$userId", userId);
+                insertCommand.Parameters.AddWithValue("$uprawnienieId", brakRoli.Id);
                 insertCommand.ExecuteNonQuery();
             }
         }

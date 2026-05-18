@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS Wizyta (
     Schorzenia_i_dolegliwosci TEXT,
     Zalecenia_i_lekarstwa TEXT,
     FOREIGN KEY (ID_Pacjenta) REFERENCES Pacjent(ID_Pacjenta) ON DELETE CASCADE,
-    FOREIGN KEY (ID_Lekarza) REFERENCES Lekarz(ID_Uzytkownika) ON DELETE RESTRICT,
+    FOREIGN KEY (ID_Lekarza) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE RESTRICT,
     FOREIGN KEY (ID_Gabinetu) REFERENCES Gabinet(ID_Gabinetu) ON DELETE RESTRICT
 );
 
@@ -217,6 +217,7 @@ INSERT INTO Gabinet (Nazwa_Numer) SELECT 'Gabinet Zabiegowy' WHERE NOT EXISTS (S
             EnsureColumnExists(connection, "Uzytkownik", "Zapomniane_Imie_Enc", "TEXT");
             EnsureColumnExists(connection, "Uzytkownik", "Zapomniane_Nazwisko_Enc", "TEXT");
             MigrateLegacyPatients(connection);
+            MigrateWizytaDoctorForeignKey(connection);
         }
 
         private static void EnsureColumnExists(SqliteConnection connection, string tableName, string columnName, string columnDefinition)
@@ -294,6 +295,83 @@ WHERE Czy_zapomniany = 0
   );
 
 COMMIT;";
+            migrationCommand.ExecuteNonQuery();
+        }
+
+        private static void MigrateWizytaDoctorForeignKey(SqliteConnection connection)
+        {
+            var foreignKeyCommand = connection.CreateCommand();
+            foreignKeyCommand.CommandText = "PRAGMA foreign_key_list(Wizyta);";
+
+            bool referencesLegacyLekarzTable = false;
+            using (var reader = foreignKeyCommand.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    string tableName = reader.GetString(2);
+                    string fromColumn = reader.GetString(3);
+                    if (string.Equals(tableName, "Lekarz", StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(fromColumn, "ID_Lekarza", StringComparison.OrdinalIgnoreCase))
+                    {
+                        referencesLegacyLekarzTable = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!referencesLegacyLekarzTable)
+            {
+                return;
+            }
+
+            var migrationCommand = connection.CreateCommand();
+            migrationCommand.CommandText = @"
+PRAGMA foreign_keys = OFF;
+
+BEGIN TRANSACTION;
+
+ALTER TABLE Wizyta RENAME TO Wizyta_Old_Lekarz_FK;
+
+CREATE TABLE Wizyta (
+    ID_Wizyty INTEGER PRIMARY KEY AUTOINCREMENT,
+    ID_Pacjenta INTEGER NOT NULL,
+    ID_Lekarza INTEGER NOT NULL,
+    ID_Gabinetu INTEGER NOT NULL,
+    Data_i_godzina_rozpoczecia TEXT NOT NULL,
+    Status TEXT NOT NULL,
+    Schorzenia_i_dolegliwosci TEXT,
+    Zalecenia_i_lekarstwa TEXT,
+    FOREIGN KEY (ID_Pacjenta) REFERENCES Pacjent(ID_Pacjenta) ON DELETE CASCADE,
+    FOREIGN KEY (ID_Lekarza) REFERENCES Uzytkownik(ID_Uzytkownika) ON DELETE RESTRICT,
+    FOREIGN KEY (ID_Gabinetu) REFERENCES Gabinet(ID_Gabinetu) ON DELETE RESTRICT
+);
+
+INSERT INTO Wizyta (
+    ID_Wizyty,
+    ID_Pacjenta,
+    ID_Lekarza,
+    ID_Gabinetu,
+    Data_i_godzina_rozpoczecia,
+    Status,
+    Schorzenia_i_dolegliwosci,
+    Zalecenia_i_lekarstwa
+)
+SELECT
+    ID_Wizyty,
+    ID_Pacjenta,
+    ID_Lekarza,
+    ID_Gabinetu,
+    Data_i_godzina_rozpoczecia,
+    Status,
+    Schorzenia_i_dolegliwosci,
+    Zalecenia_i_lekarstwa
+FROM Wizyta_Old_Lekarz_FK;
+
+DROP TABLE Wizyta_Old_Lekarz_FK;
+
+COMMIT;
+
+PRAGMA foreign_keys = ON;";
             migrationCommand.ExecuteNonQuery();
         }
     }

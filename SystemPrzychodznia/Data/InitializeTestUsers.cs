@@ -54,6 +54,16 @@ SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'jan.kowalski' AND p.Nazwa = 'Lekarz'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
 
+INSERT INTO Lekarz_Specjalizacja (ID_Uzytkownika, ID_Specjalizacji)
+SELECT u.ID_Uzytkownika, s.ID_Specjalizacji
+FROM Uzytkownik u, Specjalizacja s
+WHERE u.Login = 'jan.kowalski' AND s.Nazwa = 'Lekarz rodzinny'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM Lekarz_Specjalizacja ls
+      WHERE ls.ID_Uzytkownika = u.ID_Uzytkownika
+        AND ls.ID_Specjalizacji = s.ID_Specjalizacji);
+
 -- Test 3: Maria Wiśniewska (Pacjent), ur. 2000-03-15, K, PESEL: 00231502340
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)
 SELECT 'Gdańsk', '80001', 'Morska', '3', '7'
@@ -125,6 +135,16 @@ INSERT INTO Uzytkownik_Uprawnienie (ID_Uzytkownika, ID_Uprawnienia)
 SELECT u.ID_Uzytkownika, p.ID_Uprawnienia FROM Uzytkownik u, Uprawnienie p
 WHERE u.Login = 'agnieszka.zalewska' AND p.Nazwa = 'Lekarz'
   AND NOT EXISTS (SELECT 1 FROM Uzytkownik_Uprawnienie up WHERE up.ID_Uzytkownika = u.ID_Uzytkownika AND up.ID_Uprawnienia = p.ID_Uprawnienia);
+
+INSERT INTO Lekarz_Specjalizacja (ID_Uzytkownika, ID_Specjalizacji)
+SELECT u.ID_Uzytkownika, s.ID_Specjalizacji
+FROM Uzytkownik u, Specjalizacja s
+WHERE u.Login = 'agnieszka.zalewska' AND s.Nazwa = 'Pediatra'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM Lekarz_Specjalizacja ls
+      WHERE ls.ID_Uzytkownika = u.ID_Uzytkownika
+        AND ls.ID_Specjalizacji = s.ID_Specjalizacji);
 
 -- Test 8: Bartosz Nowicki (Pacjent), ur. 2001-06-30, M, PESEL: 01063056789
 INSERT INTO Adres (Miejscowosc, Kod_pocztowy, Ulica, Numer_posesji_domu, Numer_lokalu_mieszkania)

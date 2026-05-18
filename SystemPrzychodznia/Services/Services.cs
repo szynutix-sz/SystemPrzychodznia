@@ -218,11 +218,16 @@ namespace SystemPrzychodznia.Services
 
         public List<Uprawnienie> GetUprawnienia() => _repository.GetUprawnienia();
 
-        public List<UserBasic> GetUsersByRole(int roleId)
+        public List<UserBasic> GetUsersByRole(string roleName)
         {
             var s = new SearchTerms();
             foreach (var up in _repository.GetUprawnienia())
-                s.Uprawnienia.Add(new Uprawnienie { Id = up.Id, Nazwa = up.Nazwa, Posiadane = up.Id == roleId ? true : (bool?)null });
+                s.Uprawnienia.Add(new Uprawnienie
+                {
+                    Id = up.Id,
+                    Nazwa = up.Nazwa,
+                    Posiadane = string.Equals(up.Nazwa, roleName, StringComparison.OrdinalIgnoreCase) ? true : (bool?)null
+                });
             return _repository.GetListUsers(s);
         }
 
@@ -375,13 +380,13 @@ namespace SystemPrzychodznia.Services
                 IdLekarza = lekarzId,
                 IdGabinetu = gabinetId,
                 DataRozpoczecia = data,
-                Status = "Zaplanowana"
+                Status = "Zarejestrowana"
             };
 
             try
             {
                 _repository.AddWizyta(wizyta);
-                return (true, "Wizyta została pomyślnie zaplanowana.");
+                return (true, "Wizyta została pomyślnie zarejestrowana.");
             }
             catch (Exception ex) { return (false, $"Błąd podczas dodawania wizyty: {ex.Message}"); }
         }

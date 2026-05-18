@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SystemPrzychodznia.Data;
 
 namespace SystemPrzychodznia
 {
@@ -8,9 +9,13 @@ namespace SystemPrzychodznia
     {
         public void grantTabsToCurrentUser()
         {
+            bool isSuperAdmin = _currentUser.Uprawnienia.HasRole(PermissionRoles.SuperAdmin);
+            bool isAdmin = _currentUser.Uprawnienia.HasRole(PermissionRoles.Admin);
+            bool isDoctor = _currentUser.Uprawnienia.HasRole(PermissionRoles.Lekarz);
+            bool isReception = _currentUser.Uprawnienia.HasRole(PermissionRoles.Recepcja);
 
             // Uprawnienie 1 - SuperAdmin
-            if (_currentUser.Uprawnienia.Exists(u => u.Id == 1 && u.Posiadane == true))
+            if (isSuperAdmin)
             {
                 if (!tabControlUserView.TabPages.Contains(tabPageAdminViewUsers))
                 {
@@ -35,7 +40,7 @@ namespace SystemPrzychodznia
             }
 
             // Uprawnienie 2 - Admin
-            if (_currentUser.Uprawnienia.Exists(u => u.Id == 2 && u.Posiadane == true))
+            if (isAdmin)
             {
                 if (!tabControlUserView.TabPages.Contains(tabPageAdminViewUsers))
                 { 
@@ -56,10 +61,18 @@ namespace SystemPrzychodznia
             }
 
             // Uprawnienie 4 - Recepcja
-            if (_currentUser.Uprawnienia.Exists(u => u.Id == 4 && u.Posiadane == true))
+            // Lekarz powinien korzystać wyłącznie z modułu "Twoje Wizyty" z modułu 5,
+            // więc zwykły moduł rejestracji wizyt nie jest mu pokazywany.
+            if (isReception && !isDoctor)
             {
                 EnsurePatientModuleVisible();
                 EnsureVisitModuleVisible();
+            }
+
+            // Uprawnienie 3 - Lekarz
+            if (isDoctor)
+            {
+                EnsureDoctorVisitsModuleVisible();
             }
 
 

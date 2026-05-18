@@ -5,6 +5,8 @@ namespace SystemPrzychodznia
         private readonly List<FormUserView.PatientChoice> _patients;
         private readonly List<FormUserView.DoctorChoice> _doctors;
         private readonly List<FormUserView.OfficeChoice> _offices;
+        private readonly List<FormUserView.SpecializationChoice> _specializations;
+        private List<FormUserView.DoctorChoice> _visibleDoctors = new();
 
         private readonly ComboBox _comboBoxPatient = new();
         private readonly ComboBox _comboBoxSpecialization = new();
@@ -21,11 +23,13 @@ namespace SystemPrzychodznia
         internal FormVisitEditor(
             List<FormUserView.PatientChoice> patients,
             List<FormUserView.DoctorChoice> doctors,
-            List<FormUserView.OfficeChoice> offices)
+            List<FormUserView.OfficeChoice> offices,
+            List<FormUserView.SpecializationChoice> specializations)
         {
             _patients = patients;
             _doctors = doctors;
             _offices = offices;
+            _specializations = specializations;
 
             InitializeVisitEditor();
             Load += FormVisitEditor_Load;
@@ -60,6 +64,7 @@ namespace SystemPrzychodznia
             ConfigureComboBox(_comboBoxSpecialization);
             ConfigureComboBox(_comboBoxDoctor);
             ConfigureComboBox(_comboBoxOffice);
+            _comboBoxSpecialization.SelectedIndexChanged += (_, _) => PopulateDoctorsForSelectedSpecialization();
 
             _dateTimePickerDate.Format = DateTimePickerFormat.Custom;
             _dateTimePickerDate.CustomFormat = "yyyy-MM-dd";
@@ -115,13 +120,8 @@ namespace SystemPrzychodznia
                 .ToArray());
 
             _comboBoxSpecialization.Items.Clear();
-            _comboBoxSpecialization.Items.Add(string.Empty);
-            _comboBoxSpecialization.SelectedIndex = 0;
-
-            _comboBoxDoctor.Items.Clear();
-            _comboBoxDoctor.Items.AddRange(_doctors
-                .Select(d => d.DisplayName)
-                .OrderBy(d => d)
+            _comboBoxSpecialization.Items.AddRange(_specializations
+                .Select(s => s.DisplayName)
                 .Cast<object>()
                 .ToArray());
 
@@ -136,9 +136,13 @@ namespace SystemPrzychodznia
                 _comboBoxPatient.SelectedIndex = 0;
             }
 
-            if (_comboBoxDoctor.Items.Count > 0)
+            if (_comboBoxSpecialization.Items.Count > 0)
             {
-                _comboBoxDoctor.SelectedIndex = 0;
+                _comboBoxSpecialization.SelectedIndex = 0;
+            }
+            else
+            {
+                PopulateDoctorsForSelectedSpecialization();
             }
 
             if (_comboBoxOffice.Items.Count > 0)
@@ -157,6 +161,12 @@ namespace SystemPrzychodznia
                 return;
             }
 
+            if (_comboBoxSpecialization.SelectedIndex < 0)
+            {
+                MessageBox.Show("Wybierz specjalizację.", "Błąd walidacji", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (_comboBoxDoctor.SelectedIndex < 0)
             {
                 MessageBox.Show("Wybierz lekarza.", "Błąd walidacji", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -170,7 +180,7 @@ namespace SystemPrzychodznia
             }
 
             var patient = _patients.First(p => p.DisplayName == _comboBoxPatient.Text);
-            var doctor = _doctors.First(d => d.DisplayName == _comboBoxDoctor.Text);
+            var doctor = _visibleDoctors.First(d => d.DisplayName == _comboBoxDoctor.Text);
             var office = _offices.First(o => o.DisplayName == _comboBoxOffice.Text);
 
             CreatedVisit = (
@@ -181,6 +191,30 @@ namespace SystemPrzychodznia
 
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void PopulateDoctorsForSelectedSpecialization()
+        {
+            FormUserView.SpecializationChoice? selectedSpecialization = _specializations
+                .FirstOrDefault(s => s.DisplayName == _comboBoxSpecialization.Text);
+
+            _visibleDoctors = selectedSpecialization == null
+                ? new List<FormUserView.DoctorChoice>()
+                : _doctors
+                    .Where(d => d.SpecializationIds.Contains(selectedSpecialization.Id))
+                    .OrderBy(d => d.DisplayName)
+                    .ToList();
+
+            _comboBoxDoctor.Items.Clear();
+            _comboBoxDoctor.Items.AddRange(_visibleDoctors
+                .Select(d => d.DisplayName)
+                .Cast<object>()
+                .ToArray());
+
+            if (_comboBoxDoctor.Items.Count > 0)
+            {
+                _comboBoxDoctor.SelectedIndex = 0;
+            }
         }
 
         private static void ConfigureComboBox(ComboBox comboBox)

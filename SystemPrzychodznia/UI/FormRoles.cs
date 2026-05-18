@@ -28,12 +28,12 @@ namespace SystemPrzychodznia
         private void listBoxRoles_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBoxRoles.SelectedIndex < 0) return;
-            LoadUsersForRole(_roles[listBoxRoles.SelectedIndex].Id);
+            LoadUsersForRole(_roles[listBoxRoles.SelectedIndex].Nazwa);
         }
 
-        private void LoadUsersForRole(int roleId)
+        private void LoadUsersForRole(string roleName)
         {
-            var users = _userService.GetUsersByRole(roleId);
+            var users = _userService.GetUsersByRole(roleName);
             dgvRoleUsers.DataSource = users;
 
             dgvRoleUsers.Columns["Id"].HeaderText = "ID";

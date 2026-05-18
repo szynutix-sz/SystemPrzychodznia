@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Windows.Forms;
 using SystemPrzychodznia.Data;
 using SystemPrzychodznia.Services;
 
@@ -15,7 +16,7 @@ namespace SystemPrzychodznia
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
 
-            DatabaseInitializer.Initialize(false);
+            DatabaseInitializer.Initialize(true);
 
             UserService _userService = new UserService();
             
@@ -35,7 +36,19 @@ namespace SystemPrzychodznia
 
                 if (_userID.loggedIn)
                 {
-                    Application.Run(new FormUserView(_userID, _userService, version));
+                    try
+                    {
+                        Application.Run(new FormUserView(_userID, _userService, version));
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            $"Wystąpił błąd podczas otwierania widoku użytkownika:{Environment.NewLine}{ex.Message}",
+                            "Błąd aplikacji",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                        break;
+                    }
                     if (_userID.loggedIn) break; //użytkownik wyszedł, ale się nie wylogował
                 }
                 else

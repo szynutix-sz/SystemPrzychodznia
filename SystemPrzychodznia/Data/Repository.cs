@@ -152,7 +152,7 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
 
             List<Uprawnienie> uprawnienia = GetUserUprawnienia(user_id);
             List<Specjalizacja> specjalizacje = GetSpecjalizacje();
-            if (uprawnienia.Exists(u => u.Id == 3 && u.Posiadane == true)) // jest lekarzem
+            if (uprawnienia.HasRole(PermissionRoles.Lekarz))
             {
                 using var connection = new SqliteConnection(_connectionString);
                 connection.Open();
@@ -479,11 +479,11 @@ WHERE u.Czy_zapomniany = 1;";
             connection.Open();
             var command = connection.CreateCommand();
 
-            // Kolizja: jeśli status to nie Odwołana i nie Zakończona
+            // Kolizja: jeśli status to nie Odwołana, Zakończona ani Zrealizowana
             // Oraz jeśli czas wizyty mieści się w promieniu +/- 29 minut (zakładamy, że wizyta trwa 30 minut).
             command.CommandText = @"
                 SELECT COUNT(*) FROM Wizyta 
-                WHERE Status NOT IN ('Odwołana', 'Zakończona')
+                WHERE Status NOT IN ('Odwołana', 'Zakończona', 'Zrealizowana')
                   AND (ID_Lekarza = $lekarz OR ID_Gabinetu = $gabinet)
                   AND ABS(ROUND((JULIANDAY(Data_i_godzina_rozpoczecia) - JULIANDAY($data)) * 1440)) < 30";
 

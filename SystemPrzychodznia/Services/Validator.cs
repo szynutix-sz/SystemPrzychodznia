@@ -138,7 +138,7 @@ namespace SystemPrzychodznia.Services
                 }
             }
 
-            if (user.Uprawnienia.Exists(u => u.Id == 3 && u.Posiadane == true))
+            if (user.Uprawnienia.HasRole(PermissionRoles.Lekarz))
             {
                 // Jeśli jest lekarzem, to musi mieć przypisaną przynajmniej jedną specjalizację
                 if (user.Specjalizacje.Exists(s => s.Posiadane == true) == false)
