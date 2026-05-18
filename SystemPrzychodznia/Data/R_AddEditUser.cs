@@ -119,10 +119,6 @@ COMMIT;
         {
             try
             {
-                if (user.Id == 1)
-                {
-                    throw new UnauthorizedAccessException("Nie można edytować SuperAdmin");
-                }
                 using var connection = new SqliteConnection(_connectionString);
                 connection.Open();
                 var command = connection.CreateCommand();

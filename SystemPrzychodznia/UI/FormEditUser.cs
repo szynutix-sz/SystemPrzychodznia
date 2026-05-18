@@ -211,6 +211,12 @@ namespace SystemPrzychodznia
             }
             else
             {
+                if(uF.Id == 1 && _editingUser.Id != 1)
+                {
+                    MessageBox.Show("Tylko SuperAdmin może edytować SuperAdmina.", "Błąd");
+                    return;
+                }
+
                 textBoxLogin.Enabled = true;
                 textBoxFirstName.Enabled = true;
                 textBoxLastName.Enabled = true;
