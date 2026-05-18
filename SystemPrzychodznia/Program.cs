@@ -16,7 +16,7 @@ namespace SystemPrzychodznia
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
 
-            DatabaseInitializer.Initialize(true);
+            DatabaseInitializer.Initialize(false);
 
             UserService _userService = new UserService();
             
