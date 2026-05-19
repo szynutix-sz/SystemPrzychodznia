@@ -284,14 +284,16 @@ namespace SystemPrzychodznia
             return _visitSpecializations.FirstOrDefault(s => s.DisplayName == comboBoxVisitSpecialization.Text)?.Id;
         }
 
-        private void LoadVisits(bool showNoResults = false)
+        private void LoadVisits(bool showNoResults = false, bool forced = false)
         {
+
             if (textBoxVisitPatient == null || textBoxVisitPESEL == null || comboBoxVisitSpecialization == null ||
                 comboBoxVisitDoctor == null || dateTimePickerVisitFrom == null || dateTimePickerVisitTo == null ||
                 dgvVisits == null || groupBoxVisits == null)
             {
                 return;
             }
+
 
             var visitRows = _userService.GetWizyty()
                 .Select(v => new VisitListItem
@@ -444,27 +446,16 @@ namespace SystemPrzychodznia
 
         private void ButtonAddVisit_Click(object? sender, EventArgs e)
         {
-            using var form = new FormVisitEditor(_visitPatients, _visitDoctors, _visitOffices, _visitSpecializations);
-            if (form.ShowDialog(this) == DialogResult.OK && form.CreatedVisit != null)
+            FormVisitEditor form = new FormVisitEditor(_visitPatients, _visitDoctors, _visitOffices, _visitSpecializations, _userService);
+            form.ShowDialog(this);
+
+            if (form.result.success == true)
             {
-                var createdVisit = form.CreatedVisit.Value;
-                var result = _userService.AddWizyta(
-                    createdVisit.PatientId,
-                    createdVisit.DoctorId,
-                    createdVisit.OfficeId,
-                    createdVisit.StartDateTime);
-
-                MessageBox.Show(
-                    result.message,
-                    result.success ? "Informacja" : "Błąd",
-                    MessageBoxButtons.OK,
-                    result.success ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
-
-                if (result.success)
-                {
-                    LoadVisits();
-                }
+                DateTime visitTime = form.visitTime;
+                dateTimePickerVisitTo.Value = visitTime;
+                LoadVisits();
             }
+
         }
 
         private void DgvVisits_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)

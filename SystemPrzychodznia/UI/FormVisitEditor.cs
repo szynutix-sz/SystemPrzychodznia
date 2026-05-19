@@ -1,3 +1,5 @@
+using SystemPrzychodznia.Services;
+
 namespace SystemPrzychodznia
 {
     internal class FormVisitEditor : Form
@@ -17,6 +19,10 @@ namespace SystemPrzychodznia
         private readonly TextBox _textBoxStatus = new();
         private readonly Button _buttonSave = new();
         private readonly Button _buttonClose = new();
+        private readonly UserService _userService;
+
+        public (bool success, string message) result = (false, "Nie zapisano wizyty.");
+        public DateTime visitTime = DateTime.MinValue;
 
         internal (int PatientId, int DoctorId, int OfficeId, DateTime StartDateTime)? CreatedVisit { get; private set; }
 
@@ -24,15 +30,18 @@ namespace SystemPrzychodznia
             List<FormUserView.PatientChoice> patients,
             List<FormUserView.DoctorChoice> doctors,
             List<FormUserView.OfficeChoice> offices,
-            List<FormUserView.SpecializationChoice> specializations)
+            List<FormUserView.SpecializationChoice> specializations,
+            UserService service)
         {
             _patients = patients;
             _doctors = doctors;
             _offices = offices;
             _specializations = specializations;
+            _userService = service;
 
             InitializeVisitEditor();
             Load += FormVisitEditor_Load;
+            
         }
 
         private void InitializeVisitEditor()
@@ -182,6 +191,7 @@ namespace SystemPrzychodznia
             var patient = _patients.First(p => p.DisplayName == _comboBoxPatient.Text);
             var doctor = _visibleDoctors.First(d => d.DisplayName == _comboBoxDoctor.Text);
             var office = _offices.First(o => o.DisplayName == _comboBoxOffice.Text);
+            var service = _userService;
 
             CreatedVisit = (
                 patient.Id,
@@ -189,8 +199,24 @@ namespace SystemPrzychodznia
                 office.Id,
                 _dateTimePickerDate.Value.Date.Add(_dateTimePickerTime.Value.TimeOfDay));
 
-            DialogResult = DialogResult.OK;
-            Close();
+            
+            result = service.AddWizyta(
+                    patient.Id,
+                    doctor.Id,
+                    office.Id,
+                    _dateTimePickerDate.Value.Date.Add(_dateTimePickerTime.Value.TimeOfDay));
+
+            MessageBox.Show(
+                result.message,
+                result.success ? "Informacja" : "Błąd",
+                MessageBoxButtons.OK,
+                result.success ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+
+            if (result.success)
+            {
+                visitTime = _dateTimePickerDate.Value.Date.Add(_dateTimePickerTime.Value.TimeOfDay);
+                Close();
+            }
         }
 
         private void PopulateDoctorsForSelectedSpecialization()

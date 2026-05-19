@@ -36,6 +36,7 @@ namespace SystemPrzychodznia
 
                 EnsurePatientModuleVisible();
                 EnsureVisitModuleVisible();
+                //EnsureDoctorVisitsModuleVisible();
 
             }
 
@@ -62,8 +63,8 @@ namespace SystemPrzychodznia
 
             // Uprawnienie 4 - Recepcja
             // Lekarz powinien korzystać wyłącznie z modułu "Twoje Wizyty" z modułu 5,
-            // więc zwykły moduł rejestracji wizyt nie jest mu pokazywany.
-            if (isReception && !isDoctor)
+            // Natomiast możę być użytkownik z uprawnieniami Recepcja i Lekarz, wtedy będzie miał dostęp do obu modułów.
+            if (isReception)
             {
                 EnsurePatientModuleVisible();
                 EnsureVisitModuleVisible();
