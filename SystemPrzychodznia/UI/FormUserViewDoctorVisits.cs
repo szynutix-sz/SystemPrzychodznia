@@ -270,7 +270,7 @@ namespace SystemPrzychodznia
             if (dgvDoctorVisits.Columns.Contains("StartDateTime"))
             {
                 dgvDoctorVisits.Columns["StartDateTime"]!.HeaderText = "Termin";
-                dgvDoctorVisits.Columns["StartDateTime"]!.Width = 150;
+                dgvDoctorVisits.Columns["StartDateTime"]!.Width = 200;
                 dgvDoctorVisits.Columns["StartDateTime"]!.DefaultCellStyle.Format = "yyyy-MM-dd HH:mm";
             }
 
