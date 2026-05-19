@@ -50,6 +50,12 @@ namespace SystemPrzychodznia
                     up.Posiadane = true;
                 }
 
+                foreach (var item in checkedListBoxSpec.CheckedItems)
+                {
+                    Specjalizacja sp = userBeforeValid.Specjalizacje.Find(s => s.Nazwa == item.ToString());
+                    sp.Posiadane = true;
+                }
+
 
                 try
                 {
