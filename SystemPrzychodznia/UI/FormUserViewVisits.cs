@@ -443,6 +443,7 @@ namespace SystemPrzychodznia
 
         private void ButtonAddVisit_Click(object? sender, EventArgs e)
         {
+            LoadVisitLookups(); // odśwież dane, aby mieć pewność, że są aktualne
             FormVisitEditor form = new FormVisitEditor(_visitPatients, _visitDoctors, _visitOffices, _visitSpecializations, _userService);
             form.ShowDialog(this);
 

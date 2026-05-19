@@ -122,6 +122,7 @@ namespace SystemPrzychodznia
 
         private void FormVisitEditor_Load(object? sender, EventArgs e)
         {
+
             _comboBoxPatient.Items.Clear();
             _comboBoxPatient.Items.AddRange(_patients
                 .Select(p => p.DisplayName)
