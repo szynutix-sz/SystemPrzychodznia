@@ -73,6 +73,7 @@ namespace SystemPrzychodznia
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 Margin = new Padding(6, 0, 6, 0)
             };
+            dateTimePickerDoctorVisitTo.Value = DateTime.Now.AddDays(7); // Domyślnie ustawiamy datę końcową na 7 dni do przodu
 
             buttonClearDoctorVisits = new Button
             {
