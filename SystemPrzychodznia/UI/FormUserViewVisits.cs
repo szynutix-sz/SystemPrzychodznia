@@ -293,7 +293,7 @@ namespace SystemPrzychodznia
             {
                 return;
             }
-
+            groupBoxVisits.Text = "Lista wizyt (przefiltrowana)";
 
             var visitRows = _userService.GetWizyty()
                 .Select(v => new VisitListItem
@@ -425,16 +425,13 @@ namespace SystemPrzychodznia
             dateTimePickerVisitFrom.Checked = false;
             dateTimePickerVisitTo.Checked = false;
 
-            groupBoxVisits.Text = "Lista wizyt";
-            LoadVisits();
+            
+            LoadVisits(); 
+            groupBoxVisits.Text = "Lista wizyt"; // domyślnie jest przefiltrowana
         }
 
         private void ButtonSearchVisits_Click(object? sender, EventArgs e)
         {
-            if (groupBoxVisits != null)
-            {
-                groupBoxVisits.Text = "Lista wizyt (przefiltrowana)";
-            }
 
             LoadVisits(showNoResults: true);
         }

@@ -176,7 +176,7 @@ namespace SystemPrzychodznia
             {
                 return;
             }
-
+            groupBoxDoctorVisits.Text = "Lista twoich wizyt (przefiltrowana)";
             var searchTerms = new SearchTermsWizyta
             {
                 IdLekarza = _currentUser.Id,
@@ -317,16 +317,13 @@ namespace SystemPrzychodznia
             textBoxDoctorVisitPESEL.Text = string.Empty;
             dateTimePickerDoctorVisitFrom.Checked = false;
             dateTimePickerDoctorVisitTo.Checked = false;
-            groupBoxDoctorVisits.Text = "Lista twoich wizyt";
+            
             LoadDoctorVisits();
+            groupBoxDoctorVisits.Text = "Lista twoich wizyt"; // domyślnie jest przefiltrowana
         }
 
         private void ButtonSearchDoctorVisits_Click(object? sender, EventArgs e)
         {
-            if (groupBoxDoctorVisits != null)
-            {
-                groupBoxDoctorVisits.Text = "Lista twoich wizyt (przefiltrowana)";
-            }
 
             LoadDoctorVisits(showNoResults: true);
         }
