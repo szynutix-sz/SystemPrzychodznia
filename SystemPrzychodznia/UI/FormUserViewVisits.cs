@@ -2,7 +2,7 @@ using SystemPrzychodznia.Data;
 
 namespace SystemPrzychodznia
 {
-    public partial class FormUserView
+    public partial class FormUserView : Form
     {
         private readonly BindingSource _bindingSourceVisits = new();
 

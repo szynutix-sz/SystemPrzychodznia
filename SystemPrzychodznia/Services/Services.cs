@@ -43,15 +43,13 @@ namespace SystemPrzychodznia.Services
             }
             catch
             {
-                return DateTime.Now; // Awaryjny powrót w razie braku internetu
+                return DateTime.Now;
             }
         }
 
-        // Zwracamy też requiresPasswordChange w wyniku logowania
         public (bool success, string message, int userId, bool requiresPasswordChange) AttemptLogin(string login, string password)
         {
             var loginData = _repository.GetLoginData(login);
-
             if (loginData.Id == 0) return (false, "Nieprawidłowy login lub hasło.", 0, false);
 
             DateTime realTimeNow = GetRealTime();
@@ -77,12 +75,10 @@ namespace SystemPrzychodznia.Services
 
                 if (_failedAttempts[login] >= 3)
                 {
-                    // Pobranie czasu od admina (z bazy)
                     int lockoutMinutes = _repository.GetLockoutDurationMinutes();
                     _repository.UpdateBlockedUntil(loginData.Id, realTimeNow.AddMinutes(lockoutMinutes));
                     return (false, $"Trzy nieudane próby! Konto zablokowane na {lockoutMinutes} minut.", 0, false);
                 }
-
                 return (false, $"Błędne hasło. Pozostało prób: {3 - _failedAttempts[login]}.", 0, false);
             }
 
@@ -90,36 +86,26 @@ namespace SystemPrzychodznia.Services
             return (true, "Zalogowano pomyślnie.", loginData.Id, loginData.RequiresPasswordChange);
         }
 
-        // --- ZMIANA: ZAWSZE TEN SAM KOMUNIKAT DLA BEZPIECZEŃSTWA (ANTI-ENUMERATION) ---
         public (bool success, string message) RecoverPassword(string login, string email)
         {
             var data = _repository.GetLoginData(login);
             string genericSuccessMsg = "Jeśli podano prawidłowe dane, nowe hasło zostało wygenerowane i wysłane na powiązany adres e-mail.";
 
-            if (data.Id == 0 || !string.Equals(data.Email, email, StringComparison.OrdinalIgnoreCase))
-            {
-                return (true, genericSuccessMsg); // Udajemy sukces!
-            }
+            if (data.Id == 0 || !string.Equals(data.Email, email, StringComparison.OrdinalIgnoreCase)) return (true, genericSuccessMsg);
 
             try
             {
                 string newPassword = GenerateRandomPassword();
                 _repository.SaveNewPassword(data.Id, newPassword);
                 SendEmail(data.Email, newPassword);
-
                 return (true, genericSuccessMsg);
             }
-            catch (Exception ex)
-            {
-                return (false, $"Błąd komunikacji: {ex.Message}");
-            }
+            catch (Exception ex) { return (false, $"Błąd komunikacji: {ex.Message}"); }
         }
 
         public ValidationResult ChangeUserPassword(int userId, string newPassword)
         {
-
             ValidationResult validation = new ValidationResult(false);
-
             validation.Errors = _validator.CzyPoprawneHaslo(userId, newPassword);
 
             if (validation.Errors.Count != 0)
@@ -134,33 +120,22 @@ namespace SystemPrzychodznia.Services
 
         private string GenerateRandomPassword()
         {
-            const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // bez dużej litery I , O
-            const string lower = "abcdefghijkmnopqrstuvwxyz"; // bez malej litery l      
-            const string digits = "123456789"; // bez 0
+            const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+            const string lower = "abcdefghijkmnopqrstuvwxyz";
+            const string digits = "123456789";
             const string special = "-_!*#$&";
-            // w zależnosci od czcnioki I i l oraz O i 0 mogą być nie do odróżnienia, więc je pomijamy w generowaniu hasła
             var random = new Random();
-            char up1 = upper[random.Next(upper.Length)];
-            char up2 = upper[random.Next(upper.Length)];
-            char up3 = upper[random.Next(upper.Length)];
-            char low1 = lower[random.Next(lower.Length)];
-            char low2 = lower[random.Next(lower.Length)];
-            char low3 = lower[random.Next(lower.Length)];
-            char dig1 = digits[random.Next(digits.Length)];
-            char dig2 = digits[random.Next(digits.Length)];
-            char spec1 = special[random.Next(special.Length)];
-            char spec2 = special[random.Next(special.Length)];
-
-            char[] array = new char[] { up1, up2, up3, low1, low2, low3, dig1, dig2, spec1, spec2 };
+            char[] array = new char[] {
+                upper[random.Next(upper.Length)], upper[random.Next(upper.Length)], upper[random.Next(upper.Length)],
+                lower[random.Next(lower.Length)], lower[random.Next(lower.Length)], lower[random.Next(lower.Length)],
+                digits[random.Next(digits.Length)], digits[random.Next(digits.Length)],
+                special[random.Next(special.Length)], special[random.Next(special.Length)]
+            };
             random.Shuffle(array);
-
             return new string(array);
         }
 
-        public List<string> GetUserPasswordHistory(int userId)
-        {
-            return _repository.GetUserPasswordHistory(userId);
-        }
+        public List<string> GetUserPasswordHistory(int userId) => _repository.GetUserPasswordHistory(userId);
 
         private void SendEmail(string targetEmail, string userPassword)
         {
@@ -181,7 +156,6 @@ namespace SystemPrzychodznia.Services
                 Body = $"Witaj,\n\nZgodnie z prośbą, system wygenerował dla Ciebie nowe hasło.\n\nTwoje nowe tymczasowe hasło to: {userPassword}\n\nPo zalogowaniu system poprosi Cię o ustalenie własnego hasła.\n\nPozdrawiamy,\nAdministratorzy Systemu",
                 IsBodyHtml = false,
             };
-
             mailMessage.To.Add(targetEmail);
             smtpClient.Send(mailMessage);
         }
@@ -193,7 +167,6 @@ namespace SystemPrzychodznia.Services
         {
             var validation = ValidateUserFull(user, false);
             if (!validation.IsValid) return validation;
-
             _repository.Add(user);
             return new ValidationResult(true);
         }
@@ -209,9 +182,7 @@ namespace SystemPrzychodznia.Services
         {
             ForgottenUser f = user.Forget(forgottenBy);
             var validation = _validator.ValidateUserFull(user, true, validatePassword: false);
-
             if (!validation.IsValid) return validation;
-
             _repository.ForgetUser(f, f.ForgottenBy);
             return new ValidationResult(true);
         }
@@ -235,7 +206,6 @@ namespace SystemPrzychodznia.Services
         {
             var validation = _validator.ValidateUserFull(user, true);
             if (!validation.IsValid) return validation;
-
             _repository.EditUser(user);
             return new ValidationResult(true);
         }
@@ -245,7 +215,6 @@ namespace SystemPrzychodznia.Services
             var preparedPatient = PreparePatientForSave(patient);
             var validation = _validator.ValidatePatientFull(preparedPatient, false);
             if (!validation.IsValid) return validation;
-
             _repository.AddPatient(preparedPatient);
             patient.Id = preparedPatient.Id;
             return new ValidationResult(true);
@@ -256,7 +225,6 @@ namespace SystemPrzychodznia.Services
             var preparedPatient = PreparePatientForSave(patient);
             var validation = _validator.ValidatePatientFull(preparedPatient, true);
             if (!validation.IsValid) return validation;
-
             _repository.EditPatient(preparedPatient);
             return new ValidationResult(true);
         }
@@ -284,7 +252,6 @@ namespace SystemPrzychodznia.Services
             if (!DateTime.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime birthDate))
                 throw new ArgumentException("Nieprawidłowy format daty.");
 
-            string genderLower = gender?.ToLower();
             int year = birthDate.Year;
             int month = birthDate.Month;
             int day = birthDate.Day;
@@ -294,9 +261,8 @@ namespace SystemPrzychodznia.Services
             else if (year >= 2100 && year <= 2199) month += 40;
             else if (year >= 2200 && year <= 2299) month += 60;
 
-            string peselBase = $"{(year % 100):D2}{month:D2}{day:D2}";
-            peselBase += $"{rnd.Next(0, 10)}{rnd.Next(0, 10)}{rnd.Next(0, 10)}";
-            int genderDigit = (genderLower == "m") ? (rnd.Next(1, 6) * 2 - 1) : (rnd.Next(0, 5) * 2);
+            string peselBase = $"{(year % 100):D2}{month:D2}{day:D2}{rnd.Next(0, 10)}{rnd.Next(0, 10)}{rnd.Next(0, 10)}";
+            int genderDigit = (gender?.ToLower() == "m") ? (rnd.Next(1, 6) * 2 - 1) : (rnd.Next(0, 5) * 2);
             peselBase += $"{genderDigit}";
 
             int[] weights = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
@@ -332,8 +298,6 @@ namespace SystemPrzychodznia.Services
         // ============================================================
         public List<Gabinet> GetGabinety() => _repository.GetGabinety();
         public List<Specjalizacja> GetSpecjalizacje() => _repository.GetSpecjalizacje();
-
-        // Funkcja pozwalająca znaleźć użytkowników (lekarzy) po konkretnej specjalizacji
         public List<UserBasic> GetLekarzeBySpecjalizacja(int idSpecjalizacji) => _repository.GetLekarzeBySpecjalizacja(idSpecjalizacji);
 
         public (bool success, string message) AddGabinet(string nazwa)
@@ -360,28 +324,20 @@ namespace SystemPrzychodznia.Services
         // ============================================================
         // WIZYTY Z KOLIZJAMI I FILTROWANIEM
         // ============================================================
-
-        // Zmodyfikowana metoda pozwalająca wyszukiwać wizyty na podstawie modelu SearchTermsWizyta
         public List<Wizyta> GetWizyty(SearchTermsWizyta s = null) => _repository.GetWizyty(s);
 
         public (bool success, string message) AddWizyta(int pacjentId, int lekarzId, int gabinetId, DateTime data)
         {
             if (data < DateTime.Now) return (false, "Nie można zaplanować wizyty w przeszłości.");
 
-            // Blokada zabezpieczająca przed kolizjami
-            if (_repository.CheckWizytaCollision(lekarzId, gabinetId, data))
+            // Pobranie dokładnego czasu kolidującej wizyty
+            string collisionTime = _repository.GetWizytaCollisionTime(lekarzId, gabinetId, data);
+            if (collisionTime != null)
             {
-                return (false, "Kolizja terminu! Wybrany lekarz lub gabinet jest już zajęty w tym czasie (okienko 30 minut).");
+                return (false, $"Kolizja terminu! Wybrany lekarz lub gabinet jest już zajęty przez wizytę zaplanowaną na godzinę: {collisionTime}.");
             }
 
-            var wizyta = new Wizyta
-            {
-                IdPacjenta = pacjentId,
-                IdLekarza = lekarzId,
-                IdGabinetu = gabinetId,
-                DataRozpoczecia = data,
-                Status = "Zarejestrowana"
-            };
+            var wizyta = new Wizyta { IdPacjenta = pacjentId, IdLekarza = lekarzId, IdGabinetu = gabinetId, DataRozpoczecia = data, Status = "Zarejestrowana" };
 
             try
             {
@@ -401,10 +357,11 @@ namespace SystemPrzychodznia.Services
             if (wizyta.IdPacjenta <= 0 || wizyta.IdLekarza <= 0 || wizyta.IdGabinetu <= 0)
                 return (false, "Wizyta musi mieć przypisanego pacjenta, lekarza oraz gabinet.");
 
-            // Blokada zabezpieczająca przed kolizjami przy edycji, ignorująca swój własny stary czas
-            if (_repository.CheckWizytaCollision(wizyta.IdLekarza, wizyta.IdGabinetu, wizyta.DataRozpoczecia, wizyta.Id))
+            // Pobranie dokładnego czasu kolidującej wizyty podczas edycji
+            string collisionTime = _repository.GetWizytaCollisionTime(wizyta.IdLekarza, wizyta.IdGabinetu, wizyta.DataRozpoczecia, wizyta.Id);
+            if (collisionTime != null)
             {
-                return (false, "Kolizja terminu! Wybrany lekarz lub gabinet jest już zajęty w tym czasie (okienko 30 minut).");
+                return (false, $"Kolizja terminu! Wybrany lekarz lub gabinet jest już zajęty przez wizytę zaplanowaną na godzinę: {collisionTime}.");
             }
 
             try

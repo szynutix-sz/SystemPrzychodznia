@@ -149,9 +149,9 @@ WHERE Uzytkownik_Uprawnienie.ID_Uzytkownika = $id;";
 
         public List<Specjalizacja> GetUserSpec(int user_id)
         {
-
             List<Uprawnienie> uprawnienia = GetUserUprawnienia(user_id);
             List<Specjalizacja> specjalizacje = GetSpecjalizacje();
+
             if (uprawnienia.HasRole(PermissionRoles.Lekarz))
             {
                 using var connection = new SqliteConnection(_connectionString);
@@ -226,11 +226,11 @@ WHERE
             }
             command.CommandText += ";";
 
-            command.Parameters.AddWithValue("$login", s.Login);
-            command.Parameters.AddWithValue("$firstName", s.FirstName);
-            command.Parameters.AddWithValue("$lastName", s.LastName);
-            command.Parameters.AddWithValue("$pesel", s.PESEL);
-            command.Parameters.AddWithValue("$email", s.Email);
+            command.Parameters.AddWithValue("$login", s.Login ?? "");
+            command.Parameters.AddWithValue("$firstName", s.FirstName ?? "");
+            command.Parameters.AddWithValue("$lastName", s.LastName ?? "");
+            command.Parameters.AddWithValue("$pesel", s.PESEL ?? "");
+            command.Parameters.AddWithValue("$email", s.Email ?? "");
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
@@ -439,7 +439,6 @@ WHERE u.Czy_zapomniany = 1;";
             command.ExecuteNonQuery();
         }
 
-        // Wyszukiwanie lekarzy o określonej specjalizacji
         public List<UserBasic> GetLekarzeBySpecjalizacja(int idSpecjalizacji)
         {
             var users = new List<UserBasic>();
@@ -471,21 +470,21 @@ WHERE u.Czy_zapomniany = 1;";
         }
 
         // ==========================================
-        // WIZYTY I KOLIZJE
+        // WIZYTY, KOLIZJE (Pobieranie godziny)
         // ==========================================
-        public bool CheckWizytaCollision(int lekarzId, int gabinetId, DateTime data, int? ignoreWizytaId = null)
+
+        // Zwraca dokładną datę i godzinę wizyty w postaci stringa, z którą występuje kolizja. Jeśli brak kolizji = zwraca null.
+        public string? GetWizytaCollisionTime(int lekarzId, int gabinetId, DateTime data, int? ignoreWizytaId = null)
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             var command = connection.CreateCommand();
 
-            // Kolizja: jeśli status to nie Odwołana, Zakończona ani Zrealizowana
-            // Oraz jeśli czas wizyty mieści się w promieniu +/- 29 minut (zakładamy, że wizyta trwa 30 minut).
             command.CommandText = @"
-                SELECT COUNT(*) FROM Wizyta 
+                SELECT Data_i_godzina_rozpoczecia FROM Wizyta 
                 WHERE Status NOT IN ('Odwołana', 'Zakończona', 'Zrealizowana')
                   AND (ID_Lekarza = $lekarz OR ID_Gabinetu = $gabinet)
-                  AND ABS(ROUND((JULIANDAY(Data_i_godzina_rozpoczecia) - JULIANDAY($data)) * 1440)) < 30";
+                  AND ABS(ROUND((JULIANDAY(Data_i_godzina_rozpoczecia) - JULIANDAY($data)) * 1440)) < 30 ";
 
             if (ignoreWizytaId.HasValue)
             {
@@ -493,12 +492,14 @@ WHERE u.Czy_zapomniany = 1;";
                 command.Parameters.AddWithValue("$ignoreId", ignoreWizytaId.Value);
             }
 
+            command.CommandText += " LIMIT 1;";
+
             command.Parameters.AddWithValue("$lekarz", lekarzId);
             command.Parameters.AddWithValue("$gabinet", gabinetId);
             command.Parameters.AddWithValue("$data", data.ToString("yyyy-MM-dd HH:mm"));
 
-            long count = (long)command.ExecuteScalar();
-            return count > 0;
+            var result = command.ExecuteScalar();
+            return result != null && result != DBNull.Value ? result.ToString() : null;
         }
 
         public void AddWizyta(Wizyta wizyta)
@@ -577,7 +578,6 @@ WHERE u.Czy_zapomniany = 1;";
             command.ExecuteNonQuery();
         }
 
-        // Filtrowanie Wizyt za pomocą modelu SearchTermsWizyta
         public List<Wizyta> GetWizyty(SearchTermsWizyta s = null)
         {
             var wizyty = new List<Wizyta>();
@@ -662,7 +662,6 @@ WHERE u.Czy_zapomniany = 1;";
     {
         public int Id { get; set; }
         public string Nazwa { get; set; }
-
         public bool? Posiadane { get; set; } = false;
     }
 
@@ -680,14 +679,5 @@ WHERE u.Czy_zapomniany = 1;";
         public string NazwaPacjenta { get; set; }
         public string NazwaLekarza { get; set; }
         public string NazwaGabinetu { get; set; }
-    }
-
-    public class SearchTermsWizyta
-    {
-        public DateTime? DataOd { get; set; }
-        public DateTime? DataDo { get; set; }
-        public int? IdLekarza { get; set; }
-        public int? IdPacjenta { get; set; }
-        public string Status { get; set; }
     }
 }
