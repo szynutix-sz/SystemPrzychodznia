@@ -5,7 +5,7 @@ using SystemPrzychodznia.Services;
 namespace SystemPrzychodznia
 {
 
-    public partial class FormUserView : Form
+    public partial class FormUserView
     {
         private readonly UserService _userService;
         private BindingSource _bindingSourceUsers = new BindingSource();
