@@ -137,14 +137,24 @@ namespace SystemPrzychodznia
                     : ""
             };
 
-            if (int.TryParse(textBoxForgottenId.Text.Trim(), out int forgottenUserId))
+            string forgottenIdText = textBoxForgottenId.Text.Trim();
+            if (int.TryParse(forgottenIdText, out int forgottenUserId))
             {
                 searchTerms.Id = forgottenUserId;
             }
+            else if (!string.IsNullOrWhiteSpace(forgottenIdText))
+            {
+                searchTerms.Id = -1;
+            }
 
-            if (int.TryParse(textBoxForgottenBy.Text.Trim(), out int forgottenBy))
+            string forgottenByText = textBoxForgottenBy.Text.Trim();
+            if (int.TryParse(forgottenByText, out int forgottenBy))
             {
                 searchTerms.ForgottenBy = forgottenBy;
+            }
+            else if (!string.IsNullOrWhiteSpace(forgottenByText))
+            {
+                searchTerms.ForgottenBy = -1;
             }
 
             var users = _userService.GetListForgottenUsers(searchTerms);
