@@ -57,7 +57,7 @@ namespace SystemPrzychodznia.Services
 
             // Walidacja Numeru Nieruchomości
             if (string.IsNullOrWhiteSpace(user.PropertyNumber))
-                errors.Add("Numer nieruchomości jest wymagany");
+                errors.Add("Numer posesji jest wymagany");
 
             // Walidacja Daty Urodzenia
             if (string.IsNullOrWhiteSpace(user.BirthDate))
@@ -192,7 +192,7 @@ namespace SystemPrzychodznia.Services
                 errors.Add("Kod pocztowy musi zawierać tylko cyfry");
 
             if (string.IsNullOrWhiteSpace(patient.PropertyNumber))
-                errors.Add(RequiredFieldMessage("Numer domu"));
+                errors.Add(RequiredFieldMessage("Numer posesji"));
 
             if (string.IsNullOrWhiteSpace(patient.BirthDate))
                 errors.Add(RequiredFieldMessage("Data urodzenia"));
@@ -240,7 +240,7 @@ namespace SystemPrzychodznia.Services
                 errors.Add("Ulica nie może być dłuższa niż 255 znaków");
 
             if (!string.IsNullOrWhiteSpace(patient.PropertyNumber) && patient.PropertyNumber.Length > 255)
-                errors.Add("Numer nieruchomości nie może być dłuższy niż 255 znaków");
+                errors.Add("Numer posesji nie może być dłuższy niż 255 znaków");
 
             if (!string.IsNullOrWhiteSpace(patient.HouseUnitNumber) && patient.HouseUnitNumber.Length > 255)
                 errors.Add("Numer lokalu nie może być dłuższy niż 255 znaków");
